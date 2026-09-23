@@ -1,0 +1,84 @@
+# --- Сборка .NET ---
+bin/
+obj/
+[Bb]in/
+[Oo]bj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# --- Публикация ---
+publish/
+*.publish/
+*.pubxml
+*.pubxml.user
+
+# --- Visual Studio / VS Code ---
+.vs/
+.vscode/
+.idea/
+
+# --- Логи ---
+logs/
+*.log
+*.nlog
+*.log.*
+*.trace
+
+# --- Docker ---
+*.tar
+*.tar.gz
+docker-compose.override.yml
+
+# --- Секреты и окружение ---
+.env
+.env.*
+!.env.example
+appsettings.Production.json
+appsettings.Development.json
+secrets.json
+*.secret
+
+# --- Данные приложения ---
+backup_*.sql
+db_report.txt
+*.dump
+*.sqlite
+*.sqlite3
+
+# --- Ключи шифрования и сертификаты ---
+dataprotection/
+DataProtection-Keys/
+https/
+*.pfx
+*.pem
+*.key
+
+# --- Шаблоны документов с реальными данными ---
+wwwroot/documentTemplates/ТКП*.xlsx
+wwwroot/documentTemplates/ФормаОтвета*.xlsx
+!wwwroot/documentTemplates/.gitkeep
+
+# --- Нативные библиотеки ---
+NativeLibs/*
+!NativeLibs/README.md
+
+# --- Временные файлы ---
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# --- Файлы резервного копирования ---
+*.bak
+*.old
+
+# --- Тестовые данные ---
+test-results/
+coverage/
+*.coverage
+*.coveragexml

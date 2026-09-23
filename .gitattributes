@@ -1,0 +1,18 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Explicit binary types
+*.xlsx  binary
+*.xlsm  binary
+*.docx  binary
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.ico   binary
+*.pdf   binary
+
+# C# sources
+*.cs      text
+*.csproj  text
+*.sln     text
