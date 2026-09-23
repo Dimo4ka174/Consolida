@@ -1,3 +1,5 @@
 <Solution>
+  <Project Path="Application/Application.csproj" />
   <Project Path="Consolida/Consolida.csproj" />
+  <Project Path="DB/DB.csproj" />
 </Solution>

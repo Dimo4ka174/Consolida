@@ -1,0 +1,224 @@
+/* ============================================================
+   Шапка
+   ============================================================ */
+.header {
+    padding-top: var(--space-5);
+}
+
+.header-card {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-sm);
+    padding: var(--space-4) var(--space-5);
+    transition: background-color var(--transition-base), border-color var(--transition-base);
+}
+
+/* Внутренний контейнер шапки */
+.header-nav {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+}
+
+.header-title {
+    font-family: var(--font-family);
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-xl);
+    color: var(--text-primary);
+    margin: 0;
+    flex-grow: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
+}
+
+.header-title-spacer {
+    flex-grow: 1;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex-shrink: 0;
+}
+
+/* ============================================================
+   Кнопки шапки
+   ============================================================ */
+.btn-header {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    font-family: var(--font-family);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    border-radius: var(--radius-md);
+    border: 1px solid transparent;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+}
+
+    .btn-header:hover {
+        text-decoration: none;
+    }
+
+/* Основная кнопка (Вход) */
+.btn-header-primary {
+    background-color: var(--accent);
+    color: var(--accent-text);
+}
+
+    .btn-header-primary:hover {
+        background-color: var(--accent-hover);
+        color: var(--accent-text);
+    }
+
+/* Второстепенная кнопка (Регистрация, admin) */
+.btn-header-secondary {
+    background-color: transparent;
+    color: var(--text-primary);
+    border-color: var(--border-medium);
+}
+
+    .btn-header-secondary:hover {
+        background-color: var(--bg-hover);
+        color: var(--text-primary);
+        border-color: var(--border-strong);
+    }
+
+/* Опасная кнопка (Выход) */
+.btn-header-danger {
+    background-color: transparent;
+    color: var(--danger);
+    border-color: transparent;
+}
+
+    .btn-header-danger:hover {
+        background-color: var(--danger-soft);
+        color: var(--danger);
+    }
+
+/* ============================================================
+   Переключатель темы
+   ============================================================ */
+.theme-toggle {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--border-soft);
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    flex-shrink: 0;
+    transition: background-color var(--transition-fast), border-color var(--transition-fast);
+}
+
+    .theme-toggle:hover {
+        background-color: var(--bg-hover);
+        border-color: var(--border-medium);
+    }
+
+    .theme-toggle .mask-icon {
+        width: 18px;
+        height: 18px;
+        transition: transform var(--transition-fast);
+    }
+
+    .theme-toggle:hover .mask-icon {
+        transform: rotate(15deg);
+    }
+
+/* Показ иконки по теме */
+[data-theme="light"] .theme-icon-sun,
+:root:not([data-theme="dark"]) .theme-icon-sun {
+    display: none;
+}
+
+[data-theme="dark"] .theme-icon-moon {
+    display: none;
+}
+
+/* ============================================================
+   Кнопка-гамбургер
+   ============================================================ */
+.sidebar-nav {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--border-soft);
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    flex-shrink: 0;
+    transition: background-color var(--transition-fast), border-color var(--transition-fast);
+}
+
+    .sidebar-nav:hover {
+        background-color: var(--bg-hover);
+        border-color: var(--border-medium);
+    }
+
+    .sidebar-nav.active {
+        border-color: var(--accent);
+        background-color: var(--accent-soft);
+    }
+
+        .sidebar-nav.active .bar {
+            background-color: var(--accent);
+        }
+
+        .sidebar-nav.active .top-bar {
+            transform: rotate(45deg);
+            top: 6px;
+        }
+
+        .sidebar-nav.active .middle-bar {
+            opacity: 0;
+        }
+
+        .sidebar-nav.active .bottom-bar {
+            transform: rotate(-45deg);
+            top: 6px;
+        }
+
+.hamburger-icon {
+    display: inline-block;
+    position: relative;
+    width: 16px;
+    height: 14px;
+}
+
+.bar {
+    display: block;
+    width: 100%;
+    height: 2px;
+    border-radius: 2px;
+    background-color: var(--text-primary);
+    position: absolute;
+    transition: transform var(--transition-slow), opacity var(--transition-slow), background-color var(--transition-slow);
+}
+
+.top-bar {
+    top: 0;
+}
+
+.middle-bar {
+    top: 6px;
+}
+
+.bottom-bar {
+    top: 12px;
+}

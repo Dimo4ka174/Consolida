@@ -1,0 +1,194 @@
+/* ---------- —ветла€ тема (по умолчанию) ---------- */
+:root,
+[data-theme="light"] {
+    /* ‘он */
+    --bg-page: #f7f8fa;
+    --bg-page-gradient: linear-gradient(180deg, #f7f8fa 0%, #eef0f4 100%);
+    --bg-surface: #ffffff;
+    --bg-surface-elevated: #ffffff;
+    --bg-subtle: #f1f3f5;
+    --bg-hover: #e9ecef;
+    --bg-active: #e6efff;
+    /* √раницы */
+    --border-soft: #e5e7eb;
+    --border-medium: #d1d5db;
+    --border-strong: #9ca3af;
+    /* “екст */
+    --text-primary: #111827;
+    --text-secondary: #4b5563;
+    --text-muted: #6b7280;
+    --text-inverse: #ffffff;
+    /* јкцент Ч Atlassian Blue (Jira, Confluence) */
+    --accent: #0052CC;
+    --accent-hover: #0747A6;
+    --accent-soft: rgba(0, 82, 204, 0.12);
+    --accent-text: #ffffff;
+    /* Info Ч чуть светлее акцента дл€ информационных сообщений */
+    --info: #2684FF;
+    --info-hover: #0052CC;
+    --info-soft: rgba(38, 132, 255, 0.12);
+    /* Danger Ч Tailwind Red 600 */
+    --danger: #DC2626;
+    --danger-hover: #B91C1C;
+    --danger-soft: rgba(220, 38, 38, 0.12);
+    /* Warning Ч Tailwind Amber 600 */
+    --warning: #D97706;
+    --warning-hover: #B45309;
+    --warning-soft: rgba(217, 119, 6, 0.15);
+    /* Success Ч Tailwind Green 600 */
+    --success: #16A34A;
+    --success-hover: #15803D;
+    --success-soft: rgba(22, 163, 74, 0.12);
+    /* “ени */
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.12);
+    /* –адиусы */
+    --radius-xs: 6px;
+    --radius-sm: 10px;
+    --radius-md: 14px;
+    --radius-lg: 20px;
+    --radius-xl: 28px;
+    --radius-pill: 9999px;
+    /* ќтступы */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --space-8: 32px;
+    --space-10: 40px;
+    /* “ипографика */
+    --font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-size-xs: 0.75rem;
+    --font-size-sm: 0.875rem;
+    --font-size-base: 1rem;
+    --font-size-lg: 1.125rem;
+    --font-size-xl: 1.25rem;
+    --font-size-2xl: 1.5rem;
+    --font-size-3xl: 2rem;
+    --font-weight-regular: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+    /* ѕереходы */
+    --transition-fast: 150ms ease;
+    --transition-base: 200ms ease;
+    --transition-slow: 300ms ease;
+    /* »конки Ч фильтр дл€ адаптации к теме */
+    --icon-filter: none;
+    /* Bootstrap overrides */
+    --bs-body-color: #111827;
+    --bs-body-bg: #ffffff;
+    --bs-heading-color: #111827;
+    --bs-border-color: #e5e7eb;
+    --bs-secondary-color: #4b5563;
+    --bs-emphasis-color: #111827;
+    --bs-link-color: #0052CC;
+    --bs-link-hover-color: #0747A6;
+    --bs-table-color: #111827;
+    --bs-table-bg: transparent;
+    --bs-table-border-color: #e5e7eb;
+    --bs-table-striped-color: #111827;
+    --bs-table-striped-bg: rgba(0, 0, 0, 0.02);
+    --bs-table-hover-color: #111827;
+    --bs-table-hover-bg: rgba(0, 82, 204, 0.06);
+    --bs-body-color-rgb: 17, 24, 39;
+    --bs-emphasis-color-rgb: 17, 24, 39;
+    --bs-secondary-color-rgb: 75, 85, 99;
+    /* Bootstrap modal overrides */
+    --bs-modal-bg: var(--bg-surface);
+    --bs-modal-color: var(--text-primary);
+    --bs-modal-border-color: var(--border-soft);
+    --bs-modal-header-border-color: var(--border-soft);
+    --bs-modal-footer-border-color: var(--border-soft);
+    --bs-modal-header-border-width: 1px;
+    --bs-modal-footer-border-width: 1px;
+    --bs-modal-border-radius: var(--radius-lg);
+    --bs-modal-box-shadow: var(--shadow-lg);
+    --bs-modal-btn-close-color: var(--text-primary);
+}
+
+/* ---------- “Ємна€ тема ---------- */
+[data-theme="dark"] {
+    /* ‘он */
+    --bg-page: #0f1115;
+    --bg-page-gradient: linear-gradient(180deg, #0f1115 0%, #14171d 100%);
+    --bg-surface: #1a1d23;
+    --bg-surface-elevated: #22262e;
+    --bg-subtle: #23272f;
+    --bg-hover: #2a2f38;
+    --bg-active: #0d2d5e;
+    /* √раницы */
+    --border-soft: #2d323b;
+    --border-medium: #3a4049;
+    --border-strong: #565d68;
+    /* “екст */
+    --text-primary: #f3f4f6;
+    --text-secondary: #b8bcc4;
+    --text-muted: #8b9199;
+    --text-inverse: #111827;
+    /* јкцент Ч Atlassian Blue, светлее дл€ контраста */
+    --accent: #4C9AFF;
+    --accent-hover: #2684FF;
+    --accent-soft: rgba(76, 154, 255, 0.15);
+    --accent-text: #041e42;
+    /* Info */
+    --info: #79B8FF;
+    --info-hover: #4C9AFF;
+    --info-soft: rgba(121, 184, 255, 0.15);
+    /* Danger Ч Tailwind Red 400 */
+    --danger: #F87171;
+    --danger-hover: #EF4444;
+    --danger-soft: rgba(248, 113, 113, 0.15);
+    /* Warning Ч Tailwind Amber 400 */
+    --warning: #FBBF24;
+    --warning-hover: #F59E0B;
+    --warning-soft: rgba(251, 191, 36, 0.15);
+    /* Success Ч Tailwind Green 400 */
+    --success: #4ADE80;
+    --success-hover: #22C55E;
+    --success-soft: rgba(74, 222, 128, 0.15);
+    /* “ени */
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.6);
+    /* »конки */
+    --icon-filter: invert(1) brightness(1.2);
+    /* Bootstrap overrides */
+    --bs-body-color: #f3f4f6;
+    --bs-body-bg: #1a1d23;
+    --bs-heading-color: #f3f4f6;
+    --bs-border-color: #2d323b;
+    --bs-secondary-color: #b8bcc4;
+    --bs-emphasis-color: #f3f4f6;
+    --bs-link-color: #4C9AFF;
+    --bs-link-hover-color: #79B8FF;
+    --bs-table-color: #f3f4f6;
+    --bs-table-bg: transparent;
+    --bs-table-border-color: #2d323b;
+    --bs-table-striped-color: #f3f4f6;
+    --bs-table-striped-bg: rgba(255, 255, 255, 0.03);
+    --bs-table-hover-color: #f3f4f6;
+    --bs-table-hover-bg: rgba(76, 154, 255, 0.08);
+    --bs-body-color-rgb: 243, 244, 246;
+    --bs-emphasis-color-rgb: 243, 244, 246;
+    --bs-secondary-color-rgb: 184, 188, 196;
+}
+
+/* ѕлавное переключение темы */
+html {
+    color-scheme: light;
+}
+
+[data-theme="dark"] {
+    color-scheme: dark;
+}
+
+html,
+body {
+    transition: background-color var(--transition-base), color var(--transition-base);
+}

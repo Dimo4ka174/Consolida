@@ -1,0 +1,410 @@
+﻿/* ============================================================
+   Общие стили
+   ============================================================ */
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    font-family: var(--font-family);
+    background: var(--bg-page-gradient);
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    transition: background var(--transition-base), color var(--transition-base);
+}
+
+main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.main-content {
+    flex: 1;
+    max-width: 100%;
+    margin: 0 auto;
+    padding-top: var(--space-5);
+}
+
+/* ============================================================
+   Футер
+   ============================================================ */
+.footer {
+    background-color: transparent;
+    padding: var(--space-2) 0;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: var(--font-size-sm);
+    margin-top: auto;
+}
+
+    .footer a {
+        color: var(--text-secondary);
+        text-decoration: none;
+    }
+
+        .footer a:hover {
+            color: var(--accent);
+            text-decoration: underline;
+        }
+
+.footer-line {
+    margin: 0 auto var(--space-4) auto;
+    border: 0;
+    border-top: 1px solid var(--border-soft);
+    width: 100%;
+}
+
+.footer-content {
+    margin: 0 auto;
+}
+
+/* ============================================================
+   Основной контейнер
+   ============================================================ */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--space-4);
+}
+
+/* ============================================================
+   Alerts
+   ============================================================ */
+.alert {
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-soft);
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+    padding: var(--space-4) var(--space-5);
+}
+
+.alert-warning {
+    background-color: var(--warning-soft);
+    border-color: var(--warning);
+    color: var(--text-primary);
+}
+
+.alert-info {
+    background-color: var(--info-soft);
+    border-color: var(--info);
+    color: var(--text-primary);
+}
+
+.alert-danger {
+    background-color: var(--danger-soft);
+    border-color: var(--danger);
+    color: var(--text-primary);
+}
+
+.text-danger {
+    color: var(--danger);
+    font-size: var(--font-size-sm);
+}
+
+/* ============================================================
+   Заголовки
+   ============================================================ */
+.h2.text-center {
+    font-family: var(--font-family);
+    font-weight: var(--font-weight-bold);
+    font-size: var(--font-size-2xl);
+    color: var(--text-primary);
+}
+
+/* ============================================================
+   Поля ввода и селекты
+   ============================================================ */
+.custom-input {
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    height: 44px;
+    padding: 0 var(--space-4);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-soft);
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+    width: 100%;
+    transition: border-color var(--transition-base), box-shadow var(--transition-base);
+    text-align: left;
+}
+
+    .custom-input:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px var(--accent-soft);
+        outline: none;
+    }
+
+.custom-select {
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    height: 44px;
+    padding: 0 var(--space-4);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-soft);
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+    width: 100%;
+    transition: border-color var(--transition-base), box-shadow var(--transition-base);
+}
+
+    .custom-select:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px var(--accent-soft);
+        outline: none;
+    }
+
+/* ============================================================
+   Кастомный checkbox
+   ============================================================ */
+.custom-control-input {
+    position: absolute;
+    z-index: -1;
+    opacity: 0;
+}
+
+.custom-control-label::before {
+    content: '';
+    display: inline-block;
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+    background-color: var(--bg-surface);
+    border: 2px solid var(--border-medium);
+    border-radius: var(--radius-xs);
+    transition: background-color var(--transition-base), border-color var(--transition-base);
+}
+
+.custom-control-input:checked ~ .custom-control-label::before {
+    background-color: var(--accent);
+    border-color: var(--accent);
+}
+
+.custom-control-input:checked ~ .custom-control-label::after {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    -webkit-mask-image: url('/images/icons/check.svg');
+    mask-image: url('/images/icons/check.svg');
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    background-color: var(--accent-text);
+}
+
+/* ============================================================
+   Placeholder
+   ============================================================ */
+::placeholder {
+    color: var(--text-muted);
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    opacity: 0.7;
+}
+
+/* ============================================================
+   Таблицы
+   ============================================================ */
+.table {
+    --bs-table-color: var(--text-primary);
+    --bs-table-bg: transparent;
+    --bs-table-border-color: var(--border-soft);
+    --bs-table-striped-color: var(--text-primary);
+    --bs-table-striped-bg: rgba(0, 0, 0, 0.025);
+    --bs-table-hover-color: var(--text-primary);
+    --bs-table-hover-bg: var(--accent-soft);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .table {
+    --bs-table-striped-bg: rgba(255, 255, 255, 0.035);
+    --bs-table-hover-bg: rgba(76, 154, 255, 0.08);
+}
+
+.table > :not(caption) > * > * {
+    color: var(--text-primary);
+    border-color: var(--border-soft);
+}
+
+.table.table-striped > tbody > tr:nth-of-type(odd) > * {
+    color: var(--text-primary) !important;
+}
+
+.table.table-hover > tbody > tr:hover > * {
+    color: var(--text-primary) !important;
+}
+
+.table thead th {
+    color: var(--text-secondary);
+    border-bottom-color: var(--border-soft);
+    font-weight: var(--font-weight-semibold);
+}
+
+/* ============================================================
+   Иконки через CSS mask-image
+   ============================================================ */
+.mask-icon {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    background-color: currentColor;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    vertical-align: middle;
+}
+
+/* Регистрация иконок */
+.mask-icon-moon {
+    -webkit-mask-image: url('/images/icons/moon.svg');
+    mask-image: url('/images/icons/moon.svg');
+}
+
+.mask-icon-sun {
+    -webkit-mask-image: url('/images/icons/sun.svg');
+    mask-image: url('/images/icons/sun.svg');
+}
+
+.mask-icon-sign-out {
+    -webkit-mask-image: url('/images/icons/sign-out.svg');
+    mask-image: url('/images/icons/sign-out.svg');
+}
+
+.mask-icon-sign-in {
+    -webkit-mask-image: url('/images/icons/sign-in.svg');
+    mask-image: url('/images/icons/sign-in.svg');
+}
+
+.mask-icon-user-plus {
+    -webkit-mask-image: url('/images/icons/user-plus.svg');
+    mask-image: url('/images/icons/user-plus.svg');
+}
+
+.mask-icon-user {
+    -webkit-mask-image: url('/images/icons/user.svg');
+    mask-image: url('/images/icons/user.svg');
+}
+
+.mask-icon-kindle {
+    -webkit-mask-image: url('/images/icons/kindle.svg');
+    mask-image: url('/images/icons/kindle.svg');
+}
+
+.mask-icon-box {
+    -webkit-mask-image: url('/images/icons/box.svg');
+    mask-image: url('/images/icons/box.svg');
+}
+
+.mask-icon-percent {
+    -webkit-mask-image: url('/images/icons/percent.svg');
+    mask-image: url('/images/icons/percent.svg');
+}
+
+.mask-icon-catalog {
+    -webkit-mask-image: url('/images/icons/catalog.svg');
+    mask-image: url('/images/icons/catalog.svg');
+}
+
+.mask-icon-lock {
+    -webkit-mask-image: url('/images/icons/lock.svg');
+    mask-image: url('/images/icons/lock.svg');
+}
+
+.mask-icon-identity {
+    -webkit-mask-image: url('/images/icons/identity.svg');
+    mask-image: url('/images/icons/identity.svg');
+}
+
+.mask-icon-bell {
+    -webkit-mask-image: url('/images/icons/bell.svg');
+    mask-image: url('/images/icons/bell.svg');
+}
+
+/* ============================================================
+   Bootstrap form-control / form-select — приводим к теме
+   ============================================================ */
+.form-control,
+.form-select {
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+    border: 1px solid var(--border-soft);
+    transition: border-color var(--transition-base), box-shadow var(--transition-base);
+}
+
+    .form-control:focus,
+    .form-select:focus {
+        background-color: var(--bg-surface);
+        color: var(--text-primary);
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px var(--accent-soft);
+        outline: none;
+    }
+
+    .form-control::placeholder {
+        color: var(--text-muted);
+        opacity: 0.7;
+    }
+
+    .form-control:disabled,
+    .form-control[readonly],
+    .form-select:disabled {
+        background-color: var(--bg-subtle);
+        color: var(--text-muted);
+        opacity: 0.85;
+    }
+
+/* Убираем стрелки у input[type=number] */
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type=number] {
+    -moz-appearance: textfield;
+}
+
+/* ============================================================
+   Инпут с кнопкой-иконкой справа (замена .input-group)
+   ============================================================ */
+.input-with-icon {
+    display: flex;
+    gap: var(--space-2);
+    align-items: center;
+}
+
+    .input-with-icon .custom-input {
+        flex: 1;
+        min-width: 0;
+    }
+
+    /* Кнопка внутри такой группы — квадратная 44×44 в тон инпуту */
+    .input-with-icon .btn-icon-only {
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+        border-radius: var(--radius-md);
+        flex-shrink: 0;
+    }
+
+/* ============================================================
+   Bootstrap .table-bordered — границы в цвете темы
+   ============================================================ */
+.table-bordered > :not(caption) > * > * {
+    border-color: var(--border-soft) !important;
+    border-width: 1px;
+}
+
+.table-bordered {
+    border-color: var(--border-soft);
+}

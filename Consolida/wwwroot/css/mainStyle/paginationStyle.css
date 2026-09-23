@@ -1,0 +1,123 @@
+/* ============================================================
+   Пагинация
+   ============================================================ */
+.custom-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    padding: 0;
+    margin: var(--space-4) 0;
+    list-style: none;
+}
+
+    .custom-pagination .page-item {
+        display: inline-flex;
+    }
+
+    /* Стандартные страницы */
+    .custom-pagination .page-link {
+        font-family: var(--font-family);
+        font-weight: var(--font-weight-semibold);
+        font-size: var(--font-size-sm);
+        color: var(--text-primary);
+        background-color: var(--bg-surface);
+        border: 1px solid var(--border-soft);
+        border-radius: var(--radius-md);
+        padding: var(--space-2) var(--space-4);
+        min-width: 40px;
+        height: 40px;
+        transition: background-color var(--transition-base), color var(--transition-base), border-color var(--transition-base);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .custom-pagination .page-link:hover {
+            background-color: var(--bg-hover);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+    /* Активная страница */
+    .custom-pagination .page-item.active .page-link {
+        background-color: var(--accent);
+        border-color: var(--accent);
+        color: var(--accent-text);
+    }
+
+    /* ============================================================
+   ПЕРЕБИВАЕМ скругления крайних элементов от Bootstrap
+   ============================================================ */
+    .custom-pagination .page-item:first-child .page-link,
+    .custom-pagination .page-item:last-child .page-link {
+        border-radius: var(--radius-md);
+    }
+
+    /* ============================================================
+   Кнопки "В начало" / "В конец"
+   ============================================================ */
+    .custom-pagination .btn-start-end {
+        background-color: var(--bg-surface);
+        border: 1px solid var(--accent);
+        color: var(--accent);
+        padding: var(--space-2) var(--space-4);
+        height: 40px;
+        border-radius: var(--radius-md);
+        transition: background-color var(--transition-base), color var(--transition-base);
+    }
+
+        .custom-pagination .btn-start-end:hover {
+            background-color: var(--accent);
+            color: var(--accent-text);
+            border-color: var(--accent);
+        }
+
+    /* ============================================================
+   Кнопки "Предыдущая" / "Следующая"
+   ============================================================ */
+    .custom-pagination .btn-prev-next {
+        width: 40px;
+        height: 40px;
+        padding: 0;
+        background-color: var(--bg-surface);
+        border: 1px solid var(--border-soft);
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: background-color var(--transition-base), border-color var(--transition-base);
+    }
+
+        .custom-pagination .btn-prev-next:hover {
+            background-color: var(--bg-hover);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .custom-pagination .btn-prev-next.prev::before,
+        .custom-pagination .btn-prev-next.next::before {
+            content: '';
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            -webkit-mask-size: contain;
+            mask-size: contain;
+            -webkit-mask-repeat: no-repeat;
+            mask-repeat: no-repeat;
+            -webkit-mask-position: center;
+            mask-position: center;
+            background-color: currentColor;
+        }
+
+        .custom-pagination .btn-prev-next.prev::before {
+            -webkit-mask-image: url('/images/icons/chevron-left.svg');
+            mask-image: url('/images/icons/chevron-left.svg');
+        }
+
+        .custom-pagination .btn-prev-next.next::before {
+            -webkit-mask-image: url('/images/icons/chevron-right.svg');
+            mask-image: url('/images/icons/chevron-right.svg');
+        }

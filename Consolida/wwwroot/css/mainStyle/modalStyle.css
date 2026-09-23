@@ -1,0 +1,53 @@
+﻿/* ============================================================
+   Модальные окна Bootstrap
+   ============================================================ */
+.modal-content {
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+    font-family: var(--font-family);
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--border-soft);
+    padding: var(--space-4) var(--space-5);
+}
+
+.modal-title {
+    font-family: var(--font-family);
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-lg);
+    color: var(--text-primary);
+}
+
+.modal-body {
+    padding: var(--space-5);
+    color: var(--text-primary);
+}
+
+.modal-footer {
+    border-top: 1px solid var(--border-soft);
+    padding: var(--space-3) var(--space-5);
+}
+
+/* Кнопка-крестик закрытия */
+.modal-content .btn-close {
+    opacity: 0.6;
+    transition: opacity var(--transition-fast), filter var(--transition-fast);
+}
+
+    .modal-content .btn-close:hover {
+        opacity: 1;
+    }
+
+/* В тёмной теме иконка крестика инвертируется */
+[data-theme="dark"] .modal-content .btn-close {
+    filter: invert(1) brightness(1.2);
+}
+
+/* Затемнение под модалкой */
+.modal-backdrop.show {
+    opacity: 0.5;
+}

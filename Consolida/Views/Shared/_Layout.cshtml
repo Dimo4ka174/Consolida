@@ -1,50 +1,79 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+@{
+    var pageTitle = ViewData["Title"]?.ToString();
+    var showHeaderTitle = !string.IsNullOrWhiteSpace(pageTitle) && pageTitle != "Home Page";
+    var docTitle = string.IsNullOrWhiteSpace(pageTitle) ? "Consolida" : $"{pageTitle} — Consolida";
+}
+
+<!DOCTYPE html>
+<html lang="ru">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Consolida</title>
-    <script type="importmap"></script>
+    <title>@docTitle</title>
+
+    <!-- Тема применяется ДО отрисовки -->
+    <script src="~/js/layout/theme.js"></script>
+
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/Consolida.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/mainStyle/designTokens.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/mainStyle/baseStyle.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/mainStyle/buttonStyle.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/mainStyle/modalStyle.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/mainStyle/headerStyle.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/mainStyle/cardStyle.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/mainStyle/paginationStyle.css" asp-append-version="true" />
+    @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Consolida</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                </div>
+    <header class="header col-12">
+        <div class="container">
+            <div class="header-card">
+                <nav class="header-nav">
+                    @if (showHeaderTitle)
+                    {
+                        <h1 class="header-title">@pageTitle</h1>
+                    }
+                    else
+                    {
+                        <div class="header-title-spacer"></div>
+                    }
+
+                    <div class="header-actions">
+                        <button type="button" id="themeToggle" class="theme-toggle" aria-label="Переключить тему">
+                            <span class="mask-icon mask-icon-moon theme-icon-moon"></span>
+                            <span class="mask-icon mask-icon-sun theme-icon-sun"></span>
+                        </button>
+                    </div>
+                </nav>
             </div>
-        </nav>
+        </div>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
+
+    <div class="row">
+        <main class="main col-12">
+            @if (TempData["Message"] != null)
+            {
+                <div class="alert alert-warning">
+                    @TempData["Message"]
+                </div>
+            }
+            <div class="col-md-12 main-content" id="main-content">
+                @RenderBody()
+            </div>
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
+    <footer class="footer col-12">
         <div class="container">
-            &copy; 2026 - Consolida - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <hr class="footer-line" />
+            <div class="footer-content">
+                Consolida © @DateTime.Now.Year — <a href="/Home/Privacy">Конфиденциальность</a>
+            </div>
         </div>
     </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

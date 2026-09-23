@@ -1,0 +1,664 @@
+﻿/* ============================================================
+   Кнопки
+   ============================================================ */
+
+/* Базовый класс кнопки — общий для всех */
+.btn {
+    font-family: var(--font-family);
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-sm);
+    border-radius: var(--radius-md);
+    padding: var(--space-2) var(--space-4);
+    text-decoration: none;
+    transition: background-color var(--transition-base), color var(--transition-base), border-color var(--transition-base);
+}
+
+/* Уменьшенные кнопки в таблицах */
+.btn-sm {
+    height: 32px;
+    padding-left: 32px;
+    font-size: var(--font-size-xs);
+}
+
+    .btn-sm::after {
+        width: 12px;
+        height: 12px;
+        left: 10px;
+    }
+
+/* ============================================================
+   Кнопка "Создать"
+   ============================================================ */
+.btn-create {
+    background-color: var(--accent);
+    color: var(--accent-text);
+    border: 2px solid var(--accent);
+    position: relative;
+    padding-left: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 44px;
+    text-transform: uppercase;
+}
+
+    .btn-create::after {
+        content: '';
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 16px;
+        height: 16px;
+        -webkit-mask-image: url('/images/icons/plus.svg');
+        mask-image: url('/images/icons/plus.svg');
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+    }
+
+    .btn-create:hover {
+        background-color: var(--accent-hover);
+        border-color: var(--accent-hover);
+        color: var(--accent-text);
+    }
+
+/* Кнопка "Создать запись" (btn-success.w-50) */
+.btn-success.w-50 {
+    background-color: var(--accent);
+    color: var(--accent-text);
+    border: 2px solid var(--accent);
+    text-transform: uppercase;
+    height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+    .btn-success.w-50:hover {
+        background-color: var(--accent-hover);
+        border-color: var(--accent-hover);
+        color: var(--accent-text);
+    }
+
+/* ============================================================
+   Кнопка "Перейти к" (серая, с иконкой →)
+   ============================================================ */
+.btn-go-to {
+    color: var(--text-primary);
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-soft);
+    position: relative;
+    padding-left: 36px;
+    display: inline-flex;
+    align-items: center;
+    height: 44px;
+}
+
+    .btn-go-to::after {
+        content: '';
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 16px;
+        height: 16px;
+        -webkit-mask-image: url('/images/icons/arrow-right.svg');
+        mask-image: url('/images/icons/arrow-right.svg');
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+        transition: transform var(--transition-base);
+    }
+
+    .btn-go-to:hover {
+        background-color: var(--bg-hover);
+        color: var(--accent);
+        border-color: var(--accent);
+    }
+
+        .btn-go-to:hover::after {
+            transform: translateY(-50%) translateX(2px);
+        }
+
+/* ============================================================
+   Кнопка "Поиск" (синяя, с лупой)
+   ============================================================ */
+.btn-search {
+    background-color: var(--accent);
+    color: var(--accent-text);
+    border: 2px solid var(--accent);
+    position: relative;
+    padding-left: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 44px;
+}
+
+    .btn-search::after {
+        content: '';
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 16px;
+        height: 16px;
+        -webkit-mask-image: url('/images/icons/search.svg');
+        mask-image: url('/images/icons/search.svg');
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+    }
+
+    .btn-search:hover {
+        background-color: var(--accent-hover);
+        border-color: var(--accent-hover);
+        color: var(--accent-text);
+    }
+
+/* ============================================================
+   Кнопка "Детали" (серая ghost, с лупой)
+   ============================================================ */
+.btn-details {
+    color: var(--text-primary);
+    background-color: var(--bg-surface);
+    border: 2px solid var(--border-medium);
+    position: relative;
+    padding-left: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 44px;
+}
+
+    .btn-details::after {
+        content: '';
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 14px;
+        height: 14px;
+        -webkit-mask-image: url('/images/icons/search.svg');
+        mask-image: url('/images/icons/search.svg');
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+    }
+
+    .btn-details:hover {
+        background-color: var(--accent-soft);
+        border-color: var(--accent);
+        color: var(--accent);
+    }
+
+/* ============================================================
+   Кнопка "Изменить" (синяя ghost, с карандашом)
+   ============================================================ */
+.btn-edit {
+    color: var(--info);
+    background-color: transparent;
+    border: 2px solid var(--info);
+    position: relative;
+    padding-left: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 44px;
+}
+
+    .btn-edit::after {
+        content: '';
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 14px;
+        height: 14px;
+        -webkit-mask-image: url('/images/icons/edit.svg');
+        mask-image: url('/images/icons/edit.svg');
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+    }
+
+    .btn-edit:hover {
+        background-color: var(--info);
+        color: var(--text-inverse);
+    }
+
+/* ============================================================
+   Кнопка "Удалить" (красная ghost, с крестиком)
+   ============================================================ */
+.btn-delete {
+    color: var(--danger);
+    background-color: transparent;
+    border: 2px solid var(--danger);
+    position: relative;
+    padding-left: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 44px;
+}
+
+    .btn-delete::after {
+        content: '';
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 14px;
+        height: 14px;
+        -webkit-mask-image: url('/images/icons/delete.svg');
+        mask-image: url('/images/icons/delete.svg');
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+    }
+
+    .btn-delete:hover {
+        background-color: var(--danger);
+        color: var(--text-inverse);
+    }
+
+/* ============================================================
+   Кнопка "Сбросить" (серая ghost, с крестиком)
+   ============================================================ */
+.btn-reset {
+    color: var(--text-secondary);
+    background-color: transparent;
+    border: 2px solid var(--border-medium);
+    position: relative;
+    padding-left: 36px;
+    padding-right: var(--space-4);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 44px;
+    white-space: nowrap;
+    text-decoration: none;
+    transition: background-color var(--transition-base), color var(--transition-base), border-color var(--transition-base);
+}
+
+    .btn-reset::after {
+        content: '';
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 16px;
+        height: 16px;
+        -webkit-mask-image: url('/images/icons/close.svg');
+        mask-image: url('/images/icons/close.svg');
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+    }
+
+    .btn-reset:hover {
+        background-color: var(--danger-soft);
+        border-color: var(--danger);
+        color: var(--danger);
+    }
+
+/* ============================================================
+   Кнопка "Скачать"
+   ============================================================ */
+.btn-download {
+    color: var(--accent);
+    background-color: transparent;
+    border: 2px solid var(--accent);
+    position: relative;
+    padding-left: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+}
+
+    .btn-download::after {
+        content: '';
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 16px;
+        height: 16px;
+        -webkit-mask-image: url('/images/icons/download.svg');
+        mask-image: url('/images/icons/download.svg');
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+    }
+
+    .btn-download:hover {
+        background-color: var(--accent);
+        color: var(--accent-text);
+    }
+
+/* ============================================================
+   Группа кнопок файлов (btn-file + btn-upload)
+   ============================================================ */
+.btn-group-file {
+    display: inline-flex;
+    border: 2px solid var(--accent);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.btn-file,
+.btn-upload {
+    position: relative;
+    padding-left: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    transition: background-color var(--transition-base), color var(--transition-base);
+}
+
+.btn-file {
+    color: var(--accent);
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    outline: none;
+}
+
+    .btn-file::after {
+        content: '';
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 16px;
+        height: 16px;
+        -webkit-mask-image: url('/images/icons/paper-clip.svg');
+        mask-image: url('/images/icons/paper-clip.svg');
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+    }
+
+    .btn-file:hover,
+    .btn-file.selected {
+        background-color: var(--accent);
+        color: var(--accent-text);
+    }
+
+        .btn-file.selected::after {
+            -webkit-mask-image: url('/images/icons/mark-white.svg');
+            mask-image: url('/images/icons/mark-white.svg');
+        }
+
+.btn-upload {
+    color: var(--accent-text);
+    background-color: var(--accent);
+    border: none;
+}
+
+    .btn-upload::after {
+        content: '';
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 16px;
+        height: 16px;
+        -webkit-mask-image: url('/images/icons/upload.svg');
+        mask-image: url('/images/icons/upload.svg');
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+    }
+
+    .btn-upload:hover {
+        background-color: var(--accent-hover);
+        color: var(--accent-text);
+    }
+
+/* ============================================================
+   Кнопка "Регистрация"
+   ============================================================ */
+.btn-register {
+    color: var(--accent);
+    border: 2px solid var(--accent);
+    background-color: var(--bg-surface);
+    position: relative;
+    padding-left: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    transition: background-color var(--transition-base), color var(--transition-base), border-color var(--transition-base);
+}
+
+    .btn-register::after {
+        content: '';
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 16px;
+        height: 16px;
+        -webkit-mask-image: url('/images/icons/user-plus.svg');
+        mask-image: url('/images/icons/user-plus.svg');
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+    }
+
+    .btn-register:hover {
+        background-color: var(--bg-hover);
+        border-color: var(--accent);
+        color: var(--accent);
+    }
+
+/* ============================================================
+   Кнопка "Дубль" (серая ghost, с иконкой копии)
+   ============================================================ */
+.btn-copy {
+    color: var(--text-primary);
+    background-color: var(--bg-surface);
+    border: 2px solid var(--border-medium);
+    position: relative;
+    padding-left: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 44px;
+    transition: background-color var(--transition-base), color var(--transition-base), border-color var(--transition-base);
+}
+
+    .btn-copy::after {
+        content: '';
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 16px;
+        height: 16px;
+        -webkit-mask-image: url('/images/icons/copy.svg');
+        mask-image: url('/images/icons/copy.svg');
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+    }
+
+    .btn-copy:hover {
+        background-color: var(--accent-soft);
+        border-color: var(--accent);
+        color: var(--accent);
+    }
+
+/* ============================================================
+   Кнопка "Комментарий" (серая ghost, с иконкой чата)
+   ============================================================ */
+.btn-comment {
+    color: var(--text-primary);
+    background-color: var(--bg-surface);
+    border: 2px solid var(--border-medium);
+    position: relative;
+    padding-left: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 44px;
+    transition: background-color var(--transition-base), color var(--transition-base), border-color var(--transition-base);
+}
+
+    /* Повышаем специфичность — перебиваем .comment-toggle из Bootstrap */
+    .btn-comment.comment-toggle {
+        padding: 0 1rem 0 36px;
+        height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-comment::after {
+        content: '';
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 16px;
+        height: 16px;
+        -webkit-mask-image: url('/images/icons/chat.svg');
+        mask-image: url('/images/icons/chat.svg');
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+    }
+
+    .btn-comment:hover {
+        background-color: var(--accent-soft);
+        border-color: var(--accent);
+        color: var(--accent);
+    }
+
+    /* Комментарий, к которому уже что-то написано — акцентная подсветка */
+    .btn-comment.has-comment {
+        background-color: var(--info-soft);
+        border-color: var(--info);
+        color: var(--info);
+    }
+
+        .btn-comment.has-comment::after {
+            background-color: var(--info);
+        }
+
+        .btn-comment.has-comment:hover {
+            background-color: var(--info-soft);
+            border-color: var(--info-hover);
+            color: var(--info-hover);
+        }
+
+/* ============================================================
+   Компактные круглые кнопки-иконки
+   <a class="btn btn-sm btn-edit btn-icon-only" title="..."></a>
+   ============================================================ */
+.btn-icon-only {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    position: relative;
+    flex-shrink: 0;
+}
+
+    .btn-icon-only::after {
+        position: static;
+        transform: none !important;
+        left: auto;
+        top: auto;
+        width: 14px;
+        height: 14px;
+    }
+
+    /* Приглушаем hover-эффект сдвига у btn-go-to внутри круглой кнопки */
+    .btn-icon-only.btn-go-to:hover::after {
+        transform: none !important;
+    }
+
+/* Уменьшенная версия для таблиц */
+.btn-sm.btn-icon-only {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+}
+
+    .btn-sm.btn-icon-only::after {
+        width: 12px;
+        height: 12px;
+    }
+
+/* Увеличенная версия для фильтров (в пару к инпутам 44px) */
+.btn-icon-lg {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+}
+
+    .btn-icon-lg::after {
+        width: 16px;
+        height: 16px;
+    }

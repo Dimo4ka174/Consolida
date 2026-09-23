@@ -1,0 +1,178 @@
+/* ============================================================
+   Sidebar (боковое меню)
+   ============================================================ */
+.sidebar {
+    position: fixed;
+    top: var(--space-5);
+    left: 0;
+    height: calc(100vh - 40px);
+    width: 260px;
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-md);
+    padding: var(--space-5);
+    z-index: 1000;
+    transition: transform var(--transition-slow);
+    transform: translateX(calc(-100% - 40px));
+    overflow-y: auto;
+}
+
+    .sidebar.show {
+        transform: translateX(var(--space-5));
+    }
+
+@media (max-width: 768px) {
+    .sidebar {
+        width: calc(100% - 20px);
+        top: var(--space-3);
+        height: calc(100vh - 20px);
+        transform: translateX(-110%);
+    }
+
+        .sidebar.show {
+            transform: translateX(var(--space-3));
+        }
+}
+
+/* ============================================================
+   Backdrop Ч затемнение под sidebar
+   ============================================================ */
+.sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.35);
+    z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--transition-base), visibility var(--transition-base);
+    cursor: pointer;
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
+}
+
+    .sidebar-backdrop.show {
+        opacity: 1;
+        visibility: visible;
+    }
+
+[data-theme="dark"] .sidebar-backdrop {
+    background-color: rgba(0, 0, 0, 0.55);
+}
+
+@media (max-width: 768px) {
+    .sidebar-backdrop {
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+}
+
+/* ============================================================
+   ћеню
+   ============================================================ */
+.sidebar-nav-wrapper {
+    display: block;
+}
+
+.sidebar-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.sidebar-item {
+    width: 100%;
+}
+
+/*  нопка категории Ч в стиле кнопок в шапке */
+.sidebar-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    font-family: var(--font-family);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-md);
+    text-align: left;
+    cursor: pointer;
+    transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+}
+
+    .sidebar-btn:hover {
+        background-color: var(--bg-hover);
+        border-color: var(--border-medium);
+        color: var(--text-primary);
+    }
+
+    .sidebar-btn[aria-expanded="true"] {
+        background-color: var(--accent-soft);
+        border-color: var(--accent);
+        color: var(--accent);
+    }
+
+    .sidebar-btn .mask-icon {
+        width: 20px;
+        height: 20px;
+        background-color: var(--text-secondary);
+        transition: background-color var(--transition-fast);
+    }
+
+    .sidebar-btn:hover .mask-icon {
+        background-color: var(--text-primary);
+    }
+
+    .sidebar-btn[aria-expanded="true"] .mask-icon {
+        background-color: var(--accent);
+    }
+
+.sidebar-btn-label {
+    flex-grow: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ============================================================
+   Dropdown внутри sidebar
+   ============================================================ */
+.sidebar-dropdown {
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+    padding: var(--space-2) var(--space-2) var(--space-3) 0;
+    margin: 0;
+    position: static !important;
+    transform: none !important;
+    width: 100%;
+}
+
+    .sidebar-dropdown .dropdown-item {
+        display: block;
+        font-family: var(--font-family);
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-regular);
+        color: var(--text-secondary);
+        padding: var(--space-2) var(--space-3) var(--space-2) 44px;
+        border-radius: var(--radius-sm);
+        text-decoration: none;
+        transition: background-color var(--transition-fast), color var(--transition-fast);
+        white-space: normal;
+    }
+
+        .sidebar-dropdown .dropdown-item:hover {
+            background-color: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .sidebar-dropdown .dropdown-item.active {
+            background-color: var(--accent-soft);
+            color: var(--accent);
+            font-weight: var(--font-weight-semibold);
+        }

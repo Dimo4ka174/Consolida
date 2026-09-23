@@ -1,0 +1,49 @@
+/* ============================================================
+   Общий стиль карточки
+   ============================================================ */
+.card {
+    background-color: var(--bg-surface);
+    font-family: var(--font-family);
+    padding: var(--space-5);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: var(--space-5);
+    color: var(--text-primary);
+    transition: background-color var(--transition-base), border-color var(--transition-base), box-shadow var(--transition-base);
+}
+
+/* Опциональный класс для «плиточных» карточек, где hover уместен */
+.card-interactive {
+    transition: transform var(--transition-base), box-shadow var(--transition-base), background-color var(--transition-base), border-color var(--transition-base);
+}
+
+    .card-interactive:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-md);
+    }
+
+/* Заголовок карточки */
+.card-title {
+    font-family: var(--font-family);
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-lg);
+    letter-spacing: -0.01em;
+    color: var(--text-primary);
+    margin: 0 0 var(--space-4) 0;
+}
+
+/* Описание карточки */
+.card-description {
+    font-family: var(--font-family);
+    font-weight: var(--font-weight-regular);
+    font-size: var(--font-size-base);
+    margin-bottom: var(--space-1);
+    color: var(--text-secondary);
+}
+
+.btn-login-group {
+    display: flex;
+    flex-direction: row;
+    gap: var(--space-3);
+}
