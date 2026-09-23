@@ -1,0 +1,202 @@
+/* ============================================================
+   Стили для страниц администрирования ролей
+   ============================================================ */
+
+/* ============================================================
+   Чипы разрешений (в таблице ролей — Index)
+   ============================================================ */
+.claim-group-display {
+    margin-bottom: var(--space-3);
+}
+
+.claim-group-title {
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0 0 var(--space-2) 0;
+}
+
+.claim-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    background-color: var(--bg-subtle);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-sm);
+    padding: 4px 4px 4px 10px;
+    font-size: var(--font-size-xs);
+    color: var(--text-secondary);
+    transition: background-color var(--transition-fast), border-color var(--transition-fast);
+}
+
+    .claim-chip:hover {
+        background-color: var(--bg-surface);
+        border-color: var(--border-medium);
+    }
+
+.claim-chip-remove {
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background-color: transparent;
+    cursor: pointer;
+    position: relative;
+    transition: background-color var(--transition-fast);
+}
+
+    .claim-chip-remove::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 10px;
+        height: 10px;
+        -webkit-mask-image: url('/images/icons/close.svg');
+        mask-image: url('/images/icons/close.svg');
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+        opacity: 0.55;
+        transition: opacity var(--transition-fast), background-color var(--transition-fast);
+    }
+
+    .claim-chip-remove:hover {
+        background-color: var(--danger-soft);
+    }
+
+        .claim-chip-remove:hover::before {
+            opacity: 1;
+            background-color: var(--danger);
+        }
+
+/* ============================================================
+   Группы разрешений (ManageClaims)
+   ============================================================ */
+.claim-group {
+    background-color: var(--bg-subtle);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+    margin-bottom: var(--space-4);
+}
+
+.claim-group-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+    padding-bottom: var(--space-3);
+    margin-bottom: var(--space-3);
+    border-bottom: 1px solid var(--border-soft);
+}
+
+.claim-group-header-left {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+}
+
+.claim-group-name {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.claim-group-counter {
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+}
+
+    .claim-group-counter strong {
+        color: var(--accent);
+        font-weight: var(--font-weight-semibold);
+    }
+
+/* Кнопка «Выбрать все» */
+.claim-select-all {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+    user-select: none;
+}
+
+    .claim-select-all:hover {
+        background-color: var(--accent-soft);
+        border-color: var(--accent);
+        color: var(--accent);
+    }
+
+    .claim-select-all input {
+        cursor: pointer;
+        margin: 0;
+    }
+
+.claim-group-body {
+    padding-top: var(--space-1);
+}
+
+/* Элемент чекбокса внутри группы */
+.claim-check-item {
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-sm);
+    transition: background-color var(--transition-fast);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+    .claim-check-item:hover {
+        background-color: var(--bg-surface);
+    }
+
+    .claim-check-item .form-check-input {
+        margin: 0;
+        cursor: pointer;
+        flex-shrink: 0;
+    }
+
+    .claim-check-item .form-check-label {
+        cursor: pointer;
+        font-size: var(--font-size-sm);
+        color: var(--text-secondary);
+        user-select: none;
+    }
+
+/* ============================================================
+   Чекбоксы в цветах темы
+   ============================================================ */
+.form-check-input:checked {
+    background-color: var(--accent);
+    border-color: var(--accent);
+}
+
+.form-check-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.form-check-input:indeterminate {
+    background-color: var(--accent);
+    border-color: var(--accent);
+}

@@ -1,0 +1,45 @@
+﻿@using Application.ViewModels.UserViewModel
+@model ManageRolesViewModel
+
+@{
+    ViewData["Title"] = "Управление ролями";
+}
+
+<div class="container d-flex justify-content-center">
+    <div class="row">
+        <!-- Блок кнопок -->
+        <div class="mb-4">
+            <a asp-action="Index" class="btn btn-go-to">Вернуться к списку пользователей</a>
+        </div>
+
+        <!-- Карточка с формой управления ролями -->
+        <div class="col-md-12">
+            <div class="card rounded-lg p-4">
+                <h3 class="card-title text-center mb-3">Управление ролями пользователя: @Model.UserName</h3>
+                <form asp-action="UpdateRoles" method="post">
+                    <input type="hidden" asp-for="UserId" />
+                    <div class="row">
+                        @for (int i = 0; i < Model.Roles.Count; i++)
+                        {
+                            <div class="col-md-6 form-check">
+                                <input type="hidden" asp-for="Roles[i].RoleId" />
+                                <input type="hidden" asp-for="Roles[i].RoleName" />
+                                <input type="checkbox" asp-for="Roles[i].IsSelected" class="form-check-input" />
+                                <label asp-for="Roles[i].IsSelected" class="form-check-label">@Model.Roles[i].RoleName</label>
+                            </div>
+                        }
+                    </div>
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-primary w-50">Сохранить изменения</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -1,0 +1,55 @@
+﻿@using Application.ViewModels.UserViewModel
+@model CreateUserViewModel
+
+@{
+    ViewData["Title"] = "Создание нового пользователя";
+}
+
+<div class="container d-flex justify-content-center">
+    <div class="row">
+        <!-- Блок кнопок -->
+        <div class="mb-4">
+            <a asp-action="Index" class="btn btn-go-to">Вернуться к списку пользователей</a>
+        </div>
+
+        <!-- Карточка с формой создания -->
+        <div class="col-md-12">
+            <div class="card rounded-lg p-4 mb-4">
+                <form asp-action="Create" method="post">
+                    <div asp-validation-summary="All" class="text-danger"></div>
+
+                    <div class="col-md-12 form-group text-center">
+                        <label asp-for="Email" class="card-title text-center">Логин</label>
+                        <input asp-for="Email" class="form-control custom-input text-center" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-12 form-group text-center">
+                        <label asp-for="Password" class="card-title text-center">Пароль</label>
+                        <input asp-for="Password" class="form-control custom-input text-center" />
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-12 form-group text-center">
+                        <label asp-for="ConfirmPassword" class="card-title text-center">Подтвердите пароль</label>
+                        <input asp-for="ConfirmPassword" class="form-control custom-input text-center" />
+                        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                    </div>
+
+                    <br />
+
+                    <!-- Кнопки действия -->
+                    <div class="col-md-12 text-center">
+                        <input type="submit" class="btn btn-success w-50" value="Создать запись" />
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

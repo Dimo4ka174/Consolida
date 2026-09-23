@@ -1,0 +1,83 @@
+﻿@using Application.ViewModels.RoleViewModel
+@model ManageClaimsViewModel
+
+@{
+    ViewData["Title"] = "Управление разрешениями";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12 mb-4">
+            <a href="@Url.Action("Index")" class="btn btn-go-to">Вернуться к списку ролей</a>
+        </div>
+
+        <div class="col-md-12">
+            <div class="card">
+                <h3 class="card-title">Разрешения для роли «@Model.RoleName»</h3>
+
+                <form asp-action="UpdateClaims" method="post">
+                    <input type="hidden" asp-for="RoleName" />
+
+                    @foreach (var group in Model.Claims.GroupBy(c => c.Category))
+                    {
+                        var totalInGroup = Model.Claims.Count(c => c.Category == group.Key);
+                        var selectedInGroup = Model.Claims.Count(c => c.Category == group.Key && c.IsSelected);
+
+                        <div class="claim-group" data-group="@group.Key">
+                            <div class="claim-group-header">
+                                <div class="claim-group-header-left">
+                                    <h4 class="claim-group-name">@group.Key</h4>
+                                    <span class="claim-group-counter">
+                                        выбрано <strong class="claim-group-selected">@selectedInGroup</strong> из @totalInGroup
+                                    </span>
+                                </div>
+                                <label class="claim-select-all">
+                                    <input type="checkbox" class="form-check-input select-all-toggle" />
+                                    <span>Выбрать все</span>
+                                </label>
+                            </div>
+
+                            <div class="claim-group-body">
+                                <div class="row g-2">
+                                    @for (int i = 0; i < Model.Claims.Count; i++)
+                                    {
+                                        if (Model.Claims[i].Category == group.Key)
+                                        {
+                                            <div class="col-lg-4 col-md-6">
+                                                <div class="form-check claim-check-item">
+                                                    <input type="hidden" asp-for="@Model.Claims[i].Category" />
+                                                    <input type="hidden" asp-for="@Model.Claims[i].ClaimType" />
+                                                    <input type="checkbox" asp-for="@Model.Claims[i].IsSelected"
+                                                           class="form-check-input claim-checkbox" />
+                                                    <label class="form-check-label" asp-for="@Model.Claims[i].IsSelected">
+                                                        @Model.Claims[i].ClaimType
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        }
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="d-flex justify-content-center gap-2 mt-4 flex-wrap">
+                        <button type="submit" class="btn btn-create">Сохранить изменения</button>
+                        <a href="@Url.Action("Index")" class="btn btn-reset">Отмена</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Identity/roleStyle.css" asp-append-version="true" />
+}
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="~/js/admin/claims.js" asp-append-version="true"></script>
+}

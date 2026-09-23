@@ -1,0 +1,195 @@
+﻿@using Application.ViewModels.RoleViewModel
+@model List<RoleViewModel>
+
+@{
+    ViewData["Title"] = "Список ролей";
+}
+
+<div class="container">
+    <div class="row">
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="col-md-12 mb-4">
+                <div class="alert alert-info">@TempData["SuccessMessage"]</div>
+            </div>
+        }
+
+        <!-- Кнопки над таблицей -->
+        <div class="col-md-12 mb-4 d-flex gap-2 flex-wrap">
+            <a href="#" class="btn btn-create" data-bs-toggle="modal" data-bs-target="#createRoleModal">
+                Добавить новую роль
+            </a>
+            <a href="@Url.Action("Index", "Users")" class="btn btn-go-to">Перейти к пользователям</a>
+        </div>
+
+        <!-- Таблица ролей -->
+        <div class="col-md-12">
+            <div class="card">
+                <h3 class="card-title">Список ролей</h3>
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped">
+                        <thead>
+                            <tr>
+                                <th class="text-center">Наименование роли</th>
+                                <th class="text-center">Разрешения</th>
+                                <th class="text-center">Управление</th>
+                                <th class="text-center">Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var role in Model)
+                            {
+                                var collapseId = $"claims-{role.RoleName.Replace(" ", "-")}";
+                                <tr>
+                                    <td class="text-center">@role.RoleName</td>
+                                    <td class="text-center">
+                                        @if (role.GroupedClaims.Any())
+                                        {
+                                            <button class="btn btn-sm btn-details" type="button"
+                                                    data-bs-toggle="collapse"
+                                                    data-bs-target="#@collapseId"
+                                                    aria-expanded="false">
+                                                Показать разрешения (@role.GroupedClaims.Sum(g => g.Value.Count))
+                                            </button>
+
+                                            <div class="collapse text-start mt-3" id="@collapseId">
+                                                <div class="d-flex flex-column gap-2">
+                                                    @foreach (var group in role.GroupedClaims)
+                                                    {
+                                                        <div class="claim-group-display">
+                                                            <h6 class="claim-group-title">@group.Key</h6>
+                                                            <div class="d-flex flex-wrap gap-2">
+                                                                @foreach (var claim in group.Value)
+                                                                {
+                                                                    <div class="claim-chip">
+                                                                        <span>@claim.ClaimType</span>
+                                                                        <form asp-action="RemoveClaim" asp-controller="Roles" method="post" class="m-0">
+                                                                            <input type="hidden" name="RoleName" value="@role.RoleName" />
+                                                                            <input type="hidden" name="ClaimType" value="@claim.ClaimType" />
+                                                                            <input type="hidden" name="ClaimValue" value="@claim.ClaimValue" />
+                                                                            <button type="submit" class="claim-chip-remove"
+                                                                                    aria-label="Удалить"
+                                                                                    onclick="return confirm('Удалить разрешение?');"></button>
+                                                                        </form>
+                                                                    </div>
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-body-secondary">Нет разрешений</span>
+                                        }
+                                    </td>
+                                    <td class="text-center">
+                                        <a href="@Url.Action("ManageClaims", "Roles", new { roleName = role.RoleName })"
+                                           class="btn btn-sm btn-go-to">Управление</a>
+                                    </td>
+                                    <td class="text-center">
+                                        <button type="button" class="btn btn-sm btn-edit me-2 edit-role-btn"
+                                                data-role-name="@role.RoleName"
+                                                data-bs-toggle="modal" data-bs-target="#editRoleModal">
+                                            Изменить
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-delete delete-role-btn"
+                                                data-role-name="@role.RoleName"
+                                                data-bs-toggle="modal" data-bs-target="#deleteRoleModal">
+                                            Удалить
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для создания новой роли -->
+<div class="modal fade" id="createRoleModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Создание новой роли</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form asp-action="Create" method="post">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="roleName" class="form-label">Имя роли</label>
+                        <input type="text" class="custom-input" id="roleName" name="roleName"
+                               required placeholder="Введите имя роли" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-reset" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-create">Создать</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для редактирования роли -->
+<div class="modal fade" id="editRoleModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Изменение роли</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form asp-action="Edit" method="post">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="newRoleName" class="form-label">Новое имя роли</label>
+                        <input type="text" class="custom-input" id="newRoleName" name="newRoleName" required />
+                        <input type="hidden" id="oldRoleName" name="oldRoleName" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-reset" data-bs-dismiss="modal">Отмена</button>
+                    <button type="submit" class="btn btn-create">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для удаления роли -->
+<div class="modal fade" id="deleteRoleModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Подтвердите удаление</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Вы уверены, что хотите удалить роль <strong id="roleToDeleteName"></strong>?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-reset" data-bs-dismiss="modal">Отмена</button>
+                <form asp-action="Delete" method="post" class="m-0">
+                    <input type="hidden" id="roleNameToDelete" name="roleName" />
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-delete">Удалить</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Identity/roleStyle.css" asp-append-version="true" />
+}
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="~/js/admin/roles.js" asp-append-version="true"></script>
+}

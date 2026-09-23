@@ -1,0 +1,151 @@
+﻿@using Application.ViewModels.UserViewModel
+@model List<UserWithRolesViewModel>
+
+@{
+    ViewData["Title"] = "Список пользователей";
+}
+
+<div class="container d-flex justify-content-center">
+    <div class="row">
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success text-center">
+                @TempData["SuccessMessage"]
+            </div>
+        }
+
+        <!-- Кнопки над карточками -->
+        <div class="mb-4">
+            <a href="@Url.Action("Create")" class="btn btn-create me-2">Добавить нового пользователя</a>
+            <a href="@Url.Action("Index", "Roles")" class="btn btn-go-to">Перейти к ролям</a>
+        </div>
+
+        <!-- Карточка с фильтром и поиском -->
+        <div class="col-md-12 mb-4">
+            <div class="card rounded-lg p-4">
+                <h3 class="card-title text-center mb-3">Фильтр и поиск</h3>
+                <form asp-action="Index" method="get" class="mb-3">
+                    <div class="row g-3">
+                        <!-- Поиск по наименованию -->
+                        <div class="col-md-8">
+                            <label class="form-label">Поиск по лоигну</label>
+                            <input type="text" class="form-control custom-input" name="SearchString" value="@ViewBag.SearchString" placeholder="Введите логин" />
+                        </div>
+
+                        <!-- Кнопка применения фильтра -->
+                        <div class="col-md-4 align-self-end">
+                            <button type="submit" class="btn btn-search w-100">Применить фильтр</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Карточка со списком -->
+        <div class="col-md-12">
+            <div class="card rounded-lg p-4">
+                <h3 class="card-title text-center mb-3">Список пользователей</h3>
+                <table class="table table-hover table-striped table-responsive">
+                    <thead>
+                        <tr>
+                            <th class="text-center">
+                                <a href="@Url.Action("Index", new {
+                                        sortOrder = ViewBag.SortOrder == "Email" ? "Email_desc" : "Email",
+                                        searchString = ViewBag.SearchString
+                                    })">Логин пользователя</a>
+                            </th>
+                            <th class="text-center">Роли</th>
+                            <th class="text-center"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var user in Model)
+                        {
+                            <tr>
+                                <td class="text-center">@user.Email</td>
+                                <td class="text-center">@string.Join(", ", user.Roles)</td>
+                                <td class="text-center">
+                                    <a asp-action="ManageRoles" asp-route-userId="@user.UserId" class="btn btn-primary">Управление ролями</a>
+                                    <form style="display:inline">
+                                        <button type="button"
+                                                class="btn btn-warning reset-password-btn"
+                                                data-user-id="@user.UserId"
+                                                data-user-name="@user.Email">
+                                            Сбросить пароль
+                                        </button>
+                                    </form>
+                                    <form asp-action="Delete" method="post" style="display:inline">
+                                        <input type="hidden" name="userId" value="@user.UserId" />
+                                        <button type="button"
+                                                class="btn btn-danger delete-user-btn"
+                                                data-user-id="@user.UserId"
+                                                data-user-name="@user.Email">
+                                            Удалить
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Модальное окно для подтверждения удаления -->
+        <div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteUserModalLabel">Подтвердите удаление</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Вы уверены, что хотите удалить пользователя <strong id="userToDeleteName"></strong>?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                        <form id="deleteUserForm" asp-action="DeleteUser" method="post" style="display:inline">
+                            <input type="hidden" id="userIdToDelete" name="userId" />
+                            <button type="submit" class="btn btn-danger">Удалить</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Модальное окно для подтверждения сброса пароля -->
+        <div class="modal fade" id="resetPasswordModal" tabindex="-1" aria-labelledby="resetPasswordModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="resetPasswordModalLabel">Подтвердите сброс пароля</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Вы уверены, что хотите сбросить пароль пользователя <strong id="userToResetName"></strong>? Новый пароль будет установлен на "qwe123".</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                        <form id="resetPasswordForm" asp-action="ResetPassword" method="post" style="display:inline">
+                            <input type="hidden" id="userIdToReset" name="userId" />
+                            <button type="submit" class="btn btn-warning">Сбросить пароль</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Пагинация -->
+        @if (ViewBag.Paging != null)
+        {
+            <partial name="_Pagination" model="@ViewBag.Paging" />
+        }
+    </div>
+</div>
+
+<script src="~/js/admin/popup.js"></script>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

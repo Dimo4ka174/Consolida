@@ -1,0 +1,96 @@
+/* ============================================================
+   Identity / Manage profile
+   ============================================================ */
+
+.identity-page .col-md-3 {
+    flex: 0 0 auto;
+    max-width: none;
+    width: 25%;
+}
+
+.identity-page .col-md-9 {
+    flex: 0 0 auto;
+    max-width: none;
+    width: 75%;
+}
+
+.identity-page .col-md-10 {
+    width: 100%;
+}
+
+.identity-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Общий контейнер навигации */
+.profile-container {
+    display: flex;
+    gap: var(--space-5);
+    margin: var(--space-5) auto;
+    max-width: 1200px;
+}
+
+.profile-nav-container {
+    width: 300px;
+    flex-shrink: 0;
+}
+
+.profile-content-container {
+    flex-grow: 1;
+    min-width: 0;
+}
+
+/* Навигация */
+.profile-nav {
+    padding: var(--space-5);
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-sm);
+    height: auto;
+    max-width: 100%;
+    margin-bottom: var(--space-5);
+    transition: background-color var(--transition-base), border-color var(--transition-base);
+}
+
+.profile-nav-title {
+    font-family: var(--font-family);
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-xl);
+    color: var(--text-primary);
+    text-align: center;
+    margin-bottom: var(--space-4);
+}
+
+.profile-nav-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.profile-nav-item {
+    margin-bottom: var(--space-3);
+}
+
+.profile-nav-link {
+    display: block;
+    font-family: var(--font-family);
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    text-decoration: none;
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-lg);
+    transition: background-color var(--transition-base), color var(--transition-base);
+}
+
+    .profile-nav-link.active {
+        background-color: var(--accent);
+        color: var(--accent-text);
+    }
+
+    .profile-nav-link:hover {
+        background-color: var(--bg-hover);
+        color: var(--accent);
+    }
