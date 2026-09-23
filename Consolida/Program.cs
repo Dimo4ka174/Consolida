@@ -1,7 +1,8 @@
+using Application.DataAccessLayer.Interface.Common;
+using Application.DataAccessLayer.Service.Common;
 using Consolida.Infrastructure.Logging;
 using Consolida.Extensions;
 using Serilog;
-using DB;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +19,10 @@ builder.Services
     .AddCustomAuthentication()
     .AddCustomAuthorization()
     .AddCustomControllers();
+
+// Регистрация всех прикладных сервисов через ServiceFactory
+var serviceFactory = new ServiceFactory();
+serviceFactory.RegisterServices(builder.Services);
 
 var app = builder.Build();
 
@@ -39,5 +44,18 @@ app.MapRazorPages();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+// Инициализация БД и сидирование
+try
+{
+    using var scope = app.Services.CreateScope();
+    var dbInitializer = scope.ServiceProvider.GetRequiredService<IDBInitializer>();
+    await dbInitializer.Initialize();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Application failed to start");
+    throw;
+}
 
 app.Run();
