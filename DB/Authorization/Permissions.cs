@@ -1,0 +1,50 @@
+namespace DB.Authorization
+{
+    public static class Permissions
+    {
+        public static class Roles
+        {
+            public const string Read = "read_roles";
+            public const string Create = "create_roles";
+            public const string Edit = "edit_roles";
+            public const string Delete = "delete_roles";
+            public static readonly string[] All = { Read, Create, Edit, Delete };
+        }
+
+        public static class Users
+        {
+            public const string Read = "read_users";
+            public const string Create = "create_users";
+            public const string Edit = "edit_users";
+            public const string Delete = "delete_users";
+            public static readonly string[] All = { Read, Create, Edit, Delete };
+        }
+
+        public static class Cities
+        {
+            public const string Read = "read_city";
+            public const string Create = "create_city";
+            public const string Edit = "edit_city";
+            public const string Delete = "delete_city";
+            public static readonly string[] All = { Read, Create, Edit, Delete };
+        }
+
+        public static class Companies
+        {
+            public const string Read = "read_companies";
+            public const string Create = "create_companies";
+            public const string Edit = "edit_companies";
+            public const string Delete = "delete_companies";
+            public static readonly string[] All = { Read, Create, Edit, Delete };
+        }
+
+        public static class Customers
+        {
+            public const string Read = "read_customer";
+            public const string Create = "create_customer";
+            public const string Edit = "edit_customer";
+            public const string Delete = "delete_customer";
+            public static readonly string[] All = { Read, Create, Edit, Delete };
+        }
+    }
+}
