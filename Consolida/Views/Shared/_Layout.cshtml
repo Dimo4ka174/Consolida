@@ -1,3 +1,7 @@
+@using DB.Authorization
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+
 @{
     var pageTitle = ViewData["Title"]?.ToString();
     var showHeaderTitle = !string.IsNullOrWhiteSpace(pageTitle) && pageTitle != "Home Page";
@@ -20,9 +24,9 @@
     <link rel="stylesheet" href="~/css/mainStyle/buttonStyle.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/mainStyle/modalStyle.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/mainStyle/headerStyle.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/mainStyle/sliderStyle.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/mainStyle/cardStyle.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/mainStyle/paginationStyle.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/Identity/manageProfile.css" asp-append-version="true" />
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
@@ -30,6 +34,17 @@
         <div class="container">
             <div class="header-card">
                 <nav class="header-nav">
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+                        <button type="button" class="sidebar-nav" id="sidebar-nav" aria-label="Меню">
+                            <span class="hamburger-icon">
+                                <span class="bar top-bar"></span>
+                                <span class="bar middle-bar"></span>
+                                <span class="bar bottom-bar"></span>
+                            </span>
+                        </button>
+                    }
+
                     @if (showHeaderTitle)
                     {
                         <h1 class="header-title">@pageTitle</h1>
@@ -44,6 +59,8 @@
                             <span class="mask-icon mask-icon-moon theme-icon-moon"></span>
                             <span class="mask-icon mask-icon-sun theme-icon-sun"></span>
                         </button>
+
+                        <partial name="_LoginPartial" />
                     </div>
                 </nav>
             </div>
@@ -51,6 +68,8 @@
     </header>
 
     <div class="row">
+        <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+        <partial name="_Slider" />
         <main class="main col-12">
             @if (TempData["Message"] != null)
             {
@@ -75,6 +94,7 @@
 
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/js/layout/slider.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

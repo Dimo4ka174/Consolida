@@ -1,9 +1,10 @@
+using Microsoft.AspNetCore.DataProtection;
 using Consolida.Infrastructure.Email;
-using DB;
-using DB.Auth;
-using DB.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using DB.Authorization;
+using DB.Auth;
+using DB;
 
 namespace Consolida.Extensions
 {
@@ -70,8 +71,6 @@ namespace Consolida.Extensions
                 options.Cookie.IsEssential = true;
 
                 // SameAsRequest — работает и по HTTP, и по HTTPS.
-                // Always — сломает логин при заходе на http://localhost:5041,
-                // потому что cookie не будет сохраняться.
                 options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
 
                 options.LoginPath = "/Identity/Account/Login";
@@ -93,6 +92,30 @@ namespace Consolida.Extensions
             {
                 AuthorizationPolicies.Configure(options);
             });
+
+            return services;
+        }
+
+        /// <summary>
+        /// Data Protection: ключи шифрования в файловой системе.
+        /// Для Docker путь /app/DataProtection-Keys; локально — DataProtection-Keys/ в корне.
+        /// </summary>
+        public static IServiceCollection AddCustomDataProtection(
+            this IServiceCollection services,
+            IConfiguration configuration)
+        {
+            var isContainer = Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true";
+            var path = configuration["DATA_PROTECTION_PATH"]
+                ?? (isContainer ? "/app/DataProtection-Keys" : "DataProtection-Keys");
+
+            var dir = new DirectoryInfo(path);
+            if (!dir.Exists)
+                dir.Create();
+
+            services.AddDataProtection()
+                .PersistKeysToFileSystem(dir)
+                .SetApplicationName("Consolida")
+                .SetDefaultKeyLifetime(TimeSpan.FromDays(90));
 
             return services;
         }

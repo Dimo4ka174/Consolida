@@ -1,43 +1,46 @@
 ﻿@page
 @model EmailModel
 @{
-    ViewData["Title"] = "Manage Email";
+    ViewData["Title"] = "Смена логина";
     ViewData["ActivePage"] = ManageNavPages.Email;
 }
 
-<h3>@ViewData["Title"]</h3>
-<partial name="_StatusMessage" for="StatusMessage" />
-<div class="row">
-    <div class="col-md-6">
-        <form id="email-form" method="post">
-            <div asp-validation-summary="All" class="text-danger" role="alert"></div>
-            @if (Model.IsEmailConfirmed)
-            {
-                <div class="form-floating mb-3 input-group">
-                    <input asp-for="Email" class="form-control" placeholder="Please enter your email." disabled />
-                        <div class="input-group-append">
-                            <span class="h-100 input-group-text text-success font-weight-bold">✓</span>
-                        </div>
-                    <label asp-for="Email" class="form-label"></label>
+<div class="profile-container">
+    <div class="profile-nav-container">
+        <div class="profile-nav">
+            <h4 class="profile-nav-title">Настройки</h4>
+            <partial name="_ManageNav" />
+        </div>
+    </div>
+
+    <div class="profile-content-container">
+        <div class="card rounded-lg p-4">
+            <h3 class="card-title mb-3">@ViewData["Title"]</h3>
+            <partial name="_StatusMessage" for="StatusMessage" />
+
+            <form id="email-form" method="post">
+                <div asp-validation-summary="All" class="text-danger mb-3" role="alert"></div>
+
+                <div class="mb-3">
+                    <label for="current-email" class="form-label">Текущий логин</label>
+                    <input id="current-email" value="@Model.Email" class="custom-input" disabled />
                 </div>
-            }
-            else
-            {
-                <div class="form-floating mb-3">
-                    <input asp-for="Email" class="form-control" placeholder="Please enter your email." disabled />
-                    <label asp-for="Email" class="form-label"></label>
-                    <button id="email-verification" type="submit" asp-page-handler="SendVerificationEmail" class="btn btn-link">Send verification email</button>
+
+                <div class="mb-3">
+                    <label asp-for="Input.NewEmail" class="form-label">Новый логин</label>
+                    <input asp-for="Input.NewEmail" class="custom-input" autocomplete="email" />
+                    <span asp-validation-for="Input.NewEmail" class="text-danger"></span>
                 </div>
-            }
-            <div class="form-floating mb-3">
-                <input asp-for="Input.NewEmail" class="form-control" autocomplete="email" aria-required="true" placeholder="Please enter new email." />
-                <label asp-for="Input.NewEmail" class="form-label"></label>
-                <span asp-validation-for="Input.NewEmail" class="text-danger"></span>
-            </div>
-            <button id="change-email-button" type="submit" asp-page-handler="ChangeEmail" class="w-100 btn btn-lg btn-primary">Change email</button>
-        </form>
+
+                <button id="change-email-button" type="submit" asp-page-handler="ChangeEmail" class="btn btn-create">Изменить</button>
+            </form>
+        </div>
     </div>
 </div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Identity/manageProfile.css" asp-append-version="true" />
+}
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

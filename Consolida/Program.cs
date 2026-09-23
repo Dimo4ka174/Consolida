@@ -1,5 +1,5 @@
-using Consolida.Extensions;
 using Consolida.Infrastructure.Logging;
+using Consolida.Extensions;
 using Serilog;
 using DB;
 
@@ -14,6 +14,7 @@ SerilogConfigurator.ConfigureSerilog(builder.Configuration, builder.Host);
 
 builder.Services
     .AddCustomDatabaseAndIdentity(builder.Configuration)
+    .AddCustomDataProtection(builder.Configuration)
     .AddCustomAuthentication()
     .AddCustomAuthorization()
     .AddCustomControllers();

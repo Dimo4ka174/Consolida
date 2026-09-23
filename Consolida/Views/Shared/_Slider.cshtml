@@ -1,0 +1,79 @@
+@inject SignInManager<ApplicationUser> SignInManager
+@inject IAuthorizationService AuthorizationService
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+@using DB.Authorization
+
+<div class="sidebar" id="sidebar">
+    <nav class="sidebar-nav-wrapper">
+        <ul class="sidebar-menu">
+
+            @if ((await AuthorizationService.AuthorizeAsync(User, "ReadCities")).Succeeded ||
+                 (await AuthorizationService.AuthorizeAsync(User, "ReadCompanies")).Succeeded ||
+                 (await AuthorizationService.AuthorizeAsync(User, "ReadCustomers")).Succeeded)
+            {
+                <li class="sidebar-item">
+                    <button type="button" class="sidebar-btn" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="mask-icon mask-icon-kindle"></span>
+                        <span class="sidebar-btn-label">Справочники</span>
+                    </button>
+                    <ul class="dropdown-menu sidebar-dropdown">
+                        @if ((await AuthorizationService.AuthorizeAsync(User, "ReadCities")).Succeeded)
+                        {
+                            <li><a class="dropdown-item @(Context.Request.Path.StartsWithSegments("/Cities") ? "active" : "")" href="/Cities">Города</a></li>
+                        }
+                        @if ((await AuthorizationService.AuthorizeAsync(User, "ReadCompanies")).Succeeded)
+                        {
+                            <li><a class="dropdown-item @(Context.Request.Path.StartsWithSegments("/Companies") ? "active" : "")" href="/Companies">Компании</a></li>
+                        }
+                        @if ((await AuthorizationService.AuthorizeAsync(User, "ReadCustomers")).Succeeded)
+                        {
+                            <li><a class="dropdown-item @(Context.Request.Path.StartsWithSegments("/Customers") ? "active" : "")" href="/Customers">Клиенты</a></li>
+                        }
+                    </ul>
+                </li>
+            }
+
+            @if ((await AuthorizationService.AuthorizeAsync(User, "UserManager")).Succeeded ||
+                 (await AuthorizationService.AuthorizeAsync(User, "RoleManager")).Succeeded)
+            {
+                <li class="sidebar-item">
+                    <button type="button" class="sidebar-btn" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="mask-icon mask-icon-lock"></span>
+                        <span class="sidebar-btn-label">Администрирование</span>
+                    </button>
+                    <ul class="dropdown-menu sidebar-dropdown">
+                        @if ((await AuthorizationService.AuthorizeAsync(User, "RoleManager")).Succeeded)
+                        {
+                            <li><a class="dropdown-item @(Context.Request.Path.StartsWithSegments("/Roles") ? "active" : "")" href="/Roles">Список ролей</a></li>
+                        }
+                        @if ((await AuthorizationService.AuthorizeAsync(User, "UserManager")).Succeeded)
+                        {
+                            <li><a class="dropdown-item @(Context.Request.Path.StartsWithSegments("/Users") ? "active" : "")" href="/Users">Список пользователей</a></li>
+                        }
+                    </ul>
+                </li>
+            }
+
+            <li class="sidebar-item">
+                <button type="button" class="sidebar-btn" data-bs-toggle="dropdown" aria-expanded="false">
+                    <span class="mask-icon mask-icon-identity"></span>
+                    <span class="sidebar-btn-label">Аккаунт</span>
+                </button>
+                <ul class="dropdown-menu sidebar-dropdown">
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+                        <li><a class="dropdown-item @(Context.Request.Path.StartsWithSegments("/Identity/Account/Manage") ? "active" : "")" asp-area="Identity" asp-page="/Account/Manage/Index">Профиль</a></li>
+                        <li><a class="dropdown-item" asp-area="Identity" asp-page="/Account/Logout">Выход</a></li>
+                    }
+                    else
+                    {
+                        <li><a class="dropdown-item" asp-area="Identity" asp-page="/Account/Login">Вход</a></li>
+                        <li><a class="dropdown-item" asp-area="Identity" asp-page="/Account/Register">Регистрация</a></li>
+                    }
+                </ul>
+            </li>
+
+        </ul>
+    </nav>
+</div>
