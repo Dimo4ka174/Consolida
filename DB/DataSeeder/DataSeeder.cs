@@ -18,8 +18,8 @@ namespace DB.DataSeeder
             await CodeTNVDDataSeeder.Seed(context, logger);
             await ManufacturerDataSeeder.Seed(context, logger);
             await ProductDataSeeder.Seed(context, logger);
-            await MeasureUnitDataSeeder.Seed(context, logger);
-            await TaxTypeDataSeeder.Seed(context, logger);
+            await TaxDataSeeder.Seed(context, logger);
+            await OrderDataSeeder.Seed(context, logger);
         }
     }
 }

@@ -26,5 +26,7 @@ namespace DB.Entity
 
         [ForeignKey("ManufacturerId")]
         public virtual Manufacturer? Manufacturer { get; set; }
+
+        public List<OrderProduct> OrdersProducts { get; set; } = new List<OrderProduct>();
     }
 }
