@@ -1,10 +1,10 @@
-﻿using Application.DataAccessLayer.Interface.Entities;
 using Application.DataAccessLayer.Interface.Common;
+using Application.DataAccessLayer.Interface.Entities;
 using Application.DataAccessLayer.Service.Common;
 using Application.ViewModels.CityModel;
-using Microsoft.EntityFrameworkCore;
 using AutoMapper;
 using DB.Entity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.DataAccessLayer.Service.Entity
 {

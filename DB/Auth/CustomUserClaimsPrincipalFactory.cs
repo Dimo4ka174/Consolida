@@ -1,11 +1,11 @@
+using System;
+using System.Collections.Generic;
+using System.Security.Claims;
+using System.Text;
+using DB.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System.Collections.Generic;
-using System.Security.Claims;
-using DB.Authorization;
-using System.Text;
-using System;
 
 namespace DB.Auth
 {

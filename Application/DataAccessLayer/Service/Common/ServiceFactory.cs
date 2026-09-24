@@ -16,7 +16,6 @@ namespace Application.DataAccessLayer.Service.Common
             {
                 RegisterAutoMapper(services);
                 RegisterDataAccess(services);
-                RegisterCache(services);
                 RegisterBusinessServices(services);
                 RegisterDBInitService(services);
 
@@ -40,13 +39,6 @@ namespace Application.DataAccessLayer.Service.Common
             services.AddScoped(typeof(IRepository<>), typeof(GenericRepository<>));
             services.AddScoped(typeof(IFilterService<>), typeof(FilterService<>));
             services.AddScoped<ICascadeSoftDeleteService, CascadeSoftDeleteService>();
-        }
-
-        private static void RegisterCache(IServiceCollection services)
-        {
-            services.AddMemoryCache();
-            services.AddScoped(typeof(ICacheStrategy<>), typeof(MemoryCacheStrategy<>));
-            services.AddScoped(typeof(ICacheService<>), typeof(CacheService<>));
         }
 
         private static void RegisterBusinessServices(IServiceCollection services)

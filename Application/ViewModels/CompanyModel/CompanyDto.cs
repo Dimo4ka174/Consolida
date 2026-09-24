@@ -1,6 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Mvc.Rendering;
+using System.ComponentModel.DataAnnotations;
 using DB.Entity.Enum;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Application.ViewModels.CompanyModel
 {
@@ -25,6 +25,6 @@ namespace Application.ViewModels.CompanyModel
 
 
         public List<SelectListItem> CitiesList { get; set; } = new List<SelectListItem>();
-        public List<SelectListItem> CountriesList { get; set; } = new List<SelectListItem>();        
+        public List<SelectListItem> CountriesList { get; set; } = new List<SelectListItem>();
     }
 }

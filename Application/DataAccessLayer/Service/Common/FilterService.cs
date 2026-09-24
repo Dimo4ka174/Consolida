@@ -1,7 +1,7 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using System.Reflection;
-using DB.Abstract;
 using Application.DataAccessLayer.Interface.Common;
+using DB.Abstract;
 
 namespace Application.DataAccessLayer.Service.Common
 {

@@ -1,4 +1,4 @@
-﻿using Application.DataAccessLayer.Service.Common;
+using Application.DataAccessLayer.Service.Common;
 using DB.Abstract;
 
 namespace Application.DataAccessLayer.Interface.Common

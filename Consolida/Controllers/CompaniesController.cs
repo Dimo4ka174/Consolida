@@ -2,8 +2,8 @@ using Application.DataAccessLayer.Interface.Entities;
 using Application.DataAccessLayer.Service.Common;
 using Application.ViewModels.CompanyModel;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Consolida.Controllers
 {

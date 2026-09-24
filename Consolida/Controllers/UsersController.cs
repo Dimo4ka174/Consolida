@@ -1,10 +1,10 @@
 using Application.DataAccessLayer.Service.Common;
 using Application.ViewModels.UserViewModel;
+using DB.Authorization;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using DB.Authorization;
+using Microsoft.EntityFrameworkCore;
 
 namespace Consolida.Controllers
 {

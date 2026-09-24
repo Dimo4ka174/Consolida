@@ -1,6 +1,6 @@
-using Application.ViewModels.CustomerModel;
-using Application.ViewModels.CompanyModel;
 using Application.ViewModels.CityModel;
+using Application.ViewModels.CompanyModel;
+using Application.ViewModels.CustomerModel;
 using AutoMapper;
 using DB.Entity;
 

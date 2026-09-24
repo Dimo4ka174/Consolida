@@ -1,13 +1,13 @@
 using Application.DataAccessLayer.Interface.Common;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Configuration;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+using DB;
 using DB.Authorization;
 using DB.DataSeeder;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Npgsql;
-using DB;
 
 namespace Application.DataAccessLayer.Service.Common
 {

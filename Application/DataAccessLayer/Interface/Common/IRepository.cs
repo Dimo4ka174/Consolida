@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using DB.Abstract;
 
 namespace Application.DataAccessLayer.Interface.Common

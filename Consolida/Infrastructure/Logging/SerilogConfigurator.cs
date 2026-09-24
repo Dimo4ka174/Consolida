@@ -1,6 +1,6 @@
-using Serilog.Formatting.Compact;
-using Serilog.Events;
 using Serilog;
+using Serilog.Events;
+using Serilog.Formatting.Compact;
 
 namespace Consolida.Infrastructure.Logging
 {

@@ -1,7 +1,7 @@
-using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
-using DB.Entity.Enum;
+using System.ComponentModel.DataAnnotations.Schema;
 using DB.Abstract;
+using DB.Entity.Enum;
 
 namespace DB.Entity
 {

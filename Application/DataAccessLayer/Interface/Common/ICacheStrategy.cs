@@ -1,4 +1,4 @@
-﻿namespace Application.DataAccessLayer.Interface.Common
+namespace Application.DataAccessLayer.Interface.Common
 {
     /// <summary>
     /// Стратегия кэширования. Strategy — мы можем подставить любую реализацию (MemoryCache или Redis), и кэш-сервис будет работать одинаково.

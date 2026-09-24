@@ -1,9 +1,9 @@
 using Application.DataAccessLayer.Interface.Entities;
 using Application.DataAccessLayer.Service.Common;
-using Microsoft.AspNetCore.Authorization;
 using Application.ViewModels.CityModel;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Consolida.Controllers
 {

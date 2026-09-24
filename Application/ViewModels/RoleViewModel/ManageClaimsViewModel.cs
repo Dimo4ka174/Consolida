@@ -1,4 +1,4 @@
-﻿namespace Application.ViewModels.RoleViewModel
+namespace Application.ViewModels.RoleViewModel
 {
     public class ManageClaimsViewModel
     {

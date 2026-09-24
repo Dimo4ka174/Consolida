@@ -1,11 +1,11 @@
-using Application.DataAccessLayer.Interface.Entities;
 using Application.DataAccessLayer.Interface.Common;
+using Application.DataAccessLayer.Interface.Entities;
 using Application.DataAccessLayer.Service.Common;
 using Application.ViewModels.CustomerModel;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using DB.Entity.Enum;
 using AutoMapper;
 using DB.Entity;
+using DB.Entity.Enum;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Application.DataAccessLayer.Service.Entity
 {

@@ -1,8 +1,8 @@
 using Application.ViewModels.RoleViewModel;
+using DB.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using DB.Authorization;
 
 namespace Consolida.Controllers
 {

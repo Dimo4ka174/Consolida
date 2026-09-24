@@ -1,7 +1,7 @@
 using Application.DataAccessLayer.Interface.Common;
 using Application.DataAccessLayer.Service.Common;
-using Consolida.Infrastructure.Logging;
 using Consolida.Extensions;
+using Consolida.Infrastructure.Logging;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,15 +18,21 @@ builder.Services
     .AddCustomDataProtection(builder.Configuration)
     .AddCustomAuthentication()
     .AddCustomAuthorization()
-    .AddCustomControllers();
+    .AddCustomControllers()
+    .AddCustomSwagger()
+    .AddCustomCache(builder.Configuration);
 
-// Регистрация всех прикладных сервисов через ServiceFactory
 var serviceFactory = new ServiceFactory();
 serviceFactory.RegisterServices(builder.Services);
 
 var app = builder.Build();
 
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+else
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
@@ -45,7 +51,7 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-// Инициализация БД и сидирование
+// Инициализация БД
 try
 {
     using var scope = app.Services.CreateScope();

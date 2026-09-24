@@ -1,9 +1,9 @@
+using System.Linq.Expressions;
 using Application.DataAccessLayer.Interface.Common;
 using DB.Abstract;
 using DB.Entity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System.Linq.Expressions;
 
 namespace Application.DataAccessLayer.Service.Common
 {

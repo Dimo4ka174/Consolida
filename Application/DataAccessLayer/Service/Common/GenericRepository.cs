@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
-using DB.Abstract;
-using DB;
 using Application.DataAccessLayer.Interface.Common;
+using DB;
+using DB.Abstract;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.DataAccessLayer.Service.Common
 {
@@ -17,7 +17,7 @@ namespace Application.DataAccessLayer.Service.Common
         }
 
         public virtual async Task Create(T entity) => await _dbSet.AddAsync(entity);
-        
+
         public virtual async Task<T?> GetById(int? Id) => await _dbSet.FirstOrDefaultAsync(x => x.Id == Id && !x.IsDeleted);
         public virtual void Update(T entity)
         {
@@ -34,7 +34,7 @@ namespace Application.DataAccessLayer.Service.Common
             }
         }
 
-        public virtual async Task CreateRange(IEnumerable<T> entities) => await _dbSet.AddRangeAsync(entities);        
+        public virtual async Task CreateRange(IEnumerable<T> entities) => await _dbSet.AddRangeAsync(entities);
         public virtual void UpdateRange(IEnumerable<T> entities) => _dbSet.UpdateRange(entities);
         public virtual async Task DeleteRange(IEnumerable<int?> ids)
         {

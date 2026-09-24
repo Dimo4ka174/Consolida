@@ -1,6 +1,6 @@
+using DB.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
-using DB.Authorization;
 
 namespace DB.DataSeeder
 {

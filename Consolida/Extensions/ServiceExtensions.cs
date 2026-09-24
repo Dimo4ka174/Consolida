@@ -1,7 +1,12 @@
+using Application.DataAccessLayer.Interface.Common;
+using Application.DataAccessLayer.Service.Common;
 using Microsoft.AspNetCore.DataProtection;
 using Consolida.Infrastructure.Email;
+using Consolida.Infrastructure.Redis;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using StackExchange.Redis;
+using Microsoft.OpenApi;
 using DB.Authorization;
 using DB.Auth;
 using DB;
@@ -10,12 +15,7 @@ namespace Consolida.Extensions
 {
     public static class ServiceExtensions
     {
-        /// <summary>
-        /// DbContext + ASP.NET Core Identity с кастомным ApplicationUser.
-        /// </summary>
-        public static IServiceCollection AddCustomDatabaseAndIdentity(
-            this IServiceCollection services,
-            IConfiguration configuration)
+        public static IServiceCollection AddCustomDatabaseAndIdentity(this IServiceCollection services, IConfiguration configuration)
         {
             var connectionString = configuration.GetConnectionString("DefaultConnection")
                 ?? throw new InvalidOperationException(
@@ -54,11 +54,7 @@ namespace Consolida.Extensions
             return services;
         }
 
-        /// <summary>
-        /// Настройки cookie аутентификации.
-        /// </summary>
-        public static IServiceCollection AddCustomAuthentication(
-            this IServiceCollection services)
+        public static IServiceCollection AddCustomAuthentication(this IServiceCollection services)
         {
             services.ConfigureApplicationCookie(options =>
             {
@@ -69,8 +65,6 @@ namespace Consolida.Extensions
                 options.Cookie.SameSite = SameSiteMode.Lax;
                 options.Cookie.Name = "Consolida.Auth";
                 options.Cookie.IsEssential = true;
-
-                // SameAsRequest — работает и по HTTP, и по HTTPS.
                 options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
 
                 options.LoginPath = "/Identity/Account/Login";
@@ -82,11 +76,7 @@ namespace Consolida.Extensions
             return services;
         }
 
-        /// <summary>
-        /// Регистрация permission-политик из DB.Authorization.
-        /// </summary>
-        public static IServiceCollection AddCustomAuthorization(
-            this IServiceCollection services)
+        public static IServiceCollection AddCustomAuthorization(this IServiceCollection services)
         {
             services.AddAuthorization(options =>
             {
@@ -96,13 +86,7 @@ namespace Consolida.Extensions
             return services;
         }
 
-        /// <summary>
-        /// Data Protection: ключи шифрования в файловой системе.
-        /// Для Docker путь /app/DataProtection-Keys; локально — DataProtection-Keys/ в корне.
-        /// </summary>
-        public static IServiceCollection AddCustomDataProtection(
-            this IServiceCollection services,
-            IConfiguration configuration)
+        public static IServiceCollection AddCustomDataProtection(this IServiceCollection services, IConfiguration configuration)
         {
             var isContainer = Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true";
             var path = configuration["DATA_PROTECTION_PATH"]
@@ -120,14 +104,66 @@ namespace Consolida.Extensions
             return services;
         }
 
-        /// <summary>
-        /// MVC + Razor Pages.
-        /// </summary>
-        public static IServiceCollection AddCustomControllers(
-            this IServiceCollection services)
+        public static IServiceCollection AddCustomControllers(this IServiceCollection services)
         {
             services.AddControllersWithViews();
             services.AddRazorPages();
+            return services;
+        }
+
+        public static IServiceCollection AddCustomSwagger(this IServiceCollection services)
+        {
+            services.AddEndpointsApiExplorer();
+            services.AddSwaggerGen(options =>
+            {
+                options.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "Consolida API",
+                    Version = "v1",
+                    Description = "Справочники и заказы"
+                });
+            });
+
+            return services;
+        }
+
+        public static IServiceCollection AddCustomCache(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddMemoryCache();
+
+            var redisHost = configuration["REDIS_HOST"];
+
+            if (!string.IsNullOrEmpty(redisHost))
+            {
+                services.Configure<RedisOptions>(options =>
+                {
+                    options.Host = redisHost;
+                    options.Port = configuration.GetValue("REDIS_PORT", 6379);
+                    options.Password = configuration["REDIS_PASSWORD"];
+                    options.InstanceName = configuration["REDIS_INSTANCE_NAME"] ?? "Consolida_";
+                });
+
+                services.AddSingleton<RedisConnectionService>();
+
+                services.AddStackExchangeRedisCache(options =>
+                {
+                    options.ConnectionMultiplexerFactory = () =>
+                    {
+                        var sp = services.BuildServiceProvider();
+                        var svc = sp.GetRequiredService<RedisConnectionService>();
+                        return Task.FromResult<IConnectionMultiplexer>(svc.Connection);
+                    };
+                    options.InstanceName = configuration["REDIS_INSTANCE_NAME"] ?? "Consolida_";
+                });
+
+                services.AddScoped(typeof(ICacheStrategy<>), typeof(RedisCacheStrategy<>));
+            }
+            else
+            {
+                services.AddScoped(typeof(ICacheStrategy<>), typeof(MemoryCacheStrategy<>));
+            }
+
+            services.AddScoped(typeof(ICacheService<>), typeof(CacheService<>));
             return services;
         }
     }

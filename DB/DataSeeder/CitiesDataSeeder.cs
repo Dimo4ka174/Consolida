@@ -1,5 +1,5 @@
-using Microsoft.Extensions.Logging;
 using DB.Entity;
+using Microsoft.Extensions.Logging;
 
 namespace DB.DataSeeder
 {

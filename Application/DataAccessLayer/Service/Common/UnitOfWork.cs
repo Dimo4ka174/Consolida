@@ -1,9 +1,9 @@
-using Application.DataAccessLayer.Interface.Common;
-using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Concurrent;
+using Application.DataAccessLayer.Interface.Common;
+using DB;
 using DB.Abstract;
 using DB.Entity;
-using DB;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Application.DataAccessLayer.Service.Common
 {

@@ -2,8 +2,8 @@ using Application.DataAccessLayer.Interface.Entities;
 using Application.DataAccessLayer.Service.Common;
 using Application.ViewModels.CustomerModel;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Consolida.Controllers
 {
@@ -110,7 +110,7 @@ namespace Consolida.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int? id, CustomerDto model,[FromForm] int page, [FromForm] string? searchStringCompany, [FromForm] string? searchStringFirstName, [FromForm] string? searchStringLastName, [FromForm] string? sortOrder)
+        public async Task<IActionResult> Edit(int? id, CustomerDto model, [FromForm] int page, [FromForm] string? searchStringCompany, [FromForm] string? searchStringFirstName, [FromForm] string? searchStringLastName, [FromForm] string? sortOrder)
         {
             if (id == null || id != model.Id)
                 return NotFound();

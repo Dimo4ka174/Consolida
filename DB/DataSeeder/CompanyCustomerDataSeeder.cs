@@ -1,7 +1,7 @@
+using DB.Entity;
+using DB.Entity.Enum;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using DB.Entity.Enum;
-using DB.Entity;
 
 namespace DB.DataSeeder
 {

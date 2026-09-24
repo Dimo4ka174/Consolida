@@ -1,4 +1,4 @@
-﻿namespace Application.DataAccessLayer.Service.Common
+namespace Application.DataAccessLayer.Service.Common
 {
     public class PagingHelpers
     {
