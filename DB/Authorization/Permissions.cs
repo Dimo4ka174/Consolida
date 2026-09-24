@@ -91,5 +91,14 @@ namespace DB.Authorization
             public const string Delete = "delete_tax_types";
             public static readonly string[] All = { Read, Create, Edit, Delete };
         }
+
+        public static class Orders
+        {
+            public const string Read = "read_orders";
+            public const string Create = "create_orders";
+            public const string Edit = "edit_orders";
+            public const string Delete = "delete_orders";
+            public static readonly string[] All = { Read, Create, Edit, Delete };
+        }
     }
 }

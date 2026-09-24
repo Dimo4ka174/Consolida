@@ -16,6 +16,7 @@ namespace DB.Authorization
             AddProduct(options);
             AddMeasureUnit(options);
             AddTaxType(options);
+            AddOrder(options);
         }
 
         private static void AddRole(AuthorizationOptions options)
@@ -106,6 +107,15 @@ namespace DB.Authorization
             options.AddPolicy("CreateTaxTypes", policy => policy.RequireClaim("Permission", Permissions.TaxTypes.Create));
             options.AddPolicy("EditTaxTypes", policy => policy.RequireClaim("Permission", Permissions.TaxTypes.Edit));
             options.AddPolicy("DeleteTaxTypes", policy => policy.RequireClaim("Permission", Permissions.TaxTypes.Delete));
+        }
+
+        private static void AddOrder(AuthorizationOptions options)
+        {
+            options.AddPolicy("OrderManager", policy => policy.RequireClaim("Permission", Permissions.Orders.All));
+            options.AddPolicy("ReadOrders", policy => policy.RequireClaim("Permission", Permissions.Orders.Read));
+            options.AddPolicy("CreateOrders", policy => policy.RequireClaim("Permission", Permissions.Orders.Create));
+            options.AddPolicy("EditOrders", policy => policy.RequireClaim("Permission", Permissions.Orders.Edit));
+            options.AddPolicy("DeleteOrders", policy => policy.RequireClaim("Permission", Permissions.Orders.Delete));
         }
     }
 }

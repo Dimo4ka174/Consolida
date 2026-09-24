@@ -14,6 +14,7 @@ namespace DB.Authorization
             { "Products", "Продукция" },
             { "MeasureUnits", "Единицы измерения" },
             { "TaxTypes", "Налоги" },
+            { "Orders", "Заказы" },
         };
     }
 }

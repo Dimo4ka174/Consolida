@@ -10,5 +10,6 @@ namespace Application.DataAccessLayer.Interface.Common
         Task DeleteProduct(int productId, CancellationToken ct = default);
         Task DeleteMeasureUnit(int measureUnitId, CancellationToken ct = default);
         Task DeleteTaxType(int taxTypeId, CancellationToken ct = default);
+        Task DeleteOrder(int orderId, CancellationToken ct = default);
     }
 }

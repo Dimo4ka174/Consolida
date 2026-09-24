@@ -1,9 +1,9 @@
-using Application.DataAccessLayer.Interface.Common;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using System.Linq.Expressions;
+using Application.DataAccessLayer.Interface.Common;
 using DB.Abstract;
 using DB.Entity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Application.DataAccessLayer.Service.Common
 {
@@ -143,11 +143,9 @@ namespace Application.DataAccessLayer.Service.Common
             var idsList = manufacturerIds.Where(id => id != null && id > 0).Select(id => id.Value).ToList();
             if (!idsList.Any()) return;
 
-            // 1. Мягко удаляем самих производителей
             await MarkAsDeleted(_unitOfWork.GetRepository<Manufacturer>().GetQueryable(),
                 m => idsList.Contains(m.Id.Value), ct);
 
-            // 2. Каскадно удаляем продукцию этих производителей
             var productIds = await _unitOfWork.GetRepository<Product>().GetQueryable()
                 .Where(p => p.ManufacturerId.HasValue && idsList.Contains(p.ManufacturerId.Value))
                 .Select(p => p.Id)
@@ -156,7 +154,6 @@ namespace Application.DataAccessLayer.Service.Common
             if (productIds.Any())
                 await DeleteProducts(productIds, ct);
 
-            // 3. Сбрасываем кэш производителей
             await _manufacturerCacheService.UpdateCacheAsync();
         }
 
@@ -179,11 +176,9 @@ namespace Application.DataAccessLayer.Service.Common
             var idsList = codeIds.Where(id => id != null && id > 0).Select(id => id.Value).ToList();
             if (!idsList.Any()) return;
 
-            // 1. Мягко удаляем коды ТН ВЭД
             await MarkAsDeleted(_unitOfWork.GetRepository<CodeTNVD>().GetQueryable(),
                 c => idsList.Contains(c.Id.Value), ct);
 
-            // 2. Каскадно удаляем продукцию с этими кодами
             var productIds = await _unitOfWork.GetRepository<Product>().GetQueryable()
                 .Where(p => p.CodeTNVDId.HasValue && idsList.Contains(p.CodeTNVDId.Value))
                 .Select(p => p.Id)
@@ -215,8 +210,7 @@ namespace Application.DataAccessLayer.Service.Common
             await MarkAsDeleted(_unitOfWork.GetRepository<Product>().GetQueryable(),
                 p => idsList.Contains(p.Id.Value), ct);
 
-            // TODO (коммит Order): каскадно помечать OrderProduct,
-            // которые ссылаются на эти продукты.
+            // TODO (коммит Order): каскадно помечать OrderProduct.
         }
 
         // -------------------- MeasureUnit --------------------
@@ -238,11 +232,9 @@ namespace Application.DataAccessLayer.Service.Common
             var idsList = measureUnitIds.Where(id => id != null && id > 0).Select(id => id.Value).ToList();
             if (!idsList.Any()) return;
 
-            // 1. Мягко удаляем сами единицы измерения
             await MarkAsDeleted(_unitOfWork.GetRepository<MeasureUnit>().GetQueryable(),
                 m => idsList.Contains(m.Id.Value), ct);
 
-            // 2. Каскадно удаляем налоги, которые ссылаются на эти единицы
             var taxTypeIds = await _unitOfWork.GetRepository<TaxType>().GetQueryable()
                 .Where(t => t.MeasureUnitId.HasValue && idsList.Contains(t.MeasureUnitId.Value))
                 .Select(t => t.Id)
@@ -276,9 +268,72 @@ namespace Application.DataAccessLayer.Service.Common
             await MarkAsDeleted(_unitOfWork.GetRepository<TaxType>().GetQueryable(),
                 t => idsList.Contains(t.Id.Value), ct);
 
-            // TODO (коммит Order): каскадно помечать OrderTaxProduct, ссылающиеся на эти налоги.
+            // OrderTaxProduct, привязанные к этому налогу, тоже помечаем удалёнными
+            await MarkAsDeleted(_unitOfWork.GetRepository<OrderTaxProduct>().GetQueryable(),
+                otp => otp.TaxTypeId.HasValue && idsList.Contains(otp.TaxTypeId.Value), ct);
+
+            // OrderTax, привязанные к этому налогу
+            await MarkAsDeleted(_unitOfWork.GetRepository<OrderTax>().GetQueryable(),
+                ot => ot.TaxTypeId.HasValue && idsList.Contains(ot.TaxTypeId.Value), ct);
 
             await _taxTypeCacheService.UpdateCacheAsync();
+        }
+
+        // -------------------- Order --------------------
+
+        public async Task DeleteOrder(int orderId, CancellationToken ct = default)
+        {
+            if (orderId <= 0) throw new ArgumentException("Invalid Order ID");
+            _logger.LogInformation("Deleting Order ID: {OrderId}", orderId);
+
+            if (_unitOfWork.HasActiveTransaction)
+                await DeleteOrders(new List<int?> { orderId }, ct);
+            else
+                await _unitOfWork.ExecuteInTransactionAsync(
+                    () => DeleteOrders(new List<int?> { orderId }, ct), ct);
+        }
+
+        private async Task DeleteOrders(IEnumerable<int?> orderIds, CancellationToken ct)
+        {
+            var idsList = orderIds.Where(id => id != null && id > 0).Select(id => id.Value).ToList();
+            if (!idsList.Any()) return;
+
+            // 1. Собираем ID продуктов заказа (понадобится для каскада на MetrologicalInfo)
+            var orderProductIds = await _unitOfWork.GetRepository<OrderProduct>().GetQueryable()
+                .Where(op => op.OrderId.HasValue && idsList.Contains(op.OrderId.Value))
+                .Select(op => op.Id)
+                .ToListAsync(ct);
+
+            // 2. Мягко удаляем сам заказ
+            await MarkAsDeleted(_unitOfWork.GetRepository<Order>().GetQueryable(),
+                o => idsList.Contains(o.Id.Value), ct);
+
+            // 3. Каскад: OrderProduct
+            if (orderProductIds.Any())
+            {
+                await MarkAsDeleted(_unitOfWork.GetRepository<OrderProduct>().GetQueryable(),
+                    op => orderProductIds.Contains(op.Id.Value), ct);
+
+                // MetrologicalInfo, привязанные к OrderProduct
+                await MarkAsDeleted(_unitOfWork.GetRepository<MetrologicalInfo>().GetQueryable(),
+                    mi => mi.OrderProductId.HasValue && orderProductIds.Contains(mi.OrderProductId.Value), ct);
+            }
+
+            // 4. Каскад: OrderTax
+            await MarkAsDeleted(_unitOfWork.GetRepository<OrderTax>().GetQueryable(),
+                ot => ot.OrderId.HasValue && idsList.Contains(ot.OrderId.Value), ct);
+
+            // 5. Каскад: OrderTaxProduct
+            await MarkAsDeleted(_unitOfWork.GetRepository<OrderTaxProduct>().GetQueryable(),
+                otp => otp.OrderId.HasValue && idsList.Contains(otp.OrderId.Value), ct);
+
+            // 6. Каскад: OrderStatusHistory
+            await MarkAsDeleted(_unitOfWork.GetRepository<OrderStatusHistory>().GetQueryable(),
+                osh => osh.OrderId.HasValue && idsList.Contains(osh.OrderId.Value), ct);
+
+            // 7. Каскад: MetrologicalInfo, привязанные к самому заказу
+            await MarkAsDeleted(_unitOfWork.GetRepository<MetrologicalInfo>().GetQueryable(),
+                mi => mi.OrderId.HasValue && idsList.Contains(mi.OrderId.Value), ct);
         }
 
         // -------------------- Helper --------------------

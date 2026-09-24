@@ -56,9 +56,10 @@ https/
 *.key
 
 # --- Шаблоны документов с реальными данными ---
-wwwroot/documentTemplates/ТКП*.xlsx
-wwwroot/documentTemplates/ФормаОтвета*.xlsx
-!wwwroot/documentTemplates/.gitkeep
+**/documentTemplates/ТКП*.xlsx
+**/documentTemplates/ФормаОтвета*.xlsx
+**/documentTemplates/Примеры/
+!**/documentTemplates/.gitkeep
 
 # --- Нативные библиотеки ---
 NativeLibs/*

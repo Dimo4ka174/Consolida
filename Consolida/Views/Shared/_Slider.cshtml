@@ -8,14 +8,21 @@
     <nav class="sidebar-nav-wrapper">
         <ul class="sidebar-menu">
 
+            @if ((await AuthorizationService.AuthorizeAsync(User, "ReadOrders")).Succeeded)
+            {
+                <li class="sidebar-item">
+                    <a class="sidebar-btn @(Context.Request.Path.StartsWithSegments("/Orders") ? "active" : "")" href="/Orders">
+                        <span class="mask-icon mask-icon-catalog"></span>
+                        <span class="sidebar-btn-label">Заказы</span>
+                    </a>
+                </li>
+            }
+
             @if ((await AuthorizationService.AuthorizeAsync(User, "ReadCities")).Succeeded ||
                  (await AuthorizationService.AuthorizeAsync(User, "ReadCompanies")).Succeeded ||
                  (await AuthorizationService.AuthorizeAsync(User, "ReadCustomers")).Succeeded ||
-                 (await AuthorizationService.AuthorizeAsync(User, "ReadCodesTNVD")).Succeeded ||
                  (await AuthorizationService.AuthorizeAsync(User, "ReadManufacturers")).Succeeded ||
-                 (await AuthorizationService.AuthorizeAsync(User, "ReadProducts")).Succeeded ||
-                 (await AuthorizationService.AuthorizeAsync(User, "ReadMeasureUnits")).Succeeded ||
-                 (await AuthorizationService.AuthorizeAsync(User, "ReadTaxTypes")).Succeeded)
+                 (await AuthorizationService.AuthorizeAsync(User, "ReadProducts")).Succeeded)
             {
                 <li class="sidebar-item">
                     <button type="button" class="sidebar-btn" data-bs-toggle="dropdown" aria-expanded="false">
@@ -35,10 +42,6 @@
                         {
                             <li><a class="dropdown-item @(Context.Request.Path.StartsWithSegments("/Customers") ? "active" : "")" href="/Customers">Клиенты</a></li>
                         }
-                        @if ((await AuthorizationService.AuthorizeAsync(User, "ReadCodesTNVD")).Succeeded)
-                        {
-                            <li><a class="dropdown-item @(Context.Request.Path.StartsWithSegments("/CodeTNVDs") ? "active" : "")" href="/CodesTNVDs">Коды ТН ВЭД</a></li>
-                        }
                         @if ((await AuthorizationService.AuthorizeAsync(User, "ReadManufacturers")).Succeeded)
                         {
                             <li><a class="dropdown-item @(Context.Request.Path.StartsWithSegments("/Manufacturers") ? "active" : "")" href="/Manufacturers">Производители</a></li>
@@ -46,6 +49,24 @@
                         @if ((await AuthorizationService.AuthorizeAsync(User, "ReadProducts")).Succeeded)
                         {
                             <li><a class="dropdown-item @(Context.Request.Path.StartsWithSegments("/Products") ? "active" : "")" href="/Products">Продукция</a></li>
+                        }
+                    </ul>
+                </li>
+            }
+
+            @if ((await AuthorizationService.AuthorizeAsync(User, "ReadCodesTNVD")).Succeeded ||
+                 (await AuthorizationService.AuthorizeAsync(User, "ReadMeasureUnits")).Succeeded ||
+                 (await AuthorizationService.AuthorizeAsync(User, "ReadTaxTypes")).Succeeded)
+            {
+                <li class="sidebar-item">
+                    <button type="button" class="sidebar-btn" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="mask-icon mask-icon-percent"></span>
+                        <span class="sidebar-btn-label">Налоги</span>
+                    </button>
+                    <ul class="dropdown-menu sidebar-dropdown">
+                        @if ((await AuthorizationService.AuthorizeAsync(User, "ReadCodesTNVD")).Succeeded)
+                        {
+                            <li><a class="dropdown-item @(Context.Request.Path.StartsWithSegments("/CodeTNVDs") ? "active" : "")" href="/CodeTNVDs">Коды ТН ВЭД</a></li>
                         }
                         @if ((await AuthorizationService.AuthorizeAsync(User, "ReadMeasureUnits")).Succeeded)
                         {
@@ -89,12 +110,12 @@
                     @if (SignInManager.IsSignedIn(User))
                     {
                         <li><a class="dropdown-item @(Context.Request.Path.StartsWithSegments("/Identity/Account/Manage") ? "active" : "")" asp-area="Identity" asp-page="/Account/Manage/Index">Профиль</a></li>
-                        <li><a class="dropdown-item" asp-area="Identity" asp-page="/Account/Logout">Выход</a></li>
+                        <li><a class="dropdown-item @(Context.Request.Path.StartsWithSegments("/Identity/Account/Logout") ? "active" : "")" asp-area="Identity" asp-page="/Account/Logout">Выход</a></li>
                     }
                     else
                     {
-                        <li><a class="dropdown-item" asp-area="Identity" asp-page="/Account/Login">Вход</a></li>
-                        <li><a class="dropdown-item" asp-area="Identity" asp-page="/Account/Register">Регистрация</a></li>
+                        <li><a class="dropdown-item @(Context.Request.Path.StartsWithSegments("/Identity/Account/Login") ? "active" : "")" asp-area="Identity" asp-page="/Account/Login">Вход</a></li>
+                        <li><a class="dropdown-item @(Context.Request.Path.StartsWithSegments("/Identity/Account/Register") ? "active" : "")" asp-area="Identity" asp-page="/Account/Register">Регистрация</a></li>
                     }
                 </ul>
             </li>

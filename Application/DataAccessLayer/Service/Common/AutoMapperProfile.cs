@@ -4,10 +4,13 @@ using Application.ViewModels.CompanyModel;
 using Application.ViewModels.CustomerModel;
 using Application.ViewModels.ManufacturerModel;
 using Application.ViewModels.MeasureUnitModel;
+using Application.ViewModels.OrderModel;
+using Application.ViewModels.OrderModel.Products;
 using Application.ViewModels.ProductModel;
 using Application.ViewModels.TaxTypeModel;
 using AutoMapper;
 using DB.Entity;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Application.DataAccessLayer.Service.Common
 {
@@ -15,115 +18,239 @@ namespace Application.DataAccessLayer.Service.Common
     {
         public AutoMapperProfile()
         {
-            // -------------------- City --------------------
+            // ============================================================
+            // =================== БАЗОВЫЕ СПРАВОЧНИКИ =====================
+            // ============================================================
+
+            // --- City ---
             CreateMap<CityDto, City>()
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
-                .ForMember(dest => dest.Companies, opt => opt.Ignore())
+                .ForMember(d => d.Id, o => o.MapFrom(s => s.Id))
+                .ForMember(d => d.Name, o => o.MapFrom(s => s.Name))
+                .ForMember(d => d.Companies, o => o.Ignore())
                 .ReverseMap();
 
-            // -------------------- Company --------------------
+            // --- Company ---
             CreateMap<CompanyDto, Company>()
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
-                .ForMember(dest => dest.CityId, opt => opt.MapFrom(src => src.CityId))
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
-                .ForMember(dest => dest.Country, opt => opt.MapFrom(src => src.Country))
-                .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
-                .ForMember(dest => dest.City, opt => opt.Ignore())
-                .ForMember(dest => dest.Customers, opt => opt.Ignore())
+                .ForMember(d => d.Id, o => o.MapFrom(s => s.Id))
+                .ForMember(d => d.CityId, o => o.MapFrom(s => s.CityId))
+                .ForMember(d => d.Name, o => o.MapFrom(s => s.Name))
+                .ForMember(d => d.Country, o => o.MapFrom(s => s.Country))
+                .ForMember(d => d.Address, o => o.MapFrom(s => s.Address))
+                .ForMember(d => d.City, o => o.Ignore())
+                .ForMember(d => d.Customers, o => o.Ignore())
                 .ReverseMap()
-                .ForMember(dest => dest.CitiesList, opt => opt.Ignore())
-                .ForMember(dest => dest.CountriesList, opt => opt.Ignore());
+                .ForMember(d => d.CitiesList, o => o.Ignore())
+                .ForMember(d => d.CountriesList, o => o.Ignore());
 
-            // -------------------- Customer --------------------
+            // --- Customer ---
             CreateMap<CustomerDto, Customer>()
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
-                .ForMember(dest => dest.CompanyId, opt => opt.MapFrom(src => src.CompanyId))
-                .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.FirstName))
-                .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.LastName))
-                .ForMember(dest => dest.MiddleName, opt => opt.MapFrom(src => src.MiddleName))
-                .ForMember(dest => dest.PositionJob, opt => opt.MapFrom(src => src.PositionJob))
-                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
-                .ForMember(dest => dest.Phone, opt => opt.MapFrom(src => src.Phone))
-                .ForMember(dest => dest.PreferredMethod, opt => opt.MapFrom(src => src.PreferredMethod))
-                .ForMember(dest => dest.Company, opt => opt.Ignore())
+                .ForMember(d => d.Id, o => o.MapFrom(s => s.Id))
+                .ForMember(d => d.CompanyId, o => o.MapFrom(s => s.CompanyId))
+                .ForMember(d => d.FirstName, o => o.MapFrom(s => s.FirstName))
+                .ForMember(d => d.LastName, o => o.MapFrom(s => s.LastName))
+                .ForMember(d => d.MiddleName, o => o.MapFrom(s => s.MiddleName))
+                .ForMember(d => d.PositionJob, o => o.MapFrom(s => s.PositionJob))
+                .ForMember(d => d.Email, o => o.MapFrom(s => s.Email))
+                .ForMember(d => d.Phone, o => o.MapFrom(s => s.Phone))
+                .ForMember(d => d.PreferredMethod, o => o.MapFrom(s => s.PreferredMethod))
+                .ForMember(d => d.Company, o => o.Ignore())
                 .ReverseMap()
-                .ForMember(dest => dest.CompanyName, opt => opt.Ignore())
-                .ForMember(dest => dest.CompaniesList, opt => opt.Ignore())
-                .ForMember(dest => dest.PreferredMethodsList, opt => opt.Ignore());
+                .ForMember(d => d.CompanyName, o => o.Ignore())
+                .ForMember(d => d.CompaniesList, o => o.Ignore())
+                .ForMember(d => d.PreferredMethodsList, o => o.Ignore());
 
-            // -------------------- CodeTNVD --------------------
+            // --- CodeTNVD ---
             CreateMap<CodeTNVD, CodeTNVDdto>()
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
-                .ForMember(dest => dest.Rate, opt => opt.MapFrom(src => src.Rate));
+                .ForMember(d => d.Id, o => o.MapFrom(s => s.Id))
+                .ForMember(d => d.Name, o => o.MapFrom(s => s.Name))
+                .ForMember(d => d.Rate, o => o.MapFrom(s => s.Rate));
 
             CreateMap<CodeTNVDdto, CodeTNVD>()
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
-                .ForMember(dest => dest.Rate, opt => opt.MapFrom(src => src.Rate))
-                .ForMember(dest => dest.IsDeleted, opt => opt.Ignore())
-                .ForMember(dest => dest.Products, opt => opt.Ignore());
+                .ForMember(d => d.Id, o => o.MapFrom(s => s.Id))
+                .ForMember(d => d.Name, o => o.MapFrom(s => s.Name))
+                .ForMember(d => d.Rate, o => o.MapFrom(s => s.Rate))
+                .ForMember(d => d.IsDeleted, o => o.Ignore())
+                .ForMember(d => d.Products, o => o.Ignore());
 
-            // -------------------- Manufacturer --------------------
+            // --- Manufacturer ---
             CreateMap<Manufacturer, ManufacturerDto>()
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name));
+                .ForMember(d => d.Id, o => o.MapFrom(s => s.Id))
+                .ForMember(d => d.Name, o => o.MapFrom(s => s.Name));
 
             CreateMap<ManufacturerDto, Manufacturer>()
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
-                .ForMember(dest => dest.IsDeleted, opt => opt.Ignore())
-                .ForMember(dest => dest.Products, opt => opt.Ignore());
+                .ForMember(d => d.Id, o => o.MapFrom(s => s.Id))
+                .ForMember(d => d.Name, o => o.MapFrom(s => s.Name))
+                .ForMember(d => d.IsDeleted, o => o.Ignore())
+                .ForMember(d => d.Products, o => o.Ignore());
 
-            // -------------------- Product --------------------
+            // --- Product ---
             CreateMap<Product, ProductDto>()
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
-                .ForMember(dest => dest.ManufacturerId, opt => opt.MapFrom(src => src.ManufacturerId))
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
-                .ForMember(dest => dest.Model, opt => opt.MapFrom(src => src.Model))
-                .ForMember(dest => dest.Cost, opt => opt.MapFrom(src => src.Price))
-                .ForMember(dest => dest.CreatedDate, opt => opt.MapFrom(src => src.CreatedDate))
-                .ForMember(dest => dest.ManufacturersList, opt => opt.Ignore());
+                .ForMember(d => d.Id, o => o.MapFrom(s => s.Id))
+                .ForMember(d => d.ManufacturerId, o => o.MapFrom(s => s.ManufacturerId))
+                .ForMember(d => d.Name, o => o.MapFrom(s => s.Name))
+                .ForMember(d => d.Model, o => o.MapFrom(s => s.Model))
+                .ForMember(d => d.Cost, o => o.MapFrom(s => s.Price))
+                .ForMember(d => d.CreatedDate, o => o.MapFrom(s => s.CreatedDate))
+                .ForMember(d => d.ManufacturersList, o => o.Ignore());
 
             CreateMap<ProductDto, Product>()
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
-                .ForMember(dest => dest.ManufacturerId, opt => opt.MapFrom(src => src.ManufacturerId))
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
-                .ForMember(dest => dest.Model, opt => opt.MapFrom(src => src.Model))
-                .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.Cost))
-                .ForMember(dest => dest.CreatedDate, opt => opt.MapFrom(src => src.CreatedDate))
-                .ForMember(dest => dest.CodeTNVDId, opt => opt.Ignore())
-                .ForMember(dest => dest.IsDeleted, opt => opt.Ignore())
-                .ForMember(dest => dest.CodeTNVD, opt => opt.Ignore())
-                .ForMember(dest => dest.Manufacturer, opt => opt.Ignore());
+                .ForMember(d => d.Id, o => o.MapFrom(s => s.Id))
+                .ForMember(d => d.ManufacturerId, o => o.MapFrom(s => s.ManufacturerId))
+                .ForMember(d => d.Name, o => o.MapFrom(s => s.Name))
+                .ForMember(d => d.Model, o => o.MapFrom(s => s.Model))
+                .ForMember(d => d.Price, o => o.MapFrom(s => s.Cost))
+                .ForMember(d => d.CreatedDate, o => o.MapFrom(s => s.CreatedDate))
+                .ForMember(d => d.CodeTNVDId, o => o.Ignore())
+                .ForMember(d => d.IsDeleted, o => o.Ignore())
+                .ForMember(d => d.CodeTNVD, o => o.Ignore())
+                .ForMember(d => d.Manufacturer, o => o.Ignore())
+                .ForMember(d => d.OrdersProducts, o => o.Ignore());
 
-            // -------------------- MeasureUnit --------------------
+            // --- MeasureUnit ---
             CreateMap<MeasureUnit, MeasureUnitDto>()
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name));
+                .ForMember(d => d.Id, o => o.MapFrom(s => s.Id))
+                .ForMember(d => d.Name, o => o.MapFrom(s => s.Name));
 
             CreateMap<MeasureUnitDto, MeasureUnit>()
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
-                .ForMember(dest => dest.IsDeleted, opt => opt.Ignore())
-                .ForMember(dest => dest.TaxTypes, opt => opt.Ignore());
+                .ForMember(d => d.Id, o => o.MapFrom(s => s.Id))
+                .ForMember(d => d.Name, o => o.MapFrom(s => s.Name))
+                .ForMember(d => d.IsDeleted, o => o.Ignore())
+                .ForMember(d => d.TaxTypes, o => o.Ignore());
 
-            // -------------------- TaxType --------------------
+            // --- TaxType ---
             CreateMap<TaxType, TaxTypeDto>()
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
-                .ForMember(dest => dest.Cost, opt => opt.MapFrom(src => src.Cost))
-                .ForMember(dest => dest.MeasureUnitId, opt => opt.MapFrom(src => src.MeasureUnitId))
-                .ForMember(dest => dest.MeasureUnitsList, opt => opt.Ignore());
+                .ForMember(d => d.Id, o => o.MapFrom(s => s.Id))
+                .ForMember(d => d.Name, o => o.MapFrom(s => s.Name))
+                .ForMember(d => d.Cost, o => o.MapFrom(s => s.Cost))
+                .ForMember(d => d.MeasureUnitId, o => o.MapFrom(s => s.MeasureUnitId))
+                .ForMember(d => d.MeasureUnitsList, o => o.Ignore());
 
             CreateMap<TaxTypeDto, TaxType>()
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
-                .ForMember(dest => dest.Cost, opt => opt.MapFrom(src => src.Cost))
-                .ForMember(dest => dest.MeasureUnitId, opt => opt.MapFrom(src => src.MeasureUnitId))
-                .ForMember(dest => dest.IsDeleted, opt => opt.Ignore())
-                .ForMember(dest => dest.MeasureUnit, opt => opt.Ignore());
+                .ForMember(d => d.Id, o => o.MapFrom(s => s.Id))
+                .ForMember(d => d.Name, o => o.MapFrom(s => s.Name))
+                .ForMember(d => d.Cost, o => o.MapFrom(s => s.Cost))
+                .ForMember(d => d.MeasureUnitId, o => o.MapFrom(s => s.MeasureUnitId))
+                .ForMember(d => d.IsDeleted, o => o.Ignore())
+                .ForMember(d => d.MeasureUnit, o => o.Ignore())
+                .ForMember(d => d.OrdersTax, o => o.Ignore());
+
+            // ============================================================
+            // ========================== ORDER ===========================
+            // ============================================================
+
+            // --- Order → OrderListDto (для списка заказов) ---
+            CreateMap<Order, OrderListDto>()
+                .ForMember(d => d.Id, o => o.MapFrom(s => s.Id))
+                .ForMember(d => d.OrderNumber, o => o.MapFrom(s => s.OrderNumber))
+                .ForMember(d => d.CustomerId, o => o.MapFrom(s => s.CustomerId))
+                .ForMember(d => d.CompanyId, o => o.MapFrom(s => s.Customer != null ? s.Customer.CompanyId : null))
+                .ForMember(d => d.CompanyName, o => o.MapFrom(s =>
+                    s.Customer != null && s.Customer.Company != null ? s.Customer.Company.Name : string.Empty))
+                .ForMember(d => d.TotalWeight, o => o.MapFrom(s => s.TotalWeight))
+                .ForMember(d => d.TotalCost, o => o.MapFrom(s => s.TotalCost))
+                .ForMember(d => d.Priority, o => o.MapFrom(s => s.Priority))
+                .ForMember(d => d.Status, o => o.MapFrom(s => s.Status))
+                .ForMember(d => d.LastChangeDate, o => o.MapFrom(s => s.LastChangeDate));
+
+            // --- Order → DeleteOrderViewModel ---
+            // Products и StatusHistory заполняются вручную в OrderDeleteService.
+            CreateMap<Order, DeleteOrderViewModel>()
+                .ForMember(d => d.Id, o => o.MapFrom(s => s.Id ?? 0))
+                .ForMember(d => d.OrderNumber, o => o.MapFrom(s => s.OrderNumber))
+                .ForMember(d => d.CustomerName, o => o.MapFrom(s =>
+                    s.Customer != null
+                        ? (s.Customer.LastName + " " + s.Customer.FirstName).Trim()
+                        : string.Empty))
+                .ForMember(d => d.CreationDate, o => o.MapFrom(s => s.CreationDate))
+                .ForMember(d => d.TotalCost, o => o.MapFrom(s => s.TotalCost))
+                .ForMember(d => d.TotalWeight, o => o.MapFrom(s => s.TotalWeight))
+                .ForMember(d => d.Status, o => o.MapFrom(s => s.Status.ToString()))
+                .ForMember(d => d.Comment, o => o.MapFrom(s => s.Comment ?? string.Empty))
+                .ForMember(d => d.Products, o => o.Ignore())
+                .ForMember(d => d.StatusHistory, o => o.Ignore())
+                .ForMember(d => d.CustomerId, o => o.MapFrom(s => s.CustomerId));
+
+            // --- OrderFormDto → Order (создание заказа) ---
+            CreateMap<OrderFormDto, Order>()
+                .ForMember(d => d.Id, o => o.MapFrom(s => s.Id))
+                .ForMember(d => d.CustomerId, o => o.MapFrom(s => s.CustomerId))
+                .ForMember(d => d.OrderNumber, o => o.MapFrom(s => s.OrderNumber))
+                .ForMember(d => d.Priority, o => o.MapFrom(s => s.Priority))
+                .ForMember(d => d.Status, o => o.MapFrom(s => s.Status))
+                .ForMember(d => d.TotalWeight, o => o.MapFrom(s => s.TotalWeight))
+                .ForMember(d => d.TotalCost, o => o.MapFrom(s => s.TotalCost))
+                .ForMember(d => d.CreationDate, o => o.MapFrom(s => s.CreationDate))
+                .ForMember(d => d.Comment, o => o.MapFrom(s => s.Comment))
+                .ForMember(d => d.Customer, o => o.Ignore())
+                .ForMember(d => d.MetrologicalInfo, o => o.Ignore())
+                .ForMember(d => d.OrderTaxProduct, o => o.Ignore())
+                .ForMember(d => d.OrderTaxes, o => o.Ignore())
+                .ForMember(d => d.OrdersProducts, o => o.Ignore())
+                .ForMember(d => d.StatusHistory, o => o.Ignore())
+                .ForMember(d => d.LastChangeDate, o => o.Ignore())
+                .ForMember(d => d.DateCreationTKP, o => o.Ignore())
+                .ForMember(d => d.LastStatusChangeDate, o => o.Ignore())
+                .ForMember(d => d.ExchangeRate, o => o.Ignore())
+                .ForMember(d => d.IsDeleted, o => o.Ignore());
+
+            // --- ExportOrderViewModel → Order (обновление заказа при сохранении) ---
+            // Игнорируем поля, которых нет в DTO, и не перезаписываем существующие
+            // поля нулями, если в модели их нет.
+            CreateMap<ExportOrderViewModel, Order>()
+                .ForMember(d => d.ExchangeRate, o => o.MapFrom(s => s.ExchangeRate))
+                .ForMember(d => d.Comment, o => o.MapFrom(s => s.Comment))
+                .ForMember(d => d.DateCreationTKP, o => o.MapFrom(s =>
+                    s.DateCreationTKP ?? default))
+                .ForMember(d => d.Id, o => o.Ignore())
+                .ForMember(d => d.CustomerId, o => o.Ignore())
+                .ForMember(d => d.Customer, o => o.Ignore())
+                .ForMember(d => d.OrderNumber, o => o.Ignore())
+                .ForMember(d => d.Priority, o => o.Ignore())
+                .ForMember(d => d.Status, o => o.Ignore())
+                .ForMember(d => d.TotalWeight, o => o.Ignore())
+                .ForMember(d => d.TotalCost, o => o.Ignore())
+                .ForMember(d => d.CreationDate, o => o.Ignore())
+                .ForMember(d => d.LastChangeDate, o => o.Ignore())
+                .ForMember(d => d.LastStatusChangeDate, o => o.Ignore())
+                .ForMember(d => d.MetrologicalInfo, o => o.Ignore())
+                .ForMember(d => d.OrderTaxProduct, o => o.Ignore())
+                .ForMember(d => d.OrderTaxes, o => o.Ignore())
+                .ForMember(d => d.OrdersProducts, o => o.Ignore())
+                .ForMember(d => d.StatusHistory, o => o.Ignore())
+                .ForMember(d => d.IsDeleted, o => o.Ignore());
+
+            // --- ProductData → OrderProduct ---
+            CreateMap<ProductData, OrderProduct>()
+                .ForMember(d => d.Id, o => o.Ignore())
+                .ForMember(d => d.OrderId, o => o.Ignore())
+                .ForMember(d => d.ProductId, o => o.MapFrom(s => s.ProductId))
+                .ForMember(d => d.Quantity, o => o.MapFrom(s => s.Quantity))
+                .ForMember(d => d.Price, o => o.MapFrom(s => s.Price))
+                .ForMember(d => d.Weight, o => o.MapFrom(s => s.Weight))
+                .ForMember(d => d.LeadTime, o => o.MapFrom(s => s.LeadTime ?? 0))
+                .ForMember(d => d.Comment, o => o.MapFrom(s => s.Comment ?? string.Empty))
+                .ForMember(d => d.DeliveryDate, o => o.MapFrom(s =>
+                    s.DeliveryDate ?? DateTime.Now))
+                .ForMember(d => d.TotalPrice, o => o.MapFrom(s => s.Price * s.Quantity))
+                .ForMember(d => d.Order, o => o.Ignore())
+                .ForMember(d => d.Product, o => o.Ignore())
+                .ForMember(d => d.MetrologicalInfo, o => o.Ignore())
+                .ForMember(d => d.OrdersTaxes, o => o.Ignore())
+                .ForMember(d => d.IsDeleted, o => o.Ignore());
+
+            // --- OrderTaxProduct → OrderTaxProductViewModel (для Details) ---
+            CreateMap<OrderTaxProduct, OrderTaxProductViewModel>()
+                .ForMember(d => d.Id, o => o.MapFrom(s => s.Id))
+                .ForMember(d => d.Name, o => o.MapFrom(s =>
+                    s.TaxType != null ? s.TaxType.Name : "Не указано"))
+                .ForMember(d => d.Value, o => o.MapFrom(s => s.Cost))
+                .ForMember(d => d.MeasureUnit, o => o.MapFrom(s =>
+                    s.TaxType != null && s.TaxType.MeasureUnit != null
+                        ? s.TaxType.MeasureUnit.Name
+                        : "₽"))
+                .ForMember(d => d.CalculationType, o => o.Ignore())
+                .ForMember(d => d.Formula, o => o.Ignore())
+                .ForMember(d => d.IsCalculated, o => o.MapFrom(s => s.IsCalculated));
         }
     }
 }

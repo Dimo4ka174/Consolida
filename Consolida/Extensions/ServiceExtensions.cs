@@ -1,5 +1,6 @@
 using Application.DataAccessLayer.Interface.Common;
 using Application.DataAccessLayer.Service.Common;
+using Application.DataAccessLayer.CacheService;
 using Microsoft.AspNetCore.DataProtection;
 using Consolida.Infrastructure.Email;
 using Consolida.Infrastructure.Redis;
@@ -8,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
 using Microsoft.OpenApi;
 using DB.Authorization;
+using DB.Entity;
 using DB.Auth;
 using DB;
 
@@ -131,6 +133,9 @@ namespace Consolida.Extensions
         {
             services.AddMemoryCache();
 
+            // HttpClient для CurrencyCacheService (запрос курса ЦБ РФ)
+            services.AddSingleton<HttpClient>();
+
             var redisHost = configuration["REDIS_HOST"];
 
             if (!string.IsNullOrEmpty(redisHost))
@@ -157,13 +162,24 @@ namespace Consolida.Extensions
                 });
 
                 services.AddScoped(typeof(ICacheStrategy<>), typeof(RedisCacheStrategy<>));
+                services.AddScoped<ICurrencyCacheService, RedisCurrencyCacheService>();
             }
             else
             {
                 services.AddScoped(typeof(ICacheStrategy<>), typeof(MemoryCacheStrategy<>));
+                services.AddScoped<ICurrencyCacheService, MemoryCurrencyCacheService>();
             }
 
-            services.AddScoped(typeof(ICacheService<>), typeof(CacheService<>));
+            // Точечные регистрации кэш-сервисов-обёрток.
+            services.AddScoped<ICacheService<City>, CityCacheService>();
+            services.AddScoped<ICacheService<Company>, CompanyCacheService>();
+            services.AddScoped<ICacheService<Manufacturer>, ManufacturerCacheService>();
+            services.AddScoped<ICacheService<MeasureUnit>, MeasureUnitCacheService>();
+            services.AddScoped<ICacheService<TaxType>, TaxTypeCacheService>();
+
+            // Enum cache (in-memory, потому что зависит только от самого enum)
+            services.AddScoped<IEnumCacheService, EnumCacheService>();
+
             return services;
         }
     }

@@ -1,7 +1,7 @@
 using Application.DataAccessLayer.Interface.Common;
 using Application.DataAccessLayer.Service.Common;
-using Consolida.Extensions;
 using Consolida.Infrastructure.Logging;
+using Consolida.Extensions;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,6 +21,16 @@ builder.Services
     .AddCustomControllers()
     .AddCustomSwagger()
     .AddCustomCache(builder.Configuration);
+
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromHours(4);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+    options.Cookie.Name = "Consolida.Session";
+});
+
+builder.Services.AddHttpContextAccessor();
 
 var serviceFactory = new ServiceFactory();
 serviceFactory.RegisterServices(builder.Services);
@@ -45,13 +55,14 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseSession();
+
 app.MapRazorPages();
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-// Инициализация БД
 try
 {
     using var scope = app.Services.CreateScope();
