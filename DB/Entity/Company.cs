@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using DB.Entity.Enum;
 using DB.Abstract;
 
-namespace DB.Abstract
+namespace DB.Entity
 {
     [Table("Companies")]
     public class Company : IEntity

@@ -1,10 +1,8 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
-using System.Collections.Generic;
-using System.Text;
-using System;
+using DB.Abstract;
 
-namespace DB.Abstract
+namespace DB.Entity
 {
     [Table("Cities")]
     public class City : IEntity

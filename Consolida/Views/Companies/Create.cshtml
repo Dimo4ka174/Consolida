@@ -1,0 +1,79 @@
+﻿@using Application.ViewModels.CompanyModel
+@model CompanyDto
+
+@{
+    ViewData["Title"] = "Создание новой компании";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12 mb-4">
+            <a asp-action="Index" class="btn btn-go-to">Вернуться к списку компаний</a>
+        </div>
+
+        <div class="col-md-12">
+            <div class="card">
+                <h3 class="card-title">Создание новой компании</h3>
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <!-- Город (autocomplete) -->
+                    <div class="mb-4">
+                        <label class="form-label" for="cityAutocomplete">@Html.DisplayNameFor(m => m.CityId)</label>
+                        <input type="text" id="cityAutocomplete" class="custom-input"
+                               placeholder="Выберите город..." autocomplete="off" />
+                        <input type="hidden" asp-for="CityId" id="cityId" />
+                    </div>
+
+                    <!-- Страна -->
+                    <div class="mb-4">
+                        <label class="form-label" for="Country">@Html.DisplayNameFor(m => m.Country)</label>
+                        <select class="custom-select" asp-items="@Model.CountriesList" asp-for="@Model.Country"></select>
+                    </div>
+
+                    <!-- Наименование -->
+                    <div class="mb-4">
+                        <label asp-for="Name" class="form-label">@Html.DisplayNameFor(m => m.Name)</label>
+                        <input asp-for="Name" class="custom-input" aria-required="true"
+                               placeholder="Введите название компании" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+
+                    <!-- Адрес -->
+                    <div class="mb-4">
+                        <label asp-for="Address" class="form-label">@Html.DisplayNameFor(m => m.Address)</label>
+                        <input asp-for="Address" class="custom-input" aria-required="true"
+                               placeholder="Введите адрес компании" />
+                        <span asp-validation-for="Address" class="text-danger"></span>
+                    </div>
+
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-create">Создать запись</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $(function () {
+            const cities = @Html.Raw(Model.CitiesList != null && Model.CitiesList.Any()
+                            ? Json.Serialize(Model.CitiesList.Select(c => new { label = c.Text, value = c.Value }))
+                            : "[]");
+
+            $("#cityAutocomplete").autocomplete({
+                source: cities,
+                select: function (event, ui) {
+                    $("#cityId").val(ui.item.value);
+                    $("#cityAutocomplete").val(ui.item.label);
+                    return false;
+                }
+            });
+        });
+    </script>
+}

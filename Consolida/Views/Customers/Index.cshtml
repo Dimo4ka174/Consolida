@@ -1,0 +1,128 @@
+﻿@using Application.ViewModels.CustomerModel
+@model IEnumerable<CustomerDto>
+
+@{
+    ViewData["Title"] = "Список клиентов";
+}
+
+<div class="container">
+    <div class="row">
+        <!-- Кнопки над карточками -->
+        <div class="col-md-12 mb-4 d-flex gap-2 flex-wrap">
+            <a href="@Url.Action("Create")" class="btn btn-create">Добавить нового клиента</a>
+            <a href="@Url.Action("Index", "Companies")" class="btn btn-go-to">Перейти к странице компаний</a>
+        </div>
+
+        <!-- Карточка с фильтром и поиском -->
+        <div class="col-md-12 mb-4">
+            <div class="card">
+                <h3 class="card-title">Фильтр и поиск</h3>
+                <form asp-action="Index" method="get">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-lg-3 col-md-6">
+                            <label class="form-label" for="searchStringCompany">Компания</label>
+                            <input type="text" id="searchStringCompany" class="custom-input"
+                                   name="searchStringCompany"
+                                   value="@ViewBag.SearchStringCompany"
+                                   placeholder="Наименование компании" />
+                        </div>
+
+                        <div class="col-lg-3 col-md-6">
+                            <label class="form-label" for="searchStringFirstName">Имя</label>
+                            <input type="text" id="searchStringFirstName" class="custom-input"
+                                   name="searchStringFirstName"
+                                   value="@ViewBag.SearchStringFirstName"
+                                   placeholder="Имя клиента" />
+                        </div>
+
+                        <div class="col-lg-3 col-md-6">
+                            <label class="form-label" for="searchStringLastName">Фамилия</label>
+                            <input type="text" id="searchStringLastName" class="custom-input"
+                                   name="searchStringLastName"
+                                   value="@ViewBag.SearchStringLastName"
+                                   placeholder="Фамилия клиента" />
+                        </div>
+
+                        <div class="col-lg-3 col-md-6">
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-search flex-grow-1">Применить</button>
+
+                                @if (!string.IsNullOrWhiteSpace(ViewBag.SearchStringCompany as string)
+                                     || !string.IsNullOrWhiteSpace(ViewBag.SearchStringFirstName as string)
+                                     || !string.IsNullOrWhiteSpace(ViewBag.SearchStringLastName as string))
+                                {
+                                    <a asp-action="Index" class="btn btn-reset" title="Сбросить фильтр">Сбросить</a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Карточка со списком -->
+        <div class="col-md-12">
+            <div class="card">
+                <h3 class="card-title">Список клиентов</h3>
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped">
+                        <thead>
+                            <tr>
+                                <th class="text-center">Компания</th>
+                                <th class="text-center">
+                                    <a href="@Url.Action("Index", new { sortOrder = ViewBag.SortOrder == "FirstName" ? "FirstName_desc" : "FirstName", searchStringCompany = ViewBag.SearchStringCompany, searchStringFirstName = ViewBag.SearchStringFirstName, searchStringLastName = ViewBag.SearchStringLastName })">Имя</a>
+                                </th>
+                                <th class="text-center">
+                                    <a href="@Url.Action("Index", new { sortOrder = ViewBag.SortOrder == "LastName" ? "LastName_desc" : "LastName", searchStringCompany = ViewBag.SearchStringCompany, searchStringFirstName = ViewBag.SearchStringFirstName, searchStringLastName = ViewBag.SearchStringLastName })">Фамилия</a>
+                                </th>
+                                <th class="text-center">Должность</th>
+                                <th class="text-center">Email</th>
+                                <th class="text-center">Телефон</th>
+                                <th class="text-center">Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="text-center">@Html.DisplayFor(modelItem => item.CompanyName)</td>
+                                    <td class="text-center">@Html.DisplayFor(modelItem => item.FirstName)</td>
+                                    <td class="text-center">@Html.DisplayFor(modelItem => item.LastName)</td>
+                                    <td class="text-center">@Html.DisplayFor(modelItem => item.PositionJob)</td>
+                                    <td class="text-center">@Html.DisplayFor(modelItem => item.Email)</td>
+                                    <td class="text-center">@Html.DisplayFor(modelItem => item.Phone)</td>
+                                    <td class="text-center">
+                                        <a class="btn btn-sm btn-edit me-2" asp-action="Edit" asp-route-id="@item.Id"
+                                           asp-route-page="@ViewBag.CurrentPage"
+                                           asp-route-searchStringCompany="@ViewBag.SearchStringCompany"
+                                           asp-route-searchStringFirstName="@ViewBag.SearchStringFirstName"
+                                           asp-route-searchStringLastName="@ViewBag.SearchStringLastName"
+                                           asp-route-sortOrder="@ViewBag.SortOrder">Изменить</a>
+                                        <a class="btn btn-sm btn-delete" asp-action="Delete" asp-route-id="@item.Id"
+                                           asp-route-page="@ViewBag.CurrentPage"
+                                           asp-route-searchStringCompany="@ViewBag.SearchStringCompany"
+                                           asp-route-searchStringFirstName="@ViewBag.SearchStringFirstName"
+                                           asp-route-searchStringLastName="@ViewBag.SearchStringLastName"
+                                           asp-route-sortOrder="@ViewBag.SortOrder">Удалить</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Пагинация -->
+        @if (ViewBag.Paging != null)
+        {
+            <partial name="_Pagination" model="@ViewBag.Paging" />
+        }
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

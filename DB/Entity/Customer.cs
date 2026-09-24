@@ -1,12 +1,9 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.Metrics;
-using System.Collections.Generic;
 using DB.Entity.Enum;
-using System.Text;
-using System;
+using DB.Abstract;
 
-namespace DB.Abstract
+namespace DB.Entity
 {
     [Table("Customers")]
     public class Customer : IEntity
