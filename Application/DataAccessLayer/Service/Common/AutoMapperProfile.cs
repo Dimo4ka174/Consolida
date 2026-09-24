@@ -1,9 +1,11 @@
-using Application.ViewModels.ManufacturerModel;
-using Application.ViewModels.CodeTNVDModel;
-using Application.ViewModels.CustomerModel;
-using Application.ViewModels.CompanyModel;
-using Application.ViewModels.ProductModel;
 using Application.ViewModels.CityModel;
+using Application.ViewModels.CodeTNVDModel;
+using Application.ViewModels.CompanyModel;
+using Application.ViewModels.CustomerModel;
+using Application.ViewModels.ManufacturerModel;
+using Application.ViewModels.MeasureUnitModel;
+using Application.ViewModels.ProductModel;
+using Application.ViewModels.TaxTypeModel;
 using AutoMapper;
 using DB.Entity;
 
@@ -95,6 +97,33 @@ namespace Application.DataAccessLayer.Service.Common
                 .ForMember(dest => dest.IsDeleted, opt => opt.Ignore())
                 .ForMember(dest => dest.CodeTNVD, opt => opt.Ignore())
                 .ForMember(dest => dest.Manufacturer, opt => opt.Ignore());
+
+            // -------------------- MeasureUnit --------------------
+            CreateMap<MeasureUnit, MeasureUnitDto>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name));
+
+            CreateMap<MeasureUnitDto, MeasureUnit>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.IsDeleted, opt => opt.Ignore())
+                .ForMember(dest => dest.TaxTypes, opt => opt.Ignore());
+
+            // -------------------- TaxType --------------------
+            CreateMap<TaxType, TaxTypeDto>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.Cost, opt => opt.MapFrom(src => src.Cost))
+                .ForMember(dest => dest.MeasureUnitId, opt => opt.MapFrom(src => src.MeasureUnitId))
+                .ForMember(dest => dest.MeasureUnitsList, opt => opt.Ignore());
+
+            CreateMap<TaxTypeDto, TaxType>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.Cost, opt => opt.MapFrom(src => src.Cost))
+                .ForMember(dest => dest.MeasureUnitId, opt => opt.MapFrom(src => src.MeasureUnitId))
+                .ForMember(dest => dest.IsDeleted, opt => opt.Ignore())
+                .ForMember(dest => dest.MeasureUnit, opt => opt.Ignore());
         }
     }
 }

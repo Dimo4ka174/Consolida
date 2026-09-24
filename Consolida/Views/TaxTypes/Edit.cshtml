@@ -1,0 +1,60 @@
+﻿@using Application.ViewModels.TaxTypeModel
+@model TaxTypeDto
+
+@{
+    ViewData["Title"] = "Изменение налога " + "\"" + Model.Name + "\"";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12 mb-4">
+            <a asp-action="Index"
+               asp-route-page="@ViewBag.ReturnPage"
+               asp-route-searchString="@ViewBag.SearchString"
+               asp-route-searchStringMeasureUnit="@ViewBag.SearchStringMeasureUnit"
+               asp-route-sortOrder="@ViewBag.SortOrder"
+               class="btn btn-go-to">Вернуться к списку налогов</a>
+        </div>
+
+        <div class="col-md-12">
+            <div class="card">
+                <h3 class="card-title">Изменение налога</h3>
+                <form asp-action="Edit" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" name="page" value="@ViewBag.ReturnPage" />
+                    <input type="hidden" name="searchString" value="@ViewBag.SearchString" />
+                    <input type="hidden" name="searchStringMeasureUnit" value="@ViewBag.SearchStringMeasureUnit" />
+                    <input type="hidden" name="sortOrder" value="@ViewBag.SortOrder" />
+
+                    <div class="mb-4">
+                        <label asp-for="Name" class="form-label">@Html.DisplayNameFor(m => m.Name)</label>
+                        <input asp-for="Name" class="custom-input" placeholder="Введите название налога" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Cost" class="form-label">@Html.DisplayNameFor(m => m.Cost)</label>
+                        <input asp-for="Cost" class="custom-input decimal-input" placeholder="Введите стоимость" />
+                        <span asp-validation-for="Cost" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label" for="MeasureUnitId">@Html.DisplayNameFor(m => m.MeasureUnitId)</label>
+                        <select class="custom-select" asp-items="@Model.MeasureUnitsList" asp-for="@Model.MeasureUnitId"></select>
+                    </div>
+
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-create">Сохранить изменения</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

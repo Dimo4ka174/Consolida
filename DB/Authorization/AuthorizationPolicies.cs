@@ -14,6 +14,8 @@ namespace DB.Authorization
             AddCodeTNVD(options);
             AddManufacturer(options);
             AddProduct(options);
+            AddMeasureUnit(options);
+            AddTaxType(options);
         }
 
         private static void AddRole(AuthorizationOptions options)
@@ -86,6 +88,24 @@ namespace DB.Authorization
             options.AddPolicy("CreateProducts", policy => policy.RequireClaim("Permission", Permissions.Products.Create));
             options.AddPolicy("EditProducts", policy => policy.RequireClaim("Permission", Permissions.Products.Edit));
             options.AddPolicy("DeleteProducts", policy => policy.RequireClaim("Permission", Permissions.Products.Delete));
+        }
+
+        private static void AddMeasureUnit(AuthorizationOptions options)
+        {
+            options.AddPolicy("MeasureUnitManager", policy => policy.RequireClaim("Permission", Permissions.MeasureUnits.All));
+            options.AddPolicy("ReadMeasureUnits", policy => policy.RequireClaim("Permission", Permissions.MeasureUnits.Read));
+            options.AddPolicy("CreateMeasureUnits", policy => policy.RequireClaim("Permission", Permissions.MeasureUnits.Create));
+            options.AddPolicy("EditMeasureUnits", policy => policy.RequireClaim("Permission", Permissions.MeasureUnits.Edit));
+            options.AddPolicy("DeleteMeasureUnits", policy => policy.RequireClaim("Permission", Permissions.MeasureUnits.Delete));
+        }
+
+        private static void AddTaxType(AuthorizationOptions options)
+        {
+            options.AddPolicy("TaxTypeManager", policy => policy.RequireClaim("Permission", Permissions.TaxTypes.All));
+            options.AddPolicy("ReadTaxTypes", policy => policy.RequireClaim("Permission", Permissions.TaxTypes.Read));
+            options.AddPolicy("CreateTaxTypes", policy => policy.RequireClaim("Permission", Permissions.TaxTypes.Create));
+            options.AddPolicy("EditTaxTypes", policy => policy.RequireClaim("Permission", Permissions.TaxTypes.Edit));
+            options.AddPolicy("DeleteTaxTypes", policy => policy.RequireClaim("Permission", Permissions.TaxTypes.Delete));
         }
     }
 }

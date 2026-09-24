@@ -1,0 +1,47 @@
+﻿@using Application.ViewModels.MeasureUnitModel
+@model MeasureUnitDto
+
+@{
+    ViewData["Title"] = "Изменение единицы " + "\"" + Model.Name + "\"";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12 mb-4">
+            <a asp-action="Index"
+               asp-route-page="@ViewBag.ReturnPage"
+               asp-route-searchString="@ViewBag.SearchString"
+               asp-route-sortOrder="@ViewBag.SortOrder"
+               class="btn btn-go-to">Вернуться к списку</a>
+        </div>
+
+        <div class="col-md-12">
+            <div class="card">
+                <h3 class="card-title">Изменение единицы измерения</h3>
+                <form asp-action="Edit" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" name="page" value="@ViewBag.ReturnPage" />
+                    <input type="hidden" name="searchString" value="@ViewBag.SearchString" />
+                    <input type="hidden" name="sortOrder" value="@ViewBag.SortOrder" />
+
+                    <div class="mb-4">
+                        <label asp-for="Name" class="form-label">@Html.DisplayNameFor(m => m.Name)</label>
+                        <input asp-for="Name" class="custom-input" placeholder="Введите наименование" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-create">Сохранить изменения</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

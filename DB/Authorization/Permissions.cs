@@ -73,5 +73,23 @@ namespace DB.Authorization
             public const string Delete = "delete_products";
             public static readonly string[] All = { Read, Create, Edit, Delete };
         }
+
+        public static class MeasureUnits
+        {
+            public const string Read = "read_measure_units";
+            public const string Create = "create_measure_units";
+            public const string Edit = "edit_measure_units";
+            public const string Delete = "delete_measure_units";
+            public static readonly string[] All = { Read, Create, Edit, Delete };
+        }
+
+        public static class TaxTypes
+        {
+            public const string Read = "read_tax_types";
+            public const string Create = "create_tax_types";
+            public const string Edit = "edit_tax_types";
+            public const string Delete = "delete_tax_types";
+            public static readonly string[] All = { Read, Create, Edit, Delete };
+        }
     }
 }

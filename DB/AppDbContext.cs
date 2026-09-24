@@ -1,8 +1,9 @@
+using DB.Abstract;
+using DB.Authorization;
+using DB.Entity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using DB.Authorization;
-using DB.Abstract;
-using DB.Entity;
 
 namespace DB
 {
@@ -15,6 +16,8 @@ namespace DB
         public DbSet<CodeTNVD> CodesTNVD { get; set; }
         public DbSet<Manufacturer> Manufacturers { get; set; }
         public DbSet<Product> Products { get; set; }
+        public DbSet<MeasureUnit> MeasureUnits { get; set; }
+        public DbSet<TaxType> TaxTypes { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
@@ -61,6 +64,13 @@ namespace DB
                 .HasOne(p => p.CodeTNVD)
                 .WithMany(c => c.Products)
                 .HasForeignKey(p => p.CodeTNVDId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // --- TaxType / MeasureUnit ---
+            modelBuilder.Entity<TaxType>()
+                .HasOne(t => t.MeasureUnit)
+                .WithMany(m => m.TaxTypes)
+                .HasForeignKey(t => t.MeasureUnitId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
 

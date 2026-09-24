@@ -14,19 +14,25 @@ namespace Application.DataAccessLayer.Service.Common
         private readonly ICacheService<City> _cityCacheService;
         private readonly ICacheService<Company> _companyCacheService;
         private readonly ICacheService<Manufacturer> _manufacturerCacheService;
+        private readonly ICacheService<MeasureUnit> _measureUnitCacheService;
+        private readonly ICacheService<TaxType> _taxTypeCacheService;
 
         public CascadeSoftDeleteService(
             IUnitOfWork unitOfWork,
             ILogger<CascadeSoftDeleteService> logger,
             ICacheService<City> cityCacheService,
             ICacheService<Company> companyCacheService,
-            ICacheService<Manufacturer> manufacturerCacheService)
+            ICacheService<Manufacturer> manufacturerCacheService,
+            ICacheService<MeasureUnit> measureUnitCacheService,
+            ICacheService<TaxType> taxTypeCacheService)
         {
             _unitOfWork = unitOfWork;
             _logger = logger;
             _cityCacheService = cityCacheService;
             _companyCacheService = companyCacheService;
             _manufacturerCacheService = manufacturerCacheService;
+            _measureUnitCacheService = measureUnitCacheService;
+            _taxTypeCacheService = taxTypeCacheService;
         }
 
         // -------------------- City --------------------
@@ -211,6 +217,68 @@ namespace Application.DataAccessLayer.Service.Common
 
             // TODO (коммит Order): каскадно помечать OrderProduct,
             // которые ссылаются на эти продукты.
+        }
+
+        // -------------------- MeasureUnit --------------------
+
+        public async Task DeleteMeasureUnit(int measureUnitId, CancellationToken ct = default)
+        {
+            if (measureUnitId <= 0) throw new ArgumentException("Invalid MeasureUnit ID");
+            _logger.LogInformation("Deleting MeasureUnit ID: {MeasureUnitId}", measureUnitId);
+
+            if (_unitOfWork.HasActiveTransaction)
+                await DeleteMeasureUnits(new List<int?> { measureUnitId }, ct);
+            else
+                await _unitOfWork.ExecuteInTransactionAsync(
+                    () => DeleteMeasureUnits(new List<int?> { measureUnitId }, ct), ct);
+        }
+
+        private async Task DeleteMeasureUnits(IEnumerable<int?> measureUnitIds, CancellationToken ct)
+        {
+            var idsList = measureUnitIds.Where(id => id != null && id > 0).Select(id => id.Value).ToList();
+            if (!idsList.Any()) return;
+
+            // 1. Мягко удаляем сами единицы измерения
+            await MarkAsDeleted(_unitOfWork.GetRepository<MeasureUnit>().GetQueryable(),
+                m => idsList.Contains(m.Id.Value), ct);
+
+            // 2. Каскадно удаляем налоги, которые ссылаются на эти единицы
+            var taxTypeIds = await _unitOfWork.GetRepository<TaxType>().GetQueryable()
+                .Where(t => t.MeasureUnitId.HasValue && idsList.Contains(t.MeasureUnitId.Value))
+                .Select(t => t.Id)
+                .ToListAsync(ct);
+
+            if (taxTypeIds.Any())
+                await DeleteTaxTypes(taxTypeIds, ct);
+
+            await _measureUnitCacheService.UpdateCacheAsync();
+        }
+
+        // -------------------- TaxType --------------------
+
+        public async Task DeleteTaxType(int taxTypeId, CancellationToken ct = default)
+        {
+            if (taxTypeId <= 0) throw new ArgumentException("Invalid TaxType ID");
+            _logger.LogInformation("Deleting TaxType ID: {TaxTypeId}", taxTypeId);
+
+            if (_unitOfWork.HasActiveTransaction)
+                await DeleteTaxTypes(new List<int?> { taxTypeId }, ct);
+            else
+                await _unitOfWork.ExecuteInTransactionAsync(
+                    () => DeleteTaxTypes(new List<int?> { taxTypeId }, ct), ct);
+        }
+
+        private async Task DeleteTaxTypes(IEnumerable<int?> taxTypeIds, CancellationToken ct)
+        {
+            var idsList = taxTypeIds.Where(id => id != null && id > 0).Select(id => id.Value).ToList();
+            if (!idsList.Any()) return;
+
+            await MarkAsDeleted(_unitOfWork.GetRepository<TaxType>().GetQueryable(),
+                t => idsList.Contains(t.Id.Value), ct);
+
+            // TODO (коммит Order): каскадно помечать OrderTaxProduct, ссылающиеся на эти налоги.
+
+            await _taxTypeCacheService.UpdateCacheAsync();
         }
 
         // -------------------- Helper --------------------

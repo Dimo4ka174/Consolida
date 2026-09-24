@@ -28,6 +28,8 @@ namespace DB.DataSeeder
                     .Concat(Permissions.CodesTNVD.All)
                     .Concat(Permissions.Manufacturers.All)
                     .Concat(Permissions.Products.All)
+                    .Concat(Permissions.MeasureUnits.All)
+                    .Concat(Permissions.TaxTypes.All)
                     .ToArray(),
 
                 ["Manager"] = Permissions.Cities.All
@@ -36,6 +38,8 @@ namespace DB.DataSeeder
                     .Concat(Permissions.CodesTNVD.All)
                     .Concat(Permissions.Manufacturers.All)
                     .Concat(Permissions.Products.All)
+                    .Concat(Permissions.MeasureUnits.All)
+                    .Concat(Permissions.TaxTypes.All)
                     .ToArray(),
 
                 ["Director"] = new[]
@@ -46,6 +50,8 @@ namespace DB.DataSeeder
                     Permissions.CodesTNVD.Read,
                     Permissions.Manufacturers.Read,
                     Permissions.Products.Read,
+                    Permissions.MeasureUnits.Read,
+                    Permissions.TaxTypes.Read,
                 },
 
                 ["User"] = Array.Empty<string>()

@@ -12,6 +12,8 @@ namespace DB.Authorization
             { "CodesTNVD", "Коды ТН ВЭД" },
             { "Manufacturers", "Производители" },
             { "Products", "Продукция" },
+            { "MeasureUnits", "Единицы измерения" },
+            { "TaxTypes", "Налоги" },
         };
     }
 }
