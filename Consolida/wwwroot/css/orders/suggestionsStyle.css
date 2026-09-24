@@ -1,0 +1,54 @@
+/* ============================================================
+   Списки автодополнения
+   ============================================================ */
+
+/* Обёртка вокруг input+кнопки, к которой привязывается список */
+.autocomplete-anchor {
+    position: relative;
+}
+
+/* Сам список */
+.suggestions-list {
+    list-style: none;
+    padding: var(--space-1);
+    margin: var(--space-2) 0 0 0;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 1050;
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    max-height: 280px;
+    overflow-y: auto;
+    width: 100%;
+    min-width: 100%;
+}
+
+    /* Перебиваем стили Bootstrap .list-group-item */
+    .suggestions-list .list-group-item {
+        background-color: transparent;
+        border: none;
+        padding: var(--space-2) var(--space-3);
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        font-size: var(--font-size-sm);
+        color: var(--text-primary);
+        transition: background-color var(--transition-fast), color var(--transition-fast);
+    }
+
+        .suggestions-list .list-group-item:hover {
+            background-color: var(--accent-soft);
+            color: var(--accent);
+        }
+
+        .suggestions-list .list-group-item.disabled {
+            color: var(--text-muted);
+            cursor: default;
+        }
+
+            .suggestions-list .list-group-item.disabled:hover {
+                background-color: transparent;
+                color: var(--text-muted);
+            }

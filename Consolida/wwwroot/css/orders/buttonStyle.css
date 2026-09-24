@@ -1,0 +1,29 @@
+.comment-toggle {
+    padding: 0.25rem 0.5rem;
+}
+
+.comment-row {
+    background-color: #f8f9fa;
+    transition: all 0.3s ease;
+}
+
+    .comment-row.show {
+        display: table-row;
+    }
+
+.comment-input {
+    font-size: 0.875rem;
+    resize: vertical;
+    min-height: 60px;
+}
+
+#orderComment {
+    resize: vertical;
+    min-height: 100px;
+    font-size: 0.9rem;
+}
+
+.btn-create.btn-with-check::after {
+    -webkit-mask-image: url('/images/icons/check.svg');
+    mask-image: url('/images/icons/check.svg');
+}

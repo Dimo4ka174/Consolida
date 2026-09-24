@@ -1,0 +1,625 @@
+@using DB.Entity.Enum
+@using Application.ViewModels.OrderModel
+@model OrderDetailsViewModel
+
+@{
+    ViewData["Title"] = "Информация о заказе";
+
+    var displayTaxes = Model.OrderTaxes
+        .Where(t => t.Name != "Маржа" &&
+                   t.Name != "Комиссия банка" &&
+                   t.Name != "Пошлина" &&
+                   t.Name != "Не предвиденные расходы")
+        .ToList();
+
+    var taxesOrderDict = Model.OrderTaxes.ToDictionary(t => t.Name, t => t.Cost);
+    var bankCommissionRate = taxesOrderDict.GetValueOrDefault("Комиссия банка");
+
+    var commissionId = Model.TaxTypeIds["Комиссия банка"];
+    var marginId = Model.TaxTypeIds["Маржа"];
+    var unforeseenExpensesId = Model.TaxTypeIds["Не предвиденные расходы"];
+
+    var taxes = displayTaxes;
+
+    string GetIconClass(string taxName)
+    {
+        if (taxName.Contains("Таможен")) return "bi-truck";
+        if (taxName.Contains("Достав")) return "bi-box-seam";
+        if (taxName.Contains("Деклар")) return "bi-file-text";
+        if (taxName.Contains("Термин")) return "bi-building";
+        return "bi-receipt";
+    }
+
+    var showMetrological = Model.OrderTaxes.Any(t => t.Name == "Первичная поверка");
+}
+
+<div class="container">
+    <!-- Блок уведомлений -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+            @{
+                TempData.Remove("SuccessMessage");
+            }
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+            @{
+                TempData.Remove("ErrorMessage");
+            }
+        </div>
+    }
+    @if (TempData["DownloadLink"] != null)
+    {
+        <div class="alert alert-info">
+            Документ успешно сгенерирован. <a href="@TempData["DownloadLink"]">Скачать</a>.
+            @{
+                TempData.Remove("DownloadLink");
+            }
+        </div>
+    }
+    @if (TempData["OptimizationMessage"] != null && !(TempData["OptimizationMessageShown"] as bool? ?? false))
+    {
+        <div class="alert alert-info">
+            @TempData["OptimizationMessage"]
+            @{
+                TempData["OptimizationMessageShown"] = true;
+                TempData.Keep("OptimizationMessage");
+            }
+        </div>
+    }
+
+    <!-- Заголовок заказа с статусом -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 id="order-number-header" class="mb-0">Заказ № @Model.OrderNumber</h2>
+        <div class="status-badge-container">
+            <div class="d-flex align-items-center gap-3">
+                <div class="status-select-wrapper">
+                    <select id="statusSelect" class="form-select status-select-compact" data-order-id="@Model.Id">
+                        @foreach (var status in Model.AvailableStatuses)
+                        {
+                            <option value="@status.Value" selected="@status.Selected">@status.Text</option>
+                        }
+                    </select>
+                </div>
+
+                @if (Model.Status == Status.Paid)
+                {
+                    <a asp-controller="Consolidation" asp-action="Index" class="btn btn-sm btn-go-to">
+                        <i class="bi bi-box-arrow-up-right"></i> К консолидации
+                    </a>
+                }
+                else if (Model.Status == Status.OnTheWay || Model.Status == Status.Shipped)
+                {
+                    <a asp-controller="Consolidation" asp-action="Tracking" class="btn btn-sm btn-go-to">
+                        <i class="bi bi-truck"></i> К отслеживанию отгрузок
+                    </a>
+                }
+
+                <div class="status-history-link">
+                    <button type="button" class="btn btn-sm btn-outline-secondary"
+                            data-bs-toggle="tooltip" data-bs-placement="bottom"
+                            title="Последнее изменение: @(Model.LastStatusChangeDate == DateTime.MinValue ? "нет данных" : $"{Model.LastStatusChangeDate:dd/MM/yy HH:mm}")">
+                        <i class="bi bi-clock-history"></i>
+                        <span class="status-history-content">
+                            @if (Model.LastStatusChangeDate != DateTime.MinValue)
+                            {
+                                <span class="status-changer">@Model.LastStatusChangedBy</span>
+                                <span class="status-change-date">(@Model.LastStatusChangeDate.ToString("dd/MM/yy HH:mm"))</span>
+                            }
+                            else
+                            {
+                                <span>нет данных</span>
+                            }
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="globalNotificationContainer" class="notification-global-container"></div>
+
+    <!-- Общая информация о заказе -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <p><strong>Создание заказа:</strong> @Model.OrderCreationDate.ToString("dd/MM/yy")</p>
+                    <p><strong>Изменение заказа:</strong> @Model.LastChangeData.ToString("dd/MM/yy")</p>
+                    <p><strong>Создание ТКП:</strong> @(Model.DateCreationTKP == DateTime.MinValue ? "Дата не назначалась" : Model.DateCreationTKP.ToString("dd/MM/yy"))</p>
+                </div>
+                <div class="col-md-4">
+                    <p><strong>Клиент:</strong> @Model.CustomerName</p>
+                    <p><strong>Изменение статуса:</strong> @(Model.LastStatusChangeDate == DateTime.MinValue ? "Нет данных" : $"{Model.LastStatusChangeDate:dd/MM/yy}")</p>
+                    <p><strong>Изменил:</strong> @(Model.LastStatusChangeDate == DateTime.MinValue ? "Нет данных" : $"{Model.LastStatusChangedBy}")</p>
+                </div>
+                <div class="col-md-4">
+                    <p><strong>Общий вес:</strong> @Model.TotalWeight.ToString("N2") кг</p>
+                    <p><strong>К складу:</strong> @(Model.TotalLeadTimeWeeks.HasValue ? $"{Model.TotalLeadTimeWeeks} нед." : "не указано")</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Основные налоги заказа -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-2">
+                    <label for="exchangeRateInput"><strong>Курс юаня (₽):</strong></label>
+                    <input type="text" id="exchangeRateInput" class="form-control" value="@Model.ExchangeRate.ToString("N2")" step="0.01" />
+                </div>
+                <div class="col-md-2">
+                    <label for="bankCommissionInput"><strong>Комиссия банка (%):</strong></label>
+                    <input type="text" id="bankCommissionInput" class="form-control"
+                           data-tax-id="@commissionId"
+                           value="@taxesOrderDict["Комиссия банка"].ToString("N2")" step="0.01" />
+                </div>
+                <div class="col-md-4">
+                    <label for="marginInput"><strong>Маржа (%):</strong></label>
+                    <input type="text" id="marginInput" class="form-control"
+                           data-tax-id="@marginId"
+                           value="@taxesOrderDict["Маржа"].ToString("N2")" step="0.01" />
+                </div>
+                <div class="col-md-4">
+                    <label for="unforeseenExpensesInput"><strong>Не предвиденные расходы (%):</strong></label>
+                    <input type="text" id="unforeseenExpensesInput" class="form-control"
+                           data-tax-id="@unforeseenExpensesId"
+                           value="@taxesOrderDict["Не предвиденные расходы"].ToString("N2")" step="0.01" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Таблица товаров -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Товары</h5>
+            <table class="table table-bordered table-small">
+                <thead>
+                    <tr>
+                        <th class="text-center">№</th>
+                        <th class="text-center">Наименование</th>
+                        <th class="text-center">Модель</th>
+                        <th class="text-center">Дата</th>
+                        <th class="text-center">Срок (нед.)</th>
+                        <th class="text-center">Кол-во</th>
+                        <th class="text-center" colspan="3">Входящая цена</th>
+                        <th class="text-center">Вес (кг)</th>
+                        <th class="text-center" colspan="3">Комиссия банка (₽)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.Products.Count; i++)
+                    {
+                        var product = Model.Products[i];
+                        var exchangeRate = Model.ExchangeRate;
+
+                        <tr class="product-row" data-product-id="@product.ProductId">
+                            <td class="text-center">@(i + 1)</td>
+                            <td class="collapsible-cell" title="@product.ProductName">@product.ProductName</td>
+                            <td class="collapsible-cell" title="@product.Model">@product.Model</td>
+                            <td class="text-center delivery-date">@product.DeliveryDate.ToString("dd/MM/yy")</td>
+                            <td class="text-center">
+                                <input type="text"
+                                       class="form-control form-control-small lead-time-input"
+                                       value="@product.LeadTime"
+                                       data-product-id="@product.ProductId" />
+                            </td>
+                            <td class="text-center">
+                                <input type="text" class="form-control form-control-small quantity-input"
+                                       value="@product.Quantity" min="1" step="1"
+                                       data-product-id="@product.ProductId" />
+                            </td>
+                            <td class="text-center price-cny">@product.Price.ToString("F2") (¥)</td>
+                            <td class="text-center price-in-rubles">@((product.Price * exchangeRate).ToString("N2")) (₽)</td>
+                            <td class="text-center price-in-rubles-total">@((product.Price * exchangeRate * product.Quantity).ToString("N2")) (₽)</td>
+                            <td class="text-center">
+                                <input type="text" class="form-control form-control-small weight-input"
+                                       value="@product.Weight.ToString("N2")" min="0" step="0.01"
+                                       data-product-id="@product.ProductId" />
+                            </td>
+                            <td class="text-center bank-commission">@((product.Price * exchangeRate * (bankCommissionRate / 100)).ToString("N2")) (₽)</td>
+                            <td class="text-center bank-commission-sum-cost">@((product.Price * exchangeRate * (1 + (bankCommissionRate / 100))).ToString("N2")) (₽)</td>
+                            <td class="text-center bank-commission-sum-cost-total">@((product.Price * exchangeRate * product.Quantity * (1 + (bankCommissionRate / 100))).ToString("N2")) (₽)</td>
+                            <td class="text-center">
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-secondary comment-toggle @(string.IsNullOrEmpty(product.Comment) ? "" : "has-comment")"
+                                        data-product-id="@product.ProductId" aria-label="Комментарий к товару">
+                                    <i class="bi bi-chat-left-text-fill"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr class="comment-row d-none" data-product-id="@product.ProductId">
+                            <td colspan="14">
+                                <textarea class="comment-input"
+                                          data-product-id="@product.ProductId"
+                                          placeholder="Введите комментарий к товару" rows="2">@product.Comment</textarea>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Таблица товаров с базовыми налогами (маржа, ТН ВЭД, непредвиденные) -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Расчет</h5>
+            <table class="table table-bordered table-small">
+                <thead>
+                    <tr>
+                        <th>№</th>
+                        <th class="text-center">Маржа (%)</th>
+                        <th class="text-center">Маржа (ед)</th>
+                        <th class="text-center">Маржа (сум)</th>
+                        <th class="text-center">Прибыль</th>
+                        <th class="text-center" colspan="3">Коды ТН ВЭД</th>
+                        <th class="text-center" colspan="2">Не предвиденные расходы (%)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.Products.Count; i++)
+                    {
+                        var product = Model.Products[i];
+                        var priceInRubles = product.Price * Model.ExchangeRate;
+                        var priceWithRate = priceInRubles * (product.CodeTNVDRate / 100);
+
+                        var priceWithMargin = product.PriceAfterProfit(Model.ExchangeRate, product.MarginRate);
+                        var totalWithMargin = product.TotalPriceAfterProfit(Model.ExchangeRate, product.MarginRate);
+                        var profit = product.CalculateProfit(Model.ExchangeRate, product.MarginRate);
+
+                        <tr class="product-margin" data-product-id="@product.ProductId">
+                            <td>@(i + 1)</td>
+                            <td class="text-center margin-rate">
+                                <input type="text" class="form-control form-control-small margin-input"
+                                       data-product-id="@product.ProductId"
+                                       value="@product.MarginRate.ToString("N2")" step="0.01" />
+                            </td>
+                            <td class="text-center price-after-margin">@priceWithMargin.ToString("N2") (₽)</td>
+                            <td class="text-center total-price-after-margin">@totalWithMargin.ToString("N2") (₽)</td>
+                            <td class="text-center margin-cost">@profit.ToString("N2") (₽)</td>
+
+                            <td class="tnvd-code">
+                                <input type="text" class="form-control form-control-small code-search"
+                                       data-product-id="@product.ProductId" placeholder="Код"
+                                       value="@product.CodeTNVDName" />
+                            </td>
+                            <td class="text-center rate">
+                                <input type="text" class="form-control form-control-small rate-input"
+                                       data-code-name="@product.CodeTNVDName"
+                                       value="@product.CodeTNVDRate.ToString("N2")" step="0.01" />
+                            </td>
+                            <td class="text-center price-with-rate">@priceWithRate.ToString("N2") (₽)</td>
+
+                            <td class="text-center unforeseen-expenses">
+                                <input type="text" class="form-control form-control-small unforeseen-expenses-input"
+                                       data-product-id="@product.ProductId"
+                                       value="@product.UnforeseenExpensesRate.ToString("N2")" step="0.01" />
+                            </td>
+                            <td class="text-center unforeseen-expenses-cost">@product.CalculateUnforeseenExpense(Model.ExchangeRate, product.UnforeseenExpensesRate).ToString("N2") (₽)</td>
+
+                            <td class="d-none" data-price-cny="@product.Price"></td>
+                            <td class="d-none" data-quantity="@product.Quantity"></td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="4" class="text-end"><strong>Итого прибыль:</strong></td>
+                        <td id="total-profit" class="text-center">0.00 (₽)</td>
+                        <td colspan="3"></td>
+                        <td class="text-end"><strong>Итого:</strong></td>
+                        <td id="total-unforeseen-expenses" class="text-center">0.00 (₽)</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+    <!-- Управление дополнительными расходами -->
+    <div class="card mb-4 border-0 shadow-sm">
+        <div class="card-header border-0 pt-3 pb-0 d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-semibold">
+                <i class="bi bi-piggy-bank me-2 text-primary"></i> Дополнительные расходы
+            </h5>
+        </div>
+        <div class="card-body pt-2">
+            <div class="search-section mb-3" id="taxSearchSection">
+                <div class="tax-search-wrapper">
+                    <span class="tax-search-icon"><i class="bi bi-search"></i></span>
+                    <input type="text" class="tax-search-input" id="taxSearchInput" placeholder="Поиск расходов...">
+                    <button type="button" class="tax-search-clear" id="clearSearchBtn" title="Очистить" aria-label="Очистить">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+                <div id="searchStatus" class="small text-muted mt-1 ms-1"></div>
+                <div id="taxSearchResults" class="search-results mt-2"></div>
+            </div>
+
+            <div class="tax-badges-container" id="currentTaxesList">
+                @if (displayTaxes.Any())
+                {
+                    foreach (var tax in displayTaxes)
+                    {
+                        <div class="tax-badge-modern"
+                             data-tax-id="@tax.Id"
+                             data-tax-name="@tax.Name"
+                             data-tax-cost="@tax.Cost"
+                             data-tax-unit="@tax.MeasureUnit">
+                            <div class="tax-badge-icon"><i class="bi @GetIconClass(tax.Name)"></i></div>
+                            <div class="tax-badge-content">
+                                <div class="tax-badge-name">@tax.Name</div>
+                                <div class="tax-badge-value">@tax.Cost.ToString("N2") @tax.MeasureUnit</div>
+                            </div>
+                            <button type="button" class="tax-badge-remove remove-tax-badge"
+                                    data-tax-id="@tax.Id" data-tax-name="@tax.Name" title="Удалить расход">
+                                <i class="bi bi-x"></i>
+                            </button>
+                        </div>
+                    }
+                }
+            </div>
+            <div class="d-flex align-items-center mt-3 pt-2 border-top">
+                <i class="bi bi-info-circle-fill text-info me-2"></i>
+                <small class="text-body-secondary">Двойной клик по полю "Ед. (₽)" сбросит ручной ввод</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Таблица расчетов (динамические налоги) -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Расчет</h5>
+            <div id="taxTablesContainer"></div>
+
+            <template id="taxTableTemplate">
+                <table class="table table-bordered table-small product-tax-table">
+                    <thead><tr><th>№</th></tr><tr><th></th></tr><tr><th></th></tr></thead>
+                    <tbody></tbody>
+                    <tfoot><tr><td><strong>Итого:</strong></td></tr></tfoot>
+                </table>
+            </template>
+            <template id="taxColumnTemplate">
+                <th colspan="2" class="tax-column-header" data-tax-id="" data-tax-name="">
+                    <span class="tax-name"></span>
+                    <small class="text-body-secondary tax-unit"></small>
+                    <button type="button" class="btn btn-sm btn-link text-danger p-0 ms-2 remove-tax-from-table" title="Удалить расход"><i class="bi bi-x-circle"></i></button>
+                </th>
+            </template>
+            <template id="taxInputTemplate">
+                <td colspan="2"><input type="text" class="form-control form-control-small tax-input" data-tax-id="" data-tax-name="" value="" step="0.01" /></td>
+            </template>
+            <template id="taxHeaderLabelsTemplate">
+                <th>Ед. (₽)</th><th>Сум. (₽)</th>
+            </template>
+            <template id="taxCellTemplate">
+                <td><input type="text" class="form-control form-control-small unit-input" data-tax-id="" data-tax-name="" value="" step="0.01" /></td>
+                <td class="sum-input" data-tax-id="" data-product-id=""></td>
+            </template>
+            <template id="taxTotalTemplate">
+                <td></td><td class="total-sum" data-tax-id="" data-tax-name=""></td>
+            </template>
+        </div>
+    </div>
+
+    <!-- Итоговая стоимость -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Итоговая стоимость по каждому товару</h5>
+            <table class="table table-bordered">
+                <thead><tr><th>№</th><th>Цена за единицу без НДС (₽)</th><th>Сумма без НДС (₽)</th><th>Цена за единицу с НДС (₽)</th><th>Сумма с НДС (₽)</th></tr></thead>
+                <tbody>
+                    @for (int i = 0; i < Model.Products.Count; i++)
+                    {
+                        <tr class="product-cost" data-index="@i">
+                            <td>@(i + 1)</td>
+                            <td class="text-end price-without-vat-unit">—</td>
+                            <td class="text-end price-without-vat-total">—</td>
+                            <td class="text-end price-with-vat-unit">—</td>
+                            <td class="text-end price-with-vat-total">—</td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td><strong>Итого:</strong></td>
+                        <td></td>
+                        <td class="text-end" id="js-total-without-vat">—</td>
+                        <td></td>
+                        <td class="text-end" id="js-total-with-vat">—</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+    <!-- Кнопки действия -->
+    <div class="mb-4">
+        <div class="collapse mb-3" id="orderCommentBlock">
+            <textarea class="form-control" id="orderComment" rows="3" placeholder="Введите общий комментарий к заказу">@Model.Comment</textarea>
+        </div>
+
+        <div class="d-flex flex-wrap align-items-center gap-2">
+            <button class="btn btn-create save-btn-data" data-order-id="@Model.Id">Сохранить</button>
+            <button class="btn btn-copy duplicate-order-btn" data-order-id="@Model.Id">Дубль</button>
+            <button class="btn btn-comment comment-toggle @(string.IsNullOrEmpty(Model.Comment) ? "" : "has-comment")"
+                    type="button"
+                    data-bs-toggle="collapse" data-bs-target="#orderCommentBlock">
+                Комментарий
+            </button>
+            <button type="button" class="btn btn-comment" id="createNotificationBtn">
+                Напоминание
+            </button>
+
+            <div id="postSaveButtons" class="gap-2 @(Model.IsSaved ? "d-flex" : "d-none")">
+                <button class="btn btn-create save-btn-TKP" data-order-id="@Model.Id">Выгрузить ТКП</button>
+                <button class="btn btn-download save-btn-calculation" data-order-id="@Model.Id">
+                    Скачать расчет
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="custom-modal" class="modal fade" tabindex="-1" aria-labelledby="modal-title" aria-modal="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header"><h5 class="modal-title" id="modal-title">Подтверждение</h5></div>
+                <div class="modal-body"><p id="modal-message">Вы уверены?</p></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="modal-cancel">Нет</button>
+                    <button type="button" class="btn btn-primary" id="modal-confirm">Да</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для редактирования условий ТКП -->
+    <div class="modal fade" id="tkpSettingsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Настройка условий ТКП</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Номер ТКП:</label>
+                        <input type="text" class="form-control" id="tkpNumber" placeholder="например, 123" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Срок поставки:</label>
+                        <input type="text" class="form-control" id="tkpDeliveryTime" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Условия доставки:</label>
+                        <input type="text" class="form-control" id="tkpDeliveryTerms" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Условия оплаты:</label>
+                        <input type="text" class="form-control" id="tkpPaymentTerms" placeholder="100% предоплата" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="button" class="btn btn-primary" id="tkpGenerateBtn">Сформировать ТКП</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для уведомлений -->
+<div class="modal fade" id="notificationModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Новое напоминание</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Заголовок *</label>
+                    <input type="text" class="form-control" id="notifTitle" maxlength="200" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Описание</label>
+                    <textarea class="form-control" id="notifDescription" rows="3" maxlength="2000"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Дата *</label>
+                    <input type="date" class="form-control" id="notifDueDate" />
+                </div>
+                <div id="notificationExistingWarning"
+                     class="alert alert-warning mb-3"
+                     style="display:none;"></div>
+                <div id="notificationModalError" class="text-danger small" style="display:none;"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="button" class="btn btn-create" id="notificationSaveBtn">Создать</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Скрытые данные и JSON для JS -->
+<input type="hidden" id="orderId" value="@Model.Id" />
+<input type="hidden" id="productsCount" value="@Model.Products.Count" />
+<input type="hidden" id="total-cost-in-rubles" value="@Model.TotalCost.ToString("N2")" />
+<script>
+    window.isOrderSaved = @Json.Serialize(Model.IsSaved);
+</script>
+<script>
+    window.initialTaxes = @Html.Raw(Json.Serialize(displayTaxes));
+    window.initialProducts = @Html.Raw(Json.Serialize(Model.Products.Select(p => new
+            {
+                p.ProductId,
+                p.ProductTaxes,
+                p.MetrologicalNumber,
+                MetrologicalExpiryDate = p.MetrologicalExpiryDate.HasValue
+                ? p.MetrologicalExpiryDate.Value.ToString("yyyy-MM-dd")
+                : null
+        })));
+</script>
+<div id="tax-type-ids" data-tax-types='@Html.Raw(Json.Serialize(Model.TaxTypeIds))'></div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/orders/tableStyle.css" />
+    <link rel="stylesheet" href="~/css/orders/buttonStyle.css" />
+    <link rel="stylesheet" href="~/css/orders/selectStyle.css" />
+}
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+
+    <!-- Форматтеры -->
+    <script src="~/js/order/details/formatter/number-validator.js"></script>
+    <script src="~/js/order/details/formatter/formatter.js"></script>
+
+    <!-- Базовые расчёты -->
+    <script src="~/js/order/details/calculation/basics.js"></script>
+
+    <!-- Налоговое ядро -->
+    <script src="~/js/order/details/calculation/taxes/calculator.js"></script>
+    <script src="~/js/order/details/calculation/taxes/state-manager.js"></script>
+    <script src="~/js/order/details/calculation/taxes/column-manager.js"></script>
+    <script src="~/js/order/details/calculation/taxes/tax-management.js"></script>
+
+    <!-- Главный модуль расчётов -->
+    <script src="~/js/order/details/calculation/main.js"></script>
+
+    <!-- Итоговый расчёт -->
+    <script src="~/js/order/details/calculation/result.js"></script>
+
+    <!-- Интерфейс -->
+    <script src="~/js/order/details/ui/comment.js"></script>
+    <script src="~/js/order/details/ui/notification-modal.js"></script>
+    <script src="~/js/order/details/ui/status-updater.js"></script>
+    <script src="~/js/order/details/ui/status-history-modal.js"></script>
+    <script src="~/js/order/details/ui/modal.js"></script>
+    <script src="~/js/order/details/ui/metrological.js"></script>
+
+    <!-- Сохранение и экспорт -->
+    <script src="~/js/order/details/dataCollector.js"></script>
+    <script src="~/js/order/details/save/save-data.js"></script>
+    <script src="~/js/order/details/save/export-calculation.js"></script>
+    <script src="~/js/order/details/save/duplicate-order.js"></script>
+    <script src="~/js/order/details/save/tkp-settings.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                if (window.formatter && window.formatter.formatAllNumbersOnPage) {
+                    window.formatter.formatAllNumbersOnPage();
+                }
+            }, 500);
+        });
+    </script>
+}

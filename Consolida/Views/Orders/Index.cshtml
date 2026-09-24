@@ -1,0 +1,188 @@
+@using Application.ViewModels.OrderModel
+@using DB.Entity.Enum
+@using System.Globalization
+@model IEnumerable<OrderListDto>
+
+@{
+    var statusValues = Enum.GetValues(typeof(Status)).Cast<Status>();
+    ViewData["Title"] = "Список заказов";
+}
+
+<div class="container">
+    <div class="row">
+        <!-- Кнопки над таблицей -->
+        <div class="col-md-12 mb-4 d-flex align-items-center flex-wrap gap-2">
+            <a href="@Url.Action("Create")" class="btn btn-create">Добавить новый заказ</a>
+            <a href="@Url.Action("Index", "Customers")" class="btn btn-go-to">Перейти к клиентам</a>
+
+            <!-- Форма загрузки -->
+            <form method="post" enctype="multipart/form-data" class="d-flex align-items-center"
+                  asp-controller="ExcelOrder" asp-action="UploadOrder" onsubmit="return validateFileUpload()">
+                @Html.AntiForgeryToken()
+                <div class="btn-group-file">
+                    <label for="fileInput" class="btn btn-file" id="fileLabel">Выбрать файл</label>
+                    <button type="submit" class="btn btn-upload">Загрузить ответ</button>
+                    <input type="file" name="file" accept=".xlsx" id="fileInput" class="d-none">
+                </div>
+            </form>
+
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger mb-0 py-2">
+                    @TempData["ErrorMessage"]
+                    @{
+                        TempData.Remove("ErrorMessage");
+                    }
+                </div>
+            }
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-info mb-0 py-2">
+                    @TempData["SuccessMessage"]
+                    @{
+                        TempData.Remove("SuccessMessage");
+                    }
+                </div>
+            }
+        </div>
+
+        <!-- Фильтр и поиск -->
+        <div class="col-md-12 mb-4">
+            <div class="card">
+                <h3 class="card-title">Фильтр и поиск</h3>
+                <form method="get">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-lg-2 col-md-4">
+                            <label class="form-label" for="searchOrderNumber">Номер заказа</label>
+                            <input type="text" id="searchOrderNumber" class="custom-input"
+                                   name="searchOrderNumber" value="@ViewBag.SearchOrderNumber"
+                                   placeholder="Номер заказа" inputmode="numeric" autocomplete="off" />
+                        </div>
+
+                        <div class="col-lg-2 col-md-4">
+                            <label class="form-label" for="searchCompanyName">Компания</label>
+                            <input type="text" id="searchCompanyName" class="custom-input"
+                                   name="searchCompanyName" value="@ViewBag.searchCompanyName"
+                                   placeholder="Название компании" />
+                        </div>
+
+                        <div class="col-lg-2 col-md-4">
+                            <label class="form-label" for="status">Статус</label>
+                            <select name="status" id="status" class="custom-select">
+                                <option value="">Все</option>
+                                @foreach (var status in statusValues)
+                                {
+                                    <option value="@((int)status)" selected="@(ViewBag.Status?.Equals(status) ?? false)">
+                                        @status.GetDisplayName()
+                                    </option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="col-lg-2 col-md-4">
+                            <label class="form-label" for="searchDateFrom">Дата от</label>
+                            <input type="date" id="searchDateFrom" class="custom-input"
+                                   name="searchDateFrom" value="@ViewBag.SearchDateFrom" />
+                        </div>
+
+                        <div class="col-lg-2 col-md-4">
+                            <label class="form-label" for="searchDateTo">Дата до</label>
+                            <input type="date" id="searchDateTo" class="custom-input"
+                                   name="searchDateTo" value="@ViewBag.SearchDateTo" />
+                        </div>
+
+                        <div class="col-lg-2 col-md-4">
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-search btn-icon-only btn-icon-lg"
+                                        title="Применить фильтр" aria-label="Применить фильтр"></button>
+                                <a href="@Url.Action("Index", "Orders")"
+                                   class="btn btn-reset btn-icon-only btn-icon-lg"
+                                   title="Очистить фильтры" aria-label="Очистить фильтры"></a>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Таблица заказов -->
+        <div class="col-md-12">
+            <div class="card">
+                <h3 class="card-title">Список заказов</h3>
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped" aria-describedby="ordersTableCaption">
+                        <caption id="ordersTableCaption" class="visually-hidden">
+                            Список заказов с номерами, клиентами и статусами
+                        </caption>
+                        <thead>
+                            <tr>
+                                <th class="text-center">
+                                    <a href="@Url.Action("Index", new { sortOrder = ViewBag.SortOrder == "Number" ? "Number_desc" : "Number", searchCompanyName = ViewBag.searchCompanyName, searchOrderNumber = ViewBag.SearchOrderNumber, priority = ViewBag.Priority, status = ViewBag.Status, searchDateFrom = ViewBag.SearchDateFrom, searchDateTo = ViewBag.SearchDateTo, minAmount = ViewBag.MinAmount, maxAmount = ViewBag.MaxAmount })">Заказ №</a>
+                                </th>
+                                <th class="text-center">
+                                    <a href="@Url.Action("Index", new { sortOrder = ViewBag.SortOrder == "Company" ? "Company_desc" : "Company", searchCompanyName = ViewBag.searchCompanyName, searchOrderNumber = ViewBag.SearchOrderNumber, priority = ViewBag.Priority, status = ViewBag.Status, searchDateFrom = ViewBag.SearchDateFrom, searchDateTo = ViewBag.SearchDateTo, minAmount = ViewBag.MinAmount, maxAmount = ViewBag.MaxAmount })">Компания</a>
+                                </th>
+                                <th class="text-center">
+                                    <a href="@Url.Action("Index", new { sortOrder = ViewBag.SortOrder == "Weight" ? "Weight_desc" : "Weight", searchCompanyName = ViewBag.searchCompanyName, searchOrderNumber = ViewBag.SearchOrderNumber, priority = ViewBag.Priority, status = ViewBag.Status, searchDateFrom = ViewBag.SearchDateFrom, searchDateTo = ViewBag.SearchDateTo, minAmount = ViewBag.MinAmount, maxAmount = ViewBag.MaxAmount })">Вес</a>
+                                </th>
+                                <th class="text-center">
+                                    <a href="@Url.Action("Index", new { sortOrder = ViewBag.SortOrder == "Cost" ? "Cost_desc" : "Cost", searchCompanyName = ViewBag.searchCompanyName, searchOrderNumber = ViewBag.SearchOrderNumber, priority = ViewBag.Priority, status = ViewBag.Status, searchDateFrom = ViewBag.SearchDateFrom, searchDateTo = ViewBag.SearchDateTo, minAmount = ViewBag.MinAmount, maxAmount = ViewBag.MaxAmount })">Стоимость (¥)</a>
+                                </th>
+                                <th class="text-center">
+                                    <a href="@Url.Action("Index", new { sortOrder = ViewBag.SortOrder == "Priority" ? "Priority_desc" : "Priority", searchCompanyName = ViewBag.searchCompanyName, searchOrderNumber = ViewBag.SearchOrderNumber, priority = ViewBag.Priority, status = ViewBag.Status, searchDateFrom = ViewBag.SearchDateFrom, searchDateTo = ViewBag.SearchDateTo, minAmount = ViewBag.MinAmount, maxAmount = ViewBag.MaxAmount })">Приоритет</a>
+                                </th>
+                                <th class="text-center">Статус</th>
+                                <th class="text-center">
+                                    <a href="@Url.Action("Index", new { sortOrder = ViewBag.SortOrder == "Date" ? "Date_desc" : "Date", searchCompanyName = ViewBag.searchCompanyName, searchOrderNumber = ViewBag.SearchOrderNumber, priority = ViewBag.Priority, status = ViewBag.Status, searchDateFrom = ViewBag.SearchDateFrom, searchDateTo = ViewBag.SearchDateTo, minAmount = ViewBag.MinAmount, maxAmount = ViewBag.MaxAmount })">Дата изменения</a>
+                                </th>
+                                <th class="text-center">Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="text-center">@item.OrderNumber</td>
+                                    <td class="text-center">@item.CompanyName</td>
+                                    <td class="text-center">@item.TotalWeight</td>
+                                    <td class="text-center">@item.TotalCost.ToString("N2")</td>
+                                    <td class="text-center">@item.Priority.GetDisplayName()</td>
+                                    <td class="text-center">@item.Status.GetDisplayName()</td>
+                                    <td class="text-center">@item.LastChangeDate.ToString("dd/MM/yy HH:mm", CultureInfo.InvariantCulture)</td>
+                                    <td class="text-center">
+                                        <a class="btn btn-sm btn-details btn-icon-only me-1" asp-action="Details" asp-route-id="@item.Id"
+                                           title="Детали заказа" aria-label="Детали заказа"></a>
+                                        <a class="btn btn-sm btn-delete btn-icon-only" asp-action="Delete" asp-route-id="@item.Id"
+                                           asp-route-page="@ViewBag.CurrentPage"
+                                           asp-route-searchCompanyName="@ViewBag.searchCompanyName"
+                                           asp-route-searchOrderNumber="@ViewBag.SearchOrderNumber"
+                                           asp-route-priority="@ViewBag.Priority"
+                                           asp-route-status="@ViewBag.Status"
+                                           asp-route-searchDateFrom="@ViewBag.SearchDateFrom"
+                                           asp-route-searchDateTo="@ViewBag.SearchDateTo"
+                                           asp-route-sortOrder="@ViewBag.SortOrder"
+                                           asp-route-minAmount="@ViewBag.MinAmount"
+                                           asp-route-maxAmount="@ViewBag.MaxAmount"
+                                           title="Удалить заказ" aria-label="Удалить заказ"></a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>        
+
+        @if (ViewBag.Paging != null)
+        {
+            <partial name="_Pagination" model="@ViewBag.Paging" />
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/order/index/btnStatus.js" defer></script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

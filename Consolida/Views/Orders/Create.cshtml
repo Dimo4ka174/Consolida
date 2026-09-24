@@ -1,0 +1,236 @@
+﻿@using Application.ViewModels.OrderModel.Products
+@using Application.ViewModels.OrderModel
+@model OrderFormDto
+
+@{
+    ViewData["Title"] = "Создание нового заказа";
+}
+
+<div class="container">
+    <div class="row">
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="col-md-12 mb-4">
+                <div class="alert alert-danger">
+                    @TempData["ErrorMessage"]
+                    @{
+                        TempData.Remove("ErrorMessage");
+                    }
+                </div>
+            </div>
+        }
+
+        <div class="col-md-12 mb-4">
+            <a asp-action="Index" class="btn btn-go-to">Вернуться к списку заказов</a>
+        </div>
+
+        <div class="col-md-12">
+            <div class="card">
+                <h3 class="card-title">Новый заказ</h3>
+
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <!-- Шапка: номер, компания, клиент, приоритет -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-3">
+                            <label class="form-label" asp-for="OrderNumber">Номер заказа</label>
+                            <input asp-for="OrderNumber" type="text" class="custom-input" readonly />
+                        </div>
+
+                        <div class="col-md-3 autocomplete-anchor">
+                            <label class="form-label" for="companySearchInput">Компания</label>
+                            <div class="input-with-icon">
+                                <input type="text" class="custom-input autocomplete-input"
+                                       id="companySearchInput" placeholder="Введите название..." autocomplete="off" />
+                                <button type="button" class="btn btn-go-to btn-icon-only" id="addCompanyBtn"
+                                        title="Добавить компанию" aria-label="Добавить компанию"></button>
+                            </div>
+                            <input type="hidden" asp-for="CompanyId" id="CompanyId" />
+                            <span asp-validation-for="CompanyId" class="text-danger"></span>
+                            <ul class="suggestions-list" id="companySuggestions" style="display: none;"></ul>
+                        </div>
+
+                        <div class="col-md-3 autocomplete-anchor">
+                            <label class="form-label" for="customerSearchInput">Клиент</label>
+                            <div class="input-with-icon">
+                                <input type="text" class="custom-input autocomplete-input"
+                                       id="customerSearchInput" placeholder="Введите фамилию..." autocomplete="off" disabled />
+                                <button type="button" class="btn btn-go-to btn-icon-only" id="addCustomerBtn"
+                                        title="Добавить клиента" aria-label="Добавить клиента" disabled></button>
+                            </div>
+                            <input type="hidden" asp-for="CustomerId" id="CustomerId" />
+                            <span asp-validation-for="CustomerId" class="text-danger"></span>
+                            <ul class="suggestions-list" id="customerSuggestions" style="display: none;"></ul>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label" asp-for="Priority">Приоритет</label>
+                            <select asp-for="Priority" asp-items="Model.PrioritiesList" class="custom-select">
+                                <option value="">Выберите приоритет</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Товары -->
+                    <div class="mb-4 autocomplete-anchor">
+                        <label class="form-label">Поиск товара</label>
+                        <div class="input-with-icon">
+                            <input id="productSearch" type="text" class="custom-input"
+                                   placeholder="Введите наименование или модель..." autocomplete="off" />
+                            <button type="button" class="btn btn-go-to btn-icon-only" id="addProductBtn"
+                                    title="Добавить товар" aria-label="Добавить товар"></button>
+                        </div>
+                        <ul id="productSuggestions" class="suggestions-list" style="display: none;"></ul>
+                    </div>
+
+                    <div class="table-responsive mb-4">
+                        <table class="table table-bordered" id="selectedProductsTable">
+                            <thead>
+                                <tr>
+                                    <th>Наименование</th>
+                                    <th>Модель</th>
+                                    <th style="width: 100px;">Производитель</th>
+                                    <th style="width: 100px;">Комментарий</th>
+                                    <th style="width: 110px;">Дата доставки</th>
+                                    <th style="width: 80px;">Срок</th>
+                                    <th style="width: 75px;">Кол-во</th>
+                                    <th style="width: 80px;">Вес (кг)</th>
+                                    <th style="width: 120px;">Цена (¥)</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="selectedProductsBody"></tbody>
+                            <tfoot>
+                                <tr>
+                                    <th colspan="7" class="text-end">Итого:</th>
+                                    <th id="totalWeight">0.00</th>
+                                    <th id="totalCost">0.00</th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <!-- Комментарий -->
+                    <div class="mb-4">
+                        <label asp-for="Comment" class="form-label">@Html.DisplayNameFor(m => m.Comment)</label>
+                        <textarea asp-for="Comment" class="custom-input"
+                                  rows="3" placeholder="Введите комментарий к заказу"
+                                  data-val="false" style="height: auto; min-height: 100px; padding: var(--space-3);"></textarea>
+                        <span asp-validation-for="Comment" class="text-danger"></span>
+                    </div>
+
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-create">Создать заказ</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модалки создания -->
+<div class="modal fade" id="createProductModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Новый товар</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="newProductName" class="form-label">Наименование</label>
+                    <input type="text" class="custom-input" id="newProductName" placeholder="Насос..." />
+                </div>
+                <div class="mb-3">
+                    <label for="newProductModel" class="form-label">Модель</label>
+                    <input type="text" class="custom-input" id="newProductModel" placeholder="Модель..." />
+                </div>
+                <div class="mb-3">
+                    <label for="newProductPrice" class="form-label">Цена (¥)</label>
+                    <input type="number" class="custom-input" id="newProductPrice" placeholder="1000" step="0.01" />
+                </div>
+                <div class="mb-3">
+                    <label for="newProductManufacturer" class="form-label">Производитель</label>
+                    <input type="text" class="custom-input" id="newProductManufacturer"
+                           placeholder="Введите производителя" list="manufacturerList" />
+                    <datalist id="manufacturerList"></datalist>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-reset" data-bs-dismiss="modal">Отмена</button>
+                <button type="button" class="btn btn-create" id="saveProductBtn">Сохранить</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="createCompanyModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Новая компания</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="newCompanyName" class="form-label">Название</label>
+                    <input type="text" class="custom-input" id="newCompanyName" placeholder="ООО Ромашка" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-reset" data-bs-dismiss="modal">Отмена</button>
+                <button type="button" class="btn btn-create" id="saveCompanyBtn">Сохранить</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="createCustomerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Новый клиент</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="newCustomerFirstName" class="form-label">Имя</label>
+                    <input type="text" class="custom-input" id="newCustomerFirstName" placeholder="Иван" />
+                </div>
+                <div class="mb-3">
+                    <label for="newCustomerLastName" class="form-label">Фамилия</label>
+                    <input type="text" class="custom-input" id="newCustomerLastName" placeholder="Иванов" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-reset" data-bs-dismiss="modal">Отмена</button>
+                <button type="button" class="btn btn-create" id="saveCustomerBtn">Сохранить</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Orders/TableStyle.css" />
+    <link rel="stylesheet" href="~/css/Orders/SuggestionsStyle.css" />
+}
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        var initialProducts = @Html.Raw(Json.Serialize(Model.Products ?? new List<OrderProductViewModel>()));
+        var apiSettings = {
+            productSearchUrl: '@Url.Action("Search", "ProductAPI")',
+            updateSessionUrl: '@Url.Action("UpdateAllProductsInSession", "OrderAPI")',
+            getCustomersUrl: '@Url.Action("GetCustomersByCompany", "OrderAPI")'
+        };
+    </script>
+
+    <script type="module" src="~/js/order/create/quick-create.js"></script>
+    <script type="module" src="~/js/order/create/main.js"></script>
+}

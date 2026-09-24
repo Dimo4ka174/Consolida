@@ -1,0 +1,696 @@
+/* ======================================== */
+/* ========== ОСНОВНЫЕ СТИЛИ ФОРМ ========= */
+/* ======================================== */
+
+/* Узкие поля ввода для таблиц */
+.form-control-small {
+    width: 80px;
+    padding: 0.2rem;
+    font-size: 0.6rem;
+}
+
+/* Поле для ввода маржи */
+.margin-input {
+    width: 80px;
+    padding: 0.2rem;
+    font-size: 0.9rem;
+}
+
+/* Общий класс для мелких таблиц */
+.table-small {
+    font-size: 0.7rem;
+}
+
+/* Ячейки с длинным текстом (схлопываются) */
+.collapsible-cell {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
+}
+
+    .collapsible-cell:hover {
+        white-space: normal;
+        overflow: visible;
+        word-break: break-word;
+        background-color: var(--bg-subtle);
+    }
+
+/* Контейнер для таблиц */
+#taxTablesContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Каждая таблица занимает всю ширину */
+.product-tax-table {
+    width: 100%;
+    margin-bottom: 0;
+}
+
+/* Адаптивность для мобильных */
+@media (max-width: 1200px) {
+    .product-tax-table {
+        font-size: 0.65rem;
+    }
+
+    .form-control-small {
+        width: 60px;
+    }
+}
+
+/* ======================================== */
+/* ========== СТИЛИ ДЛЯ КОММЕНТАРИЕВ ====== */
+/* ======================================== */
+
+/* Кнопка комментария с активным комментарием */
+/* Кнопка комментария ТОВАРА с активным комментарием */
+.comment-toggle[data-product-id].has-comment {
+    background-color: var(--info-soft) !important;
+    border-color: var(--info) !important;
+    color: var(--info) !important;
+    box-shadow: 0 0 0 0.2rem var(--info-soft);
+    position: relative;
+}
+
+    .comment-toggle[data-product-id].has-comment::after {
+        content: '';
+        position: absolute;
+        top: -3px;
+        right: -3px;
+        width: 8px;
+        height: 8px;
+        background-color: var(--danger);
+        border-radius: 50%;
+        box-shadow: 0 0 0 2px var(--bg-surface);
+        /* На всякий случай перебиваем возможные mask-image от других правил */
+        -webkit-mask-image: none;
+        mask-image: none;
+    }
+
+    .comment-toggle[data-product-id].has-comment:hover {
+        background-color: var(--info-soft) !important;
+        border-color: var(--info-hover) !important;
+        box-shadow: 0 0 0 0.3rem var(--info-soft);
+    }
+
+    .comment-toggle[data-product-id].has-comment i {
+        color: var(--info) !important;
+    }
+
+/* Маленькая кнопка комментария товара */
+.btn-sm.comment-toggle[data-product-id].has-comment::after {
+    width: 6px;
+    height: 6px;
+    top: -2px;
+    right: -2px;
+}
+
+/* Маленькая кнопка комментария */
+.btn-sm.has-comment::after {
+    width: 6px;
+    height: 6px;
+    top: -2px;
+    right: -2px;
+}
+
+/* Строка с комментарием */
+.comment-row {
+    transition: background-color 0.3s ease;
+}
+
+    /* Красим td, а не tr — Bootstrap использует box-shadow inset на td */
+    .comment-row > td {
+        background-color: var(--bg-subtle) !important;
+        box-shadow: none !important;
+        border-color: var(--border-soft) !important;
+    }
+
+    /* Внутри строки — свой отступ для textarea */
+    .comment-row > td {
+        padding: var(--space-3) !important;
+    }
+
+    .comment-row.show {
+        display: table-row;
+    }
+
+/* Поле общего комментария к заказу */
+#orderComment {
+    resize: vertical;
+    min-height: 100px;
+    font-size: var(--font-size-sm);
+}
+
+/* ======================================== */
+/* ====== СТИЛИ ДЛЯ ТАБЛИЦЫ РАСЧЕТОВ ====== */
+/* ======================================== */
+
+/* Подсветка несоответствия налогов */
+.tax-mismatch {
+    border-color: var(--danger) !important;
+    color: var(--danger);
+    background-color: var(--danger-soft);
+}
+
+    .tax-mismatch:hover {
+        border-color: var(--danger-hover) !important;
+        cursor: help;
+    }
+
+.tax-input.tax-mismatch,
+.total-sum.tax-mismatch {
+    color: var(--danger);
+}
+
+/* Ручной ввод (измененное значение) */
+.unit-modified {
+    background-color: var(--warning-soft) !important;
+    border-color: var(--warning) !important;
+}
+
+/* Ручной ввод с нулевым значением */
+.unit-manual-zero {
+    background-color: var(--bg-subtle) !important;
+    border-color: var(--border-soft) !important;
+}
+
+/* Автоматический расчет */
+.unit-auto {
+    background-color: var(--bg-surface) !important;
+}
+
+/* ======================================== */
+/* ====== СТИЛИ ДЛЯ УПРАВЛЕНИЯ РАСХОДАМИ == */
+/* ======================================== */
+
+/* Карточка без границ с тенью */
+.border-0.shadow-sm {
+    box-shadow: var(--shadow-sm) !important;
+}
+
+/* ===== ПОЛЕ ПОИСКА ===== */
+#taxSearchInput {
+    border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+    padding: 0.75rem 1rem;
+    font-size: var(--font-size-base);
+    border: 1px solid var(--border-soft);
+    border-left: none;
+    background-color: var(--bg-subtle);
+    color: var(--text-primary);
+    transition: background-color var(--transition-fast), border-color var(--transition-fast);
+}
+
+    #taxSearchInput:focus {
+        outline: none;
+        box-shadow: none;
+        border-color: var(--border-soft);
+        background-color: var(--bg-surface);
+    }
+
+    #taxSearchInput:focus-visible {
+        outline: none;
+        border-color: var(--border-soft);
+    }
+
+.input-group {
+    position: relative;
+}
+
+.input-group-text {
+    border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-soft);
+    border-right: none;
+    background-color: var(--bg-subtle);
+    color: var(--text-muted);
+}
+
+.input-group:focus-within {
+    box-shadow: 0 0 0 3px var(--accent-soft);
+    border-radius: var(--radius-lg);
+}
+
+    .input-group:focus-within .input-group-text,
+    .input-group:focus-within #taxSearchInput {
+        background-color: var(--bg-surface);
+    }
+
+/* Кнопка очистки поиска */
+#clearSearchBtn {
+    border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+    border: 1px solid var(--border-soft);
+    border-left: none;
+    background-color: var(--bg-subtle);
+    color: var(--text-muted);
+    padding: 0 0.75rem;
+}
+
+    #clearSearchBtn:hover {
+        background-color: var(--bg-hover);
+        color: var(--text-primary);
+    }
+
+    #clearSearchBtn i {
+        font-size: 1rem;
+    }
+
+/* ===== РЕЗУЛЬТАТЫ ПОИСКА ===== */
+.search-results {
+    max-height: 300px;
+    overflow-y: auto;
+    border-radius: var(--radius-md);
+    background: var(--bg-surface);
+    border: 1px solid var(--border-soft);
+    box-shadow: var(--shadow-md);
+    margin-top: var(--space-2) !important;
+    width: 100%;
+}
+
+.search-result-item-modern {
+    display: flex;
+    align-items: center;
+    padding: var(--space-3) var(--space-4);
+    cursor: pointer;
+    border-bottom: 1px solid var(--border-soft);
+    transition: background-color var(--transition-fast), padding-left var(--transition-fast);
+    background: var(--bg-surface);
+    width: 100%;
+}
+
+    .search-result-item-modern:last-child {
+        border-bottom: none;
+    }
+
+    .search-result-item-modern:hover {
+        background-color: var(--bg-hover);
+        padding-left: 20px;
+    }
+
+.search-result-icon {
+    width: 32px;
+    height: 32px;
+    background: var(--accent-soft);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: var(--space-3);
+    color: var(--accent);
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.search-result-content {
+    flex: 1;
+}
+
+.search-result-name {
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    margin-bottom: 2px;
+}
+
+.search-result-details {
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+}
+
+/* Скроллбар для результатов поиска */
+.search-results::-webkit-scrollbar {
+    width: 6px;
+}
+
+.search-results::-webkit-scrollbar-track {
+    background: var(--bg-subtle);
+    border-radius: 10px;
+}
+
+.search-results::-webkit-scrollbar-thumb {
+    background: var(--border-medium);
+    border-radius: 10px;
+}
+
+    .search-results::-webkit-scrollbar-thumb:hover {
+        background: var(--border-strong);
+    }
+
+/* ===== БЕЙДЖИ РАСХОДОВ ===== */
+.tax-badges-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin: var(--space-2) 0;
+}
+
+/* Современные бейджи */
+.tax-badge-modern {
+    display: flex;
+    align-items: center;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-pill);
+    padding: 6px 6px 6px 12px;
+    box-shadow: var(--shadow-xs);
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
+    cursor: default;
+    min-width: 200px;
+    max-width: 100%;
+}
+
+    .tax-badge-modern:hover {
+        border-color: var(--accent);
+        box-shadow: var(--shadow-sm);
+        transform: translateY(-1px);
+    }
+
+/* Иконка бейджа */
+.tax-badge-icon {
+    width: 32px;
+    height: 32px;
+    background: var(--bg-subtle);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: var(--space-3);
+    color: var(--text-secondary);
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+/* Контент бейджа */
+.tax-badge-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.tax-badge-name {
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-sm);
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tax-badge-value {
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
+    font-weight: var(--font-weight-medium);
+}
+
+/* Кнопка удаления бейджа */
+.tax-badge-remove {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color var(--transition-fast), transform var(--transition-fast);
+    margin-left: var(--space-2);
+    flex-shrink: 0;
+    padding: 0;
+    position: relative;
+}
+
+    .tax-badge-remove::before {
+        content: '';
+        display: block;
+        width: 14px;
+        height: 14px;
+        -webkit-mask-image: url('/images/icons/close.svg');
+        mask-image: url('/images/icons/close.svg');
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+        opacity: 0.55;
+        transition: opacity var(--transition-fast), background-color var(--transition-fast);
+    }
+
+    .tax-badge-remove:hover {
+        background-color: var(--danger-soft);
+        transform: scale(1.1);
+    }
+
+        .tax-badge-remove:hover::before {
+            opacity: 1;
+            background-color: var(--danger);
+        }
+
+    /* Скрываем старую иконку <i>, если она ещё есть в разметке */
+    .tax-badge-remove i {
+        display: none;
+    }
+
+/* Цветовые вариации для разных типов расходов */
+.tax-badge-modern[data-tax-name*="Таможен"] .tax-badge-icon {
+    background: var(--warning-soft);
+    color: var(--warning);
+}
+
+.tax-badge-modern[data-tax-name*="Доставк"] .tax-badge-icon {
+    background: var(--success-soft);
+    color: var(--success);
+}
+
+.tax-badge-modern[data-tax-name*="Сертифи"] .tax-badge-icon,
+.tax-badge-modern[data-tax-name*="Деклара"] .tax-badge-icon {
+    background: var(--info-soft);
+    color: var(--info);
+}
+
+.tax-badge-modern[data-tax-name*="Термин"] .tax-badge-icon {
+    background: var(--accent-soft);
+    color: var(--accent);
+}
+
+/* ===== EMPTY STATE ===== */
+.empty-state {
+    background: var(--bg-subtle);
+    border-radius: var(--radius-lg);
+    padding: 2rem !important;
+    border: 2px dashed var(--border-medium);
+    transition: border-color var(--transition-fast), background-color var(--transition-fast);
+}
+
+    .empty-state:hover {
+        border-color: var(--border-strong);
+        background: var(--bg-surface);
+    }
+
+.empty-state-icon {
+    opacity: 0.6;
+    transition: opacity var(--transition-fast), transform var(--transition-fast);
+}
+
+.empty-state:hover .empty-state-icon {
+    opacity: 0.8;
+    transform: scale(1.05);
+}
+
+/* ===== ПОДСКАЗКИ ===== */
+.border-top {
+    border-color: var(--border-soft) !important;
+}
+
+.bi-info-circle-fill.text-info {
+    font-size: 1rem;
+}
+
+/* ===== АНИМАЦИИ ===== */
+@keyframes badgeAdded {
+    0% {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.tax-badge-modern.added {
+    animation: badgeAdded 0.3s ease-out;
+}
+
+/* Анимация удаления */
+.tax-badge-modern.removing {
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.3s;
+}
+
+/* ===== АДАПТИВНОСТЬ ===== */
+@media (max-width: 768px) {
+    .tax-badge-modern {
+        min-width: 100%;
+    }
+
+    .search-result-item-modern {
+        padding: 10px 12px;
+    }
+
+    #taxSearchInput {
+        font-size: 0.95rem;
+    }
+}
+
+/* ============================================================
+   Поиск расходов (замена .input-group + .bg-light)
+   ============================================================ */
+.tax-search-wrapper {
+    display: flex;
+    align-items: center;
+    background-color: var(--bg-subtle);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-lg);
+    padding: 0 var(--space-3);
+    transition: background-color var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+    .tax-search-wrapper:focus-within {
+        background-color: var(--bg-surface);
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+
+.tax-search-icon {
+    color: var(--text-muted);
+    display: inline-flex;
+    align-items: center;
+    margin-right: var(--space-2);
+    flex-shrink: 0;
+}
+
+.tax-search-input {
+    flex: 1;
+    min-width: 0;
+    height: 38px;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--text-primary);
+    font-family: var(--font-family);
+    font-size: var(--font-size-sm);
+    padding: 0;
+}
+
+    .tax-search-input::placeholder {
+        color: var(--text-muted);
+        opacity: 0.7;
+    }
+
+.tax-search-clear {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    flex-shrink: 0;
+    transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+    .tax-search-clear:hover {
+        background-color: var(--danger-soft);
+        color: var(--danger);
+    }
+
+    .tax-search-clear i {
+        font-size: 0.85rem;
+    }
+
+/* ============================================================
+   Универсальный комментарий к товару
+   ============================================================ */
+.comment-input {
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    resize: vertical;
+    min-height: 60px;
+    padding: var(--space-3);
+    width: 100%;
+}
+
+    .comment-input:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px var(--accent-soft);
+        outline: none;
+    }
+
+    .comment-input::placeholder {
+        color: var(--text-muted);
+        opacity: 0.7;
+    }
+
+/* ============================================================
+   Первичная поверка: подсветка "истекает менее чем через 2 мес."
+   ============================================================ */
+#metrologicalExpiry.date-expiring {
+    border-color: var(--danger) !important;
+    background-color: var(--danger-soft) !important;
+    color: var(--danger) !important;
+    font-weight: var(--font-weight-semibold);
+}
+
+    #metrologicalExpiry.date-expiring:focus {
+        border-color: var(--danger) !important;
+        box-shadow: 0 0 0 3px var(--danger-soft) !important;
+    }
+
+/* ============================================================
+   Первичная поверка: колонки «Номер ГРСИ» и «Срок действия»
+   ============================================================ */
+.metrological-header {
+    font-size: 0.7rem;
+    white-space: nowrap;
+}
+
+.metrological-number-input {
+    width: 100px;
+    padding: 0.2rem;
+    font-size: 0.6rem;
+}
+
+.metrological-expiry-input {
+    width: 130px;
+    padding: 0.2rem;
+    font-size: 0.6rem;
+    color: var(--text-primary);
+    background-color: var(--bg-surface);
+}
+
+    .metrological-expiry-input.date-expiring {
+        border-color: var(--danger) !important;
+        background-color: var(--danger-soft) !important;
+        color: var(--danger) !important;
+        font-weight: var(--font-weight-semibold);
+    }
+
+        .metrological-expiry-input.date-expiring:focus {
+            border-color: var(--danger) !important;
+            box-shadow: 0 0 0 3px var(--danger-soft) !important;
+        }

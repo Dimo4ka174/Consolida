@@ -1,0 +1,164 @@
+﻿@using Application.ViewModels.OrderModel
+@model DeleteOrderViewModel
+@{
+    ViewData["Title"] = "Удаление заказа";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12 mb-4 d-flex gap-2 flex-wrap">
+            <a asp-action="Index" class="btn btn-go-to">Вернуться к списку заказов</a>
+        </div>
+
+        <div class="col-md-12">
+            <div class="alert alert-danger text-center" role="alert">
+                <h4 class="mb-2">Внимание!</h4>
+                <p class="mb-0">
+                    Вы собираетесь удалить заказ и все связанные с ним данные (товары, налоги, историю).
+                    Это действие нельзя отменить.
+                </p>
+            </div>
+        </div>
+
+        <!-- Основная информация -->
+        <div class="col-md-12">
+            <div class="card">
+                <h3 class="card-title">Основная информация</h3>
+
+                <dl class="row mb-0">
+                    <dt class="col-sm-3">Номер заказа:</dt>
+                    <dd class="col-sm-9">@Model.OrderNumber</dd>
+
+                    <dt class="col-sm-3">Клиент:</dt>
+                    <dd class="col-sm-9">@Model.CustomerName</dd>
+
+                    <dt class="col-sm-3">Дата создания:</dt>
+                    <dd class="col-sm-9">@Model.CreationDate.ToString("dd.MM.yyyy")</dd>
+
+                    <dt class="col-sm-3">Текущий статус:</dt>
+                    <dd class="col-sm-9">
+                        <span class="badge bg-secondary">@Model.Status</span>
+                    </dd>
+
+                    <dt class="col-sm-3">Общий вес:</dt>
+                    <dd class="col-sm-9">@Model.TotalWeight.ToString("N2") кг</dd>
+
+                    <dt class="col-sm-3">Общая стоимость:</dt>
+                    <dd class="col-sm-9">@Model.TotalCost.ToString("N2") ¥</dd>
+
+                    @if (!string.IsNullOrWhiteSpace(Model.Comment))
+                    {
+                        <dt class="col-sm-3">Комментарий:</dt>
+                        <dd class="col-sm-9">@Model.Comment</dd>
+                    }
+                </dl>
+            </div>
+        </div>
+
+        <!-- Товары в заказе -->
+        @if (Model.Products.Any())
+        {
+            <div class="col-md-12">
+                <div class="card">
+                    <h3 class="card-title">Товары в заказе (@Model.Products.Count)</h3>
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Наименование</th>
+                                    <th>Модель</th>
+                                    <th class="text-center">Кол-во</th>
+                                    <th class="text-end">Цена (¥)</th>
+                                    <th class="text-end">Сумма (¥)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var product in Model.Products)
+                                {
+                                    <tr>
+                                        <td>@product.Name</td>
+                                        <td>@product.Model</td>
+                                        <td class="text-center">@product.Quantity</td>
+                                        <td class="text-end">@product.Price.ToString("N2")</td>
+                                        <td class="text-end">@product.TotalPrice.ToString("N2")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- История статусов -->
+        @if (Model.StatusHistory.Any())
+        {
+            <div class="col-md-12">
+                <div class="card">
+                    <h3 class="card-title">История изменений статуса</h3>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Дата</th>
+                                    <th>Пользователь</th>
+                                    <th>Статус</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var entry in Model.StatusHistory)
+                                {
+                                    <tr>
+                                        <td>@entry.ChangeDate.ToString("dd.MM.yyyy HH:mm")</td>
+                                        <td>@entry.ChangedBy</td>
+                                        <td>
+                                            <span class="badge bg-light text-dark">@entry.OldStatus</span>
+                                            <span class="mx-1">→</span>
+                                            <span class="badge bg-secondary">@entry.NewStatus</span>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- Подтверждение -->
+        <div class="col-md-12">
+            <div class="card">
+                <form asp-action="Delete" method="post" class="text-center">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@Model.Id" />
+                    <input type="hidden" name="page" value="@ViewBag.ReturnPage" />
+                    <input type="hidden" name="searchCompanyName" value="@ViewBag.searchCompanyName" />
+                    <input type="hidden" name="searchOrderNumber" value="@ViewBag.SearchOrderNumber" />
+                    <input type="hidden" name="priority" value="@ViewBag.Priority" />
+                    <input type="hidden" name="status" value="@ViewBag.Status" />
+                    <input type="hidden" name="searchDateFrom" value="@ViewBag.SearchDateFrom" />
+                    <input type="hidden" name="searchDateTo" value="@ViewBag.SearchDateTo" />
+                    <input type="hidden" name="sortOrder" value="@ViewBag.SortOrder" />
+                    <input type="hidden" name="minAmount" value="@ViewBag.MinAmount" />
+                    <input type="hidden" name="maxAmount" value="@ViewBag.MaxAmount" />
+
+                    <div class="d-flex justify-content-center gap-2 flex-wrap">
+                        <button type="submit" class="btn btn-delete">Подтвердить удаление</button>
+                        <a asp-action="Index"
+                           asp-route-page="@ViewBag.ReturnPage"
+                           asp-route-searchCompanyName="@ViewBag.searchCompanyName"
+                           asp-route-searchOrderNumber="@ViewBag.SearchOrderNumber"
+                           asp-route-priority="@ViewBag.Priority"
+                           asp-route-status="@ViewBag.Status"
+                           asp-route-searchDateFrom="@ViewBag.SearchDateFrom"
+                           asp-route-searchDateTo="@ViewBag.SearchDateTo"
+                           asp-route-sortOrder="@ViewBag.SortOrder"
+                           asp-route-minAmount="@ViewBag.MinAmount"
+                           asp-route-maxAmount="@ViewBag.MaxAmount"
+                           class="btn btn-reset">Отмена</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
