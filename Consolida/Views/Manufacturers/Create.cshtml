@@ -1,0 +1,40 @@
+﻿@using Application.ViewModels.ManufacturerModel
+@model ManufacturerDto
+
+@{
+    ViewData["Title"] = "Регистрация нового производителя";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12 mb-4">
+            <a asp-action="Index" class="btn btn-go-to">Вернуться к списку</a>
+        </div>
+
+        <div class="col-md-12">
+            <div class="card">
+                <h3 class="card-title">Регистрация нового производителя</h3>
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="mb-4">
+                        <label asp-for="Name" class="form-label">@Html.DisplayNameFor(m => m.Name)</label>
+                        <input asp-for="Name" class="custom-input" aria-required="true"
+                               placeholder="Введите наименование производителя" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-create">Создать запись</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

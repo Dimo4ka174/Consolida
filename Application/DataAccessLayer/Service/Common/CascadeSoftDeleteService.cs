@@ -1,9 +1,9 @@
-using System.Linq.Expressions;
 using Application.DataAccessLayer.Interface.Common;
-using DB.Abstract;
-using DB.Entity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Linq.Expressions;
+using DB.Abstract;
+using DB.Entity;
 
 namespace Application.DataAccessLayer.Service.Common
 {
@@ -13,18 +13,23 @@ namespace Application.DataAccessLayer.Service.Common
         private readonly ILogger<CascadeSoftDeleteService> _logger;
         private readonly ICacheService<City> _cityCacheService;
         private readonly ICacheService<Company> _companyCacheService;
+        private readonly ICacheService<Manufacturer> _manufacturerCacheService;
 
         public CascadeSoftDeleteService(
             IUnitOfWork unitOfWork,
             ILogger<CascadeSoftDeleteService> logger,
             ICacheService<City> cityCacheService,
-            ICacheService<Company> companyCacheService)
+            ICacheService<Company> companyCacheService,
+            ICacheService<Manufacturer> manufacturerCacheService)
         {
             _unitOfWork = unitOfWork;
             _logger = logger;
             _cityCacheService = cityCacheService;
             _companyCacheService = companyCacheService;
+            _manufacturerCacheService = manufacturerCacheService;
         }
+
+        // -------------------- City --------------------
 
         public async Task DeleteCity(int cityId, CancellationToken ct = default)
         {
@@ -57,6 +62,8 @@ namespace Application.DataAccessLayer.Service.Common
             await _cityCacheService.UpdateCacheAsync();
         }
 
+        // -------------------- Company --------------------
+
         public async Task DeleteCompany(int companyId, CancellationToken ct = default)
         {
             if (companyId <= 0) throw new ArgumentException("Invalid Company ID");
@@ -88,6 +95,8 @@ namespace Application.DataAccessLayer.Service.Common
             await _companyCacheService.UpdateCacheAsync();
         }
 
+        // -------------------- Customer --------------------
+
         public async Task DeleteCustomer(int customerId, CancellationToken ct = default)
         {
             if (customerId <= 0) throw new ArgumentException("Invalid Customer ID");
@@ -108,6 +117,103 @@ namespace Application.DataAccessLayer.Service.Common
             await MarkAsDeleted(_unitOfWork.GetRepository<Customer>().GetQueryable(),
                 c => idsList.Contains(c.Id.Value), ct);
         }
+
+        // -------------------- Manufacturer --------------------
+
+        public async Task DeleteManufacturer(int manufacturerId, CancellationToken ct = default)
+        {
+            if (manufacturerId <= 0) throw new ArgumentException("Invalid Manufacturer ID");
+            _logger.LogInformation("Deleting Manufacturer ID: {ManufacturerId}", manufacturerId);
+
+            if (_unitOfWork.HasActiveTransaction)
+                await DeleteManufacturers(new List<int?> { manufacturerId }, ct);
+            else
+                await _unitOfWork.ExecuteInTransactionAsync(
+                    () => DeleteManufacturers(new List<int?> { manufacturerId }, ct), ct);
+        }
+
+        private async Task DeleteManufacturers(IEnumerable<int?> manufacturerIds, CancellationToken ct)
+        {
+            var idsList = manufacturerIds.Where(id => id != null && id > 0).Select(id => id.Value).ToList();
+            if (!idsList.Any()) return;
+
+            // 1. Мягко удаляем самих производителей
+            await MarkAsDeleted(_unitOfWork.GetRepository<Manufacturer>().GetQueryable(),
+                m => idsList.Contains(m.Id.Value), ct);
+
+            // 2. Каскадно удаляем продукцию этих производителей
+            var productIds = await _unitOfWork.GetRepository<Product>().GetQueryable()
+                .Where(p => p.ManufacturerId.HasValue && idsList.Contains(p.ManufacturerId.Value))
+                .Select(p => p.Id)
+                .ToListAsync(ct);
+
+            if (productIds.Any())
+                await DeleteProducts(productIds, ct);
+
+            // 3. Сбрасываем кэш производителей
+            await _manufacturerCacheService.UpdateCacheAsync();
+        }
+
+        // -------------------- CodeTNVD --------------------
+
+        public async Task DeleteCodeTNVD(int codeTnvdId, CancellationToken ct = default)
+        {
+            if (codeTnvdId <= 0) throw new ArgumentException("Invalid CodeTNVD ID");
+            _logger.LogInformation("Deleting CodeTNVD ID: {CodeTNVDId}", codeTnvdId);
+
+            if (_unitOfWork.HasActiveTransaction)
+                await DeleteCodesTNVD(new List<int?> { codeTnvdId }, ct);
+            else
+                await _unitOfWork.ExecuteInTransactionAsync(
+                    () => DeleteCodesTNVD(new List<int?> { codeTnvdId }, ct), ct);
+        }
+
+        private async Task DeleteCodesTNVD(IEnumerable<int?> codeIds, CancellationToken ct)
+        {
+            var idsList = codeIds.Where(id => id != null && id > 0).Select(id => id.Value).ToList();
+            if (!idsList.Any()) return;
+
+            // 1. Мягко удаляем коды ТН ВЭД
+            await MarkAsDeleted(_unitOfWork.GetRepository<CodeTNVD>().GetQueryable(),
+                c => idsList.Contains(c.Id.Value), ct);
+
+            // 2. Каскадно удаляем продукцию с этими кодами
+            var productIds = await _unitOfWork.GetRepository<Product>().GetQueryable()
+                .Where(p => p.CodeTNVDId.HasValue && idsList.Contains(p.CodeTNVDId.Value))
+                .Select(p => p.Id)
+                .ToListAsync(ct);
+
+            if (productIds.Any())
+                await DeleteProducts(productIds, ct);
+        }
+
+        // -------------------- Product --------------------
+
+        public async Task DeleteProduct(int productId, CancellationToken ct = default)
+        {
+            if (productId <= 0) throw new ArgumentException("Invalid Product ID");
+            _logger.LogInformation("Deleting Product ID: {ProductId}", productId);
+
+            if (_unitOfWork.HasActiveTransaction)
+                await DeleteProducts(new List<int?> { productId }, ct);
+            else
+                await _unitOfWork.ExecuteInTransactionAsync(
+                    () => DeleteProducts(new List<int?> { productId }, ct), ct);
+        }
+
+        private async Task DeleteProducts(IEnumerable<int?> productIds, CancellationToken ct)
+        {
+            var idsList = productIds.Where(id => id != null && id > 0).Select(id => id.Value).ToList();
+            if (!idsList.Any()) return;
+
+            await MarkAsDeleted(_unitOfWork.GetRepository<Product>().GetQueryable(),
+                p => idsList.Contains(p.Id.Value), ct);
+
+            // TODO (коммит Order): каскадно помечать OrderProduct,
+            // которые ссылаются на эти продукты.
+        }
+
+        // -------------------- Helper --------------------
 
         private async Task MarkAsDeleted<T>(IQueryable<T> query,
             Expression<Func<T, bool>> predicate, CancellationToken ct)

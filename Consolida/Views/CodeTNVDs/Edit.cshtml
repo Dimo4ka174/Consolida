@@ -1,0 +1,53 @@
+﻿@using Application.ViewModels.CodeTNVDModel
+@model CodeTNVDdto
+
+@{
+    ViewData["Title"] = "Изменение кода " + "\"" + Model.Name + "\"";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12 mb-4">
+            <a asp-action="Index"
+               asp-route-page="@ViewBag.ReturnPage"
+               asp-route-searchString="@ViewBag.SearchString"
+               asp-route-sortOrder="@ViewBag.SortOrder"
+               class="btn btn-go-to">Вернуться к списку кодов</a>
+        </div>
+
+        <div class="col-md-12">
+            <div class="card">
+                <h3 class="card-title">Изменение кода ТН ВЭД</h3>
+                <form asp-action="Edit" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" name="page" value="@ViewBag.ReturnPage" />
+                    <input type="hidden" name="searchString" value="@ViewBag.SearchString" />
+                    <input type="hidden" name="sortOrder" value="@ViewBag.SortOrder" />
+
+                    <div class="mb-4">
+                        <label asp-for="Name" class="form-label">@Html.DisplayNameFor(m => m.Name)</label>
+                        <input asp-for="Name" class="custom-input" placeholder="Введите название кода" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Rate" class="form-label">@Html.DisplayNameFor(m => m.Rate)</label>
+                        <input asp-for="Rate" class="custom-input decimal-input" placeholder="Введите ставку" />
+                        <span asp-validation-for="Rate" class="text-danger"></span>
+                    </div>
+
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-create">Сохранить изменения</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

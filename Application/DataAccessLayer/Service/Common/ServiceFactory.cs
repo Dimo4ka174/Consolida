@@ -46,6 +46,10 @@ namespace Application.DataAccessLayer.Service.Common
             services.AddScoped<ICityService, CityService>();
             services.AddScoped<ICompanyService, CompanyService>();
             services.AddScoped<ICustomerService, CustomerService>();
+            services.AddScoped<ICodeTNVDService, CodeTNVDService>();
+            services.AddScoped<IManufacturerService, ManufacturerService>();
+            services.AddScoped<IProductService, ProductService>();
+            services.AddScoped<IProductApiService, ProductApiService>();
         }
 
         private static void RegisterDBInitService(IServiceCollection services)

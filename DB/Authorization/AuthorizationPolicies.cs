@@ -11,7 +11,11 @@ namespace DB.Authorization
             AddCity(options);
             AddCompany(options);
             AddCustomer(options);
+            AddCodeTNVD(options);
+            AddManufacturer(options);
+            AddProduct(options);
         }
+
         private static void AddRole(AuthorizationOptions options)
         {
             options.AddPolicy("RoleManager", policy => policy.RequireClaim("Permission", Permissions.Roles.All));
@@ -55,6 +59,33 @@ namespace DB.Authorization
             options.AddPolicy("CreateCustomers", policy => policy.RequireClaim("Permission", Permissions.Customers.Create));
             options.AddPolicy("EditCustomers", policy => policy.RequireClaim("Permission", Permissions.Customers.Edit));
             options.AddPolicy("DeleteCustomers", policy => policy.RequireClaim("Permission", Permissions.Customers.Delete));
+        }
+
+        private static void AddCodeTNVD(AuthorizationOptions options)
+        {
+            options.AddPolicy("CodeTNVDManager", policy => policy.RequireClaim("Permission", Permissions.CodesTNVD.All));
+            options.AddPolicy("ReadCodesTNVD", policy => policy.RequireClaim("Permission", Permissions.CodesTNVD.Read));
+            options.AddPolicy("CreateCodesTNVD", policy => policy.RequireClaim("Permission", Permissions.CodesTNVD.Create));
+            options.AddPolicy("EditCodesTNVD", policy => policy.RequireClaim("Permission", Permissions.CodesTNVD.Edit));
+            options.AddPolicy("DeleteCodesTNVD", policy => policy.RequireClaim("Permission", Permissions.CodesTNVD.Delete));
+        }
+
+        private static void AddManufacturer(AuthorizationOptions options)
+        {
+            options.AddPolicy("ManufacturerManager", policy => policy.RequireClaim("Permission", Permissions.Manufacturers.All));
+            options.AddPolicy("ReadManufacturers", policy => policy.RequireClaim("Permission", Permissions.Manufacturers.Read));
+            options.AddPolicy("CreateManufacturers", policy => policy.RequireClaim("Permission", Permissions.Manufacturers.Create));
+            options.AddPolicy("EditManufacturers", policy => policy.RequireClaim("Permission", Permissions.Manufacturers.Edit));
+            options.AddPolicy("DeleteManufacturers", policy => policy.RequireClaim("Permission", Permissions.Manufacturers.Delete));
+        }
+
+        private static void AddProduct(AuthorizationOptions options)
+        {
+            options.AddPolicy("ProductManager", policy => policy.RequireClaim("Permission", Permissions.Products.All));
+            options.AddPolicy("ReadProducts", policy => policy.RequireClaim("Permission", Permissions.Products.Read));
+            options.AddPolicy("CreateProducts", policy => policy.RequireClaim("Permission", Permissions.Products.Create));
+            options.AddPolicy("EditProducts", policy => policy.RequireClaim("Permission", Permissions.Products.Edit));
+            options.AddPolicy("DeleteProducts", policy => policy.RequireClaim("Permission", Permissions.Products.Delete));
         }
     }
 }

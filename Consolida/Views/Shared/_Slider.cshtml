@@ -10,7 +10,10 @@
 
             @if ((await AuthorizationService.AuthorizeAsync(User, "ReadCities")).Succeeded ||
                  (await AuthorizationService.AuthorizeAsync(User, "ReadCompanies")).Succeeded ||
-                 (await AuthorizationService.AuthorizeAsync(User, "ReadCustomers")).Succeeded)
+                 (await AuthorizationService.AuthorizeAsync(User, "ReadCustomers")).Succeeded ||
+                 (await AuthorizationService.AuthorizeAsync(User, "ReadCodesTNVD")).Succeeded ||
+                 (await AuthorizationService.AuthorizeAsync(User, "ReadManufacturers")).Succeeded ||
+                 (await AuthorizationService.AuthorizeAsync(User, "ReadProducts")).Succeeded)
             {
                 <li class="sidebar-item">
                     <button type="button" class="sidebar-btn" data-bs-toggle="dropdown" aria-expanded="false">
@@ -29,6 +32,18 @@
                         @if ((await AuthorizationService.AuthorizeAsync(User, "ReadCustomers")).Succeeded)
                         {
                             <li><a class="dropdown-item @(Context.Request.Path.StartsWithSegments("/Customers") ? "active" : "")" href="/Customers">Клиенты</a></li>
+                        }
+                        @if ((await AuthorizationService.AuthorizeAsync(User, "ReadCodesTNVD")).Succeeded)
+                        {
+                            <li><a class="dropdown-item @(Context.Request.Path.StartsWithSegments("/CodeTNVDs") ? "active" : "")" href="/CodesTNVDs">Коды ТН ВЭД</a></li>
+                        }
+                        @if ((await AuthorizationService.AuthorizeAsync(User, "ReadManufacturers")).Succeeded)
+                        {
+                            <li><a class="dropdown-item @(Context.Request.Path.StartsWithSegments("/Manufacturers") ? "active" : "")" href="/Manufacturers">Производители</a></li>
+                        }
+                        @if ((await AuthorizationService.AuthorizeAsync(User, "ReadProducts")).Succeeded)
+                        {
+                            <li><a class="dropdown-item @(Context.Request.Path.StartsWithSegments("/Products") ? "active" : "")" href="/Products">Продукция</a></li>
                         }
                     </ul>
                 </li>

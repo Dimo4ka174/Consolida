@@ -1,0 +1,35 @@
+﻿@using Application.ViewModels.ProductModel
+@model ProductDto
+
+@{
+    ViewData["Title"] = "Продукция " + "\"" + Model.Name + "\"";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12 mb-4 d-flex gap-2 flex-wrap">
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-edit">Редактировать</a>
+            <a asp-action="Index" class="btn btn-go-to">Вернуться к списку</a>
+        </div>
+
+        <div class="col-md-12">
+            <div class="card">
+                <h3 class="card-title">Информация о продукции</h3>
+
+                <dl class="row mb-0">
+                    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Name):</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.Name)</dd>
+
+                    <dt class="col-sm-3">Производитель:</dt>
+                    <dd class="col-sm-9">@Model.ManufacturersList.FirstOrDefault(m => m.Value == Model.ManufacturerId.ToString())?.Text</dd>
+
+                    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Model):</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.Model)</dd>
+
+                    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Cost):</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.Cost)</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>

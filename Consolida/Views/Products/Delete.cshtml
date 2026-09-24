@@ -1,0 +1,67 @@
+﻿@using Application.ViewModels.ProductModel
+@model ProductDto
+
+@{
+    ViewData["Title"] = "Удаление продукции " + "\"" + Model.Name + "\"";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12 mb-4 d-flex gap-2 flex-wrap">
+            <a asp-action="Edit" asp-route-id="@Model.Id"
+               asp-route-page="@ViewBag.ReturnPage"
+               asp-route-searchString="@ViewBag.SearchString"
+               asp-route-searchManufacturer="@ViewBag.SearchManufacturer"
+               asp-route-sortOrder="@ViewBag.SortOrder"
+               class="btn btn-edit">Редактировать</a>
+            <a asp-action="Index"
+               asp-route-page="@ViewBag.ReturnPage"
+               asp-route-searchString="@ViewBag.SearchString"
+               asp-route-searchManufacturer="@ViewBag.SearchManufacturer"
+               asp-route-sortOrder="@ViewBag.SortOrder"
+               class="btn btn-go-to">Вернуться к списку продукции</a>
+        </div>
+
+        <div class="col-md-12">
+            <div class="alert alert-warning text-center" role="alert">
+                <h4>ВНИМАНИЕ! При удалении продукции будут удалены все связанные с ней заказы!</h4>
+                <p class="mb-0"><strong>Вы уверены, что хотите удалить данную запись?</strong></p>
+            </div>
+        </div>
+
+        <div class="col-md-12">
+            <div class="card">
+                <h3 class="card-title">Информация о продукции</h3>
+
+                <dl class="row mb-0">
+                    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Name):</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.Name)</dd>
+
+                    <dt class="col-sm-3">Производитель:</dt>
+                    <dd class="col-sm-9">@Model.ManufacturersList.FirstOrDefault(m => m.Value == Model.ManufacturerId.ToString())?.Text</dd>
+
+                    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Model):</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.Model)</dd>
+
+                    <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Cost):</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.Cost)</dd>
+                </dl>
+
+                <form asp-action="DeleteConfirmed" method="post" class="text-center mt-4">
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" name="page" value="@ViewBag.ReturnPage" />
+                    <input type="hidden" name="searchString" value="@ViewBag.SearchString" />
+                    <input type="hidden" name="searchManufacturer" value="@ViewBag.SearchManufacturer" />
+                    <input type="hidden" name="sortOrder" value="@ViewBag.SortOrder" />
+                    <button type="submit" class="btn btn-delete">Удалить запись</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

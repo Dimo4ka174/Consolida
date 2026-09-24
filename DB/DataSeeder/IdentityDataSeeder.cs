@@ -1,10 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Security.Claims;
-using System.Text;
-using DB.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
+using System.Security.Claims;
+using DB.Authorization;
 
 namespace DB.DataSeeder
 {
@@ -28,18 +25,27 @@ namespace DB.DataSeeder
                     .Concat(Permissions.Cities.All)
                     .Concat(Permissions.Companies.All)
                     .Concat(Permissions.Customers.All)
+                    .Concat(Permissions.CodesTNVD.All)
+                    .Concat(Permissions.Manufacturers.All)
+                    .Concat(Permissions.Products.All)
                     .ToArray(),
 
                 ["Manager"] = Permissions.Cities.All
                     .Concat(Permissions.Companies.All)
                     .Concat(Permissions.Customers.All)
+                    .Concat(Permissions.CodesTNVD.All)
+                    .Concat(Permissions.Manufacturers.All)
+                    .Concat(Permissions.Products.All)
                     .ToArray(),
 
                 ["Director"] = new[]
                 {
                     Permissions.Cities.Read,
                     Permissions.Companies.Read,
-                    Permissions.Customers.Read
+                    Permissions.Customers.Read,
+                    Permissions.CodesTNVD.Read,
+                    Permissions.Manufacturers.Read,
+                    Permissions.Products.Read,
                 },
 
                 ["User"] = Array.Empty<string>()

@@ -46,5 +46,32 @@ namespace DB.Authorization
             public const string Delete = "delete_customer";
             public static readonly string[] All = { Read, Create, Edit, Delete };
         }
+
+        public static class CodesTNVD
+        {
+            public const string Read = "read_codes_tnvd";
+            public const string Create = "create_codes_tnvd";
+            public const string Edit = "edit_codes_tnvd";
+            public const string Delete = "delete_codes_tnvd";
+            public static readonly string[] All = { Read, Create, Edit, Delete };
+        }
+
+        public static class Manufacturers
+        {
+            public const string Read = "read_manufacturers";
+            public const string Create = "create_manufacturers";
+            public const string Edit = "edit_manufacturers";
+            public const string Delete = "delete_manufacturers";
+            public static readonly string[] All = { Read, Create, Edit, Delete };
+        }
+
+        public static class Products
+        {
+            public const string Read = "read_products";
+            public const string Create = "create_products";
+            public const string Edit = "edit_products";
+            public const string Delete = "delete_products";
+            public static readonly string[] All = { Read, Create, Edit, Delete };
+        }
     }
 }

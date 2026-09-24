@@ -1,0 +1,66 @@
+﻿@using Application.ViewModels.ProductModel
+@model ProductDto
+
+@{
+    ViewData["Title"] = "Создание новой продукции";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12 mb-4">
+            <a asp-action="Index" class="btn btn-go-to">Вернуться к списку продукции</a>
+        </div>
+
+        <div class="col-md-12">
+            <div class="card">
+                <h3 class="card-title">Создание новой продукции</h3>
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label" for="ManufacturerId">@Html.DisplayNameFor(m => m.ManufacturerId)</label>
+                            <select asp-for="ManufacturerId" asp-items="@Model.ManufacturersList" class="custom-select">
+                                <option value="">Выберите производителя</option>
+                            </select>
+                            <span asp-validation-for="ManufacturerId" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="Model" class="form-label">@Html.DisplayNameFor(m => m.Model)</label>
+                            <input asp-for="Model" class="custom-input" aria-required="true"
+                                   placeholder="Введите модель" />
+                            <span asp-validation-for="Model" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-4 mt-3">
+                        <label asp-for="Name" class="form-label">@Html.DisplayNameFor(m => m.Name)</label>
+                        <input asp-for="Name" class="custom-input" aria-required="true"
+                               placeholder="Введите наименование продукции" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label asp-for="Cost" class="form-label">@Html.DisplayNameFor(m => m.Cost)</label>
+                            <input asp-for="Cost" class="custom-input decimal-input" aria-required="true"
+                                   placeholder="Введите стоимость" />
+                            <span asp-validation-for="Cost" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-create">Создать запись</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

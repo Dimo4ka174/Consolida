@@ -9,6 +9,9 @@ namespace DB.Authorization
             { "Cities", "Города" },
             { "Companies", "Компании" },
             { "Customers", "Клиенты" },
+            { "CodesTNVD", "Коды ТН ВЭД" },
+            { "Manufacturers", "Производители" },
+            { "Products", "Продукция" },
         };
     }
 }
