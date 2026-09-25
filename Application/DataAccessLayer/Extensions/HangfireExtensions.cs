@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Application.DataAccessLayer.Jobs;
 using Hangfire.PostgreSql;
@@ -20,8 +20,9 @@ namespace Application.DataAccessLayer.Extensions
 
             services.AddHangfireServer();
 
-            // Регистрируем джоб
+            // Регистрируем джобы
             services.AddScoped<DeliveryNotificationJob>();
+            services.AddScoped<LockCleanupJob>();
 
             return services;
         }

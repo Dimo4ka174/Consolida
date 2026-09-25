@@ -1,8 +1,11 @@
 using Application.DataAccessLayer.Interface.Common;
 using Application.DataAccessLayer.Service.Common;
 using Application.DataAccessLayer.Service.Hubs;
+using Application.DataAccessLayer.Extensions;
+using Application.DataAccessLayer.Jobs;
 using Consolida.Infrastructure.Logging;
 using Consolida.Extensions;
+using Hangfire;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,6 +25,8 @@ builder.Services
     .AddCustomControllers()
     .AddCustomSwagger()
     .AddCustomCache(builder.Configuration);
+
+builder.Services.AddHangfireServices(builder.Configuration);
 
 builder.Services.AddSignalR();
 
@@ -58,6 +63,12 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseHangfireDashboard("/hangfire", new DashboardOptions
+{
+    Authorization = new[] { new Hangfire.Dashboard.LocalRequestsOnlyAuthorizationFilter() },
+    DashboardTitle = "Consolida Jobs"
+});
+
 app.UseSession();
 
 app.MapRazorPages();
@@ -78,6 +89,24 @@ catch (Exception ex)
 {
     Log.Fatal(ex, "Application failed to start");
     throw;
+}
+
+// Recurring jobs
+using (var scope = app.Services.CreateScope())
+{
+    var recurringJobManager = scope.ServiceProvider.GetRequiredService<IRecurringJobManager>();
+
+    recurringJobManager.AddOrUpdate<DeliveryNotificationJob>(
+        "delivery-notification",
+        job => job.ExecuteAsync(),
+        Cron.Daily(9, 0), // каждый день в 09:00
+        new RecurringJobOptions { TimeZone = TimeZoneInfo.Local });
+
+    recurringJobManager.AddOrUpdate<LockCleanupJob>(
+        "lock-cleanup",
+        job => job.ExecuteAsync(),
+        "*/15 * * * *", // каждые 15 минут
+        new RecurringJobOptions { TimeZone = TimeZoneInfo.Local });
 }
 
 app.Run();
