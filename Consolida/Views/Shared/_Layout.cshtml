@@ -56,6 +56,10 @@
                     }
 
                     <div class="header-actions">
+                        <a href="/" class="theme-toggle" aria-label="На главную" title="На главную">
+                            <span class="mask-icon mask-icon-home"></span>
+                        </a>
+
                         <button type="button" id="themeToggle" class="theme-toggle" aria-label="Переключить тему">
                             <span class="mask-icon mask-icon-moon theme-icon-moon"></span>
                             <span class="mask-icon mask-icon-sun theme-icon-sun"></span>
@@ -78,7 +82,7 @@
                     @TempData["Message"]
                 </div>
             }
-            <div class="col-md-12 main-content" id="main-content">
+            <div class="col-md-12 main-content @(ViewBag.FullWidth == true ? "main-content-full" : "")" id="main-content">
                 @RenderBody()
             </div>
         </main>

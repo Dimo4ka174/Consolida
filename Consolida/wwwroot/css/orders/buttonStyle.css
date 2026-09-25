@@ -23,7 +23,45 @@
     font-size: 0.9rem;
 }
 
-.btn-create.btn-with-check::after {
-    -webkit-mask-image: url('/images/icons/check.svg');
-    mask-image: url('/images/icons/check.svg');
+.btn-create.btn-icon-download::after {
+    -webkit-mask-image: url('/images/icons/download.svg');
+    mask-image: url('/images/icons/download.svg');
 }
+
+.btn-notification {
+    color: var(--text-primary);
+    background-color: var(--bg-surface);
+    border: 2px solid var(--border-medium);
+    position: relative;
+    padding-left: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 44px;
+    transition: background-color var(--transition-base), color var(--transition-base), border-color var(--transition-base);
+}
+
+    .btn-notification::after {
+        content: '';
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 16px;
+        height: 16px;
+        -webkit-mask-image: url('/images/icons/bell.svg');
+        mask-image: url('/images/icons/bell.svg');
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+    }
+
+    .btn-notification:hover {
+        background-color: var(--accent-soft);
+        border-color: var(--accent);
+        color: var(--accent);
+    }

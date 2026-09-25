@@ -165,7 +165,7 @@ namespace Consolida.Controllers
                     if (string.IsNullOrEmpty(tkpNumber))
                         tkpNumber = saveResult.Order.Id?.ToString() ?? "";
 
-                    var fileName = $"05-{tkpNumber}_{year} ТКП МПСА-технологии.xlsx";
+                    var fileName = $"05-{tkpNumber}_{year} ТКП.xlsx";
 
                     return File(excelStream,
                         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",

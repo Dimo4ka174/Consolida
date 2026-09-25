@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const year = new Date().getFullYear().toString().slice(-2);
             a.href = url;
-            a.download = `05-${finalNumber}_${year} ТКП МПСА-технологии.xlsx`;
+            a.download = `05-${finalNumber}_${year} ТКП.xlsx`;
 
             document.body.appendChild(a);
             a.click();

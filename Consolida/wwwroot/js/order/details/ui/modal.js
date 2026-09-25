@@ -1,4 +1,5 @@
 class SimpleModal {
+
     static async confirm(message, title = 'Подтверждение') {
         const modalEl = document.getElementById('custom-modal');
 
@@ -8,11 +9,9 @@ class SimpleModal {
 
         const modal = $(modalEl);
 
-        // Настройка содержимого
         document.getElementById('modal-title').textContent = title;
         document.getElementById('modal-message').textContent = message;
 
-        // Управление кнопками
         const cancelBtn = document.getElementById('modal-cancel');
         const confirmBtn = document.getElementById('modal-confirm');
 
@@ -25,11 +24,13 @@ class SimpleModal {
 
         return new Promise((resolve) => {
             const handleConfirm = () => {
+                modal.modal('hide');
                 cleanup();
                 resolve(true);
             };
 
             const handleCancel = () => {
+                modal.modal('hide');
                 cleanup();
                 resolve(false);
             };
@@ -62,11 +63,9 @@ class SimpleModal {
         }
         const modal = $(modalEl);
 
-        // Настройка содержимого
         document.getElementById('modal-title').textContent = title;
         document.getElementById('modal-message').textContent = message;
 
-        // Управление кнопками
         const cancelBtn = document.getElementById('modal-cancel');
         const confirmBtn = document.getElementById('modal-confirm');
 
@@ -77,6 +76,7 @@ class SimpleModal {
 
         return new Promise((resolve) => {
             const handleConfirm = () => {
+                modal.modal('hide');   // ← добавили: сначала закрываем модал
                 cleanup();
                 if (callback && typeof callback === 'function') {
                     callback();
@@ -103,6 +103,7 @@ class SimpleModal {
             });
         });
     }
+
     static async alertMultiple(messages) {
         const modalEl = document.getElementById('custom-modal');
         if (!modalEl) {
@@ -113,7 +114,6 @@ class SimpleModal {
         const confirmBtn = document.getElementById('modal-confirm');
         const cancelBtn = document.getElementById('modal-cancel');
 
-        // Настройка кнопок
         cancelBtn.style.display = 'none';
         confirmBtn.style.display = '';
         confirmBtn.textContent = 'Подтвердить';
@@ -131,7 +131,6 @@ class SimpleModal {
             document.getElementById('modal-title').textContent = title;
             document.getElementById('modal-message').textContent = message;
 
-            // Ждем подтверждения текущего сообщения
             await new Promise((resolve) => {
                 const handleConfirm = () => {
                     confirmBtn.removeEventListener('click', handleConfirm);
@@ -141,7 +140,6 @@ class SimpleModal {
                 confirmBtn.addEventListener('click', handleConfirm);
             });
 
-            // Показываем следующее сообщение
             await showNextMessage();
         };
 
@@ -159,7 +157,6 @@ class SimpleModal {
     }
 }
 
-// Инициализация
 if (!window.modal) {
     window.modal = SimpleModal;
 }

@@ -454,12 +454,12 @@
                     data-bs-toggle="collapse" data-bs-target="#orderCommentBlock">
                 Комментарий
             </button>
-            <button type="button" class="btn btn-comment" id="createNotificationBtn">
+            <button type="button" class="btn btn-notification" id="createNotificationBtn">
                 Напоминание
             </button>
 
             <div id="postSaveButtons" class="gap-2 @(Model.IsSaved ? "d-flex" : "d-none")">
-                <button class="btn btn-create save-btn-TKP" data-order-id="@Model.Id">Выгрузить ТКП</button>
+                <button class="btn btn-download save-btn-TKP" data-order-id="@Model.Id">Выгрузить ТКП</button>
                 <button class="btn btn-download save-btn-calculation" data-order-id="@Model.Id">
                     Скачать расчет
                 </button>

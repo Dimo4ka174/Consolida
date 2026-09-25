@@ -1,4 +1,4 @@
-﻿/* ============================================================
+/* ============================================================
    Общие стили
    ============================================================ */
 html, body {
@@ -29,6 +29,21 @@ main {
     padding-top: var(--space-5);
     padding-left: var(--space-4);
     padding-right: var(--space-4);
+}
+
+/* Полноширинная версия main-content — используется на канбан-досках */
+.main-content-full {
+    max-width: none;
+    width: 100%;
+    padding-left: var(--space-4);
+    padding-right: var(--space-4);
+}
+
+@media (max-width: 768px) {
+    .main-content-full {
+        padding-left: var(--space-2);
+        padding-right: var(--space-2);
+    }
 }
 
 /* ============================================================
@@ -267,6 +282,12 @@ main {
 }
 
 /* Регистрация иконок */
+
+.mask-icon-home {
+    -webkit-mask-image: url('/images/icons/home.svg');
+    mask-image: url('/images/icons/home.svg');
+}
+
 .mask-icon-moon {
     -webkit-mask-image: url('/images/icons/moon.svg');
     mask-image: url('/images/icons/moon.svg');
