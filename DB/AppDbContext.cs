@@ -27,7 +27,25 @@ namespace DB
         public DbSet<OrderStatusHistory> OrderStatusHistory { get; set; }
         public DbSet<MetrologicalInfo> MetrologicalInfos { get; set; }
 
+        public DbSet<OrderNotification> OrderNotifications { get; set; }
+        public DbSet<ConsolidationPool> ConsolidationPools { get; set; }
+        public DbSet<ConsolidationWeightLimit> ConsolidationWeightLimits { get; set; }
+        public DbSet<ConsolidationPoolHistory> ConsolidationPoolHistories { get; set; }
+
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+
+        protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+        {
+            base.ConfigureConventions(configurationBuilder);
+
+            // Все DateTime конвертируются в UTC при записи
+            // и помечаются Kind=Utc при чтении.
+            configurationBuilder.Properties<DateTime>()
+                .HaveConversion<UtcDateTimeConverter>();
+
+            configurationBuilder.Properties<DateTime?>()
+                .HaveConversion<NullableUtcDateTimeConverter>();
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -40,6 +58,8 @@ namespace DB
             modelBuilder.Entity<Order>().Property(e => e.Status).HasConversion<string>();
             modelBuilder.Entity<OrderStatusHistory>().Property(e => e.OldStatus).HasConversion<string>();
             modelBuilder.Entity<OrderStatusHistory>().Property(e => e.NewStatus).HasConversion<string>();
+            modelBuilder.Entity<ConsolidationPool>().Property(e => e.Status).HasConversion<string>();
+            modelBuilder.Entity<ConsolidationPoolHistory>().Property(e => e.EventType).HasConversion<string>();
 
             // --- City / Company / Customer ---
             modelBuilder.Entity<City>()
@@ -96,6 +116,16 @@ namespace DB
                 .HasForeignKey(o => o.CustomerId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // --- Order / ConsolidationPool ---
+            modelBuilder.Entity<Order>()
+                .HasOne(o => o.ConsolidationPool)
+                .WithMany(p => p.Orders)
+                .HasForeignKey(o => o.ConsolidationPoolId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Order>()
+                .HasIndex(o => o.ConsolidationPoolId);
+
             // --- OrderProduct ---
             modelBuilder.Entity<OrderProduct>()
                 .HasOne(op => op.Order)
@@ -149,7 +179,6 @@ namespace DB
                 .OnDelete(DeleteBehavior.Restrict);
 
             // --- MetrologicalInfo ---
-            // Опциональная 1-к-1: MetrologicalInfo принадлежит либо Order, либо OrderProduct
             modelBuilder.Entity<MetrologicalInfo>()
                 .HasOne(mi => mi.Order)
                 .WithOne(o => o.MetrologicalInfo)
@@ -163,18 +192,39 @@ namespace DB
                 .HasForeignKey<MetrologicalInfo>(mi => mi.OrderProductId)
                 .IsRequired(false)
                 .OnDelete(DeleteBehavior.Restrict);
-        }
 
-        protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
-        {
-            base.ConfigureConventions(configurationBuilder);
+            // --- OrderNotification ---
+            modelBuilder.Entity<OrderNotification>()
+                .HasOne(n => n.Order)
+                .WithMany(o => o.Notifications)
+                .HasForeignKey(n => n.OrderId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-            // Все DateTime автоматически конвертируются в UTC при записи
-            configurationBuilder.Properties<DateTime>()
-                .HaveConversion<UtcDateTimeConverter>();
+            modelBuilder.Entity<OrderNotification>()
+                .HasIndex(n => new { n.OrderId, n.IsCompleted, n.IsDeleted });
 
-            configurationBuilder.Properties<DateTime?>()
-                .HaveConversion<NullableUtcDateTimeConverter>();
+            modelBuilder.Entity<OrderNotification>()
+                .HasIndex(n => n.DueDate);
+
+            // --- ConsolidationPool ---
+            // Optimistic concurrency через системную колонку Postgres xmin.
+            modelBuilder.Entity<ConsolidationPool>()
+                .Property(p => p.Version)
+                .IsRowVersion();
+
+            modelBuilder.Entity<ConsolidationPool>()
+                .HasIndex(p => p.Status);
+
+            modelBuilder.Entity<ConsolidationPool>()
+                .HasIndex(p => p.IsDeleted);
+
+            // --- ConsolidationWeightLimit ---
+            modelBuilder.Entity<ConsolidationWeightLimit>()
+                .HasIndex(l => new { l.Value, l.IsDeleted });
+
+            // --- ConsolidationPoolHistory ---
+            modelBuilder.Entity<ConsolidationPoolHistory>()
+                .HasIndex(h => h.PoolId);
         }
 
         public override int SaveChanges()

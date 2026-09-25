@@ -20,6 +20,7 @@ namespace DB.DataSeeder
             await ProductDataSeeder.Seed(context, logger);
             await TaxDataSeeder.Seed(context, logger);
             await OrderDataSeeder.Seed(context, logger);
+            await OrderNotificationDataSeeder.Seed(context, logger);
         }
     }
 }

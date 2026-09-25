@@ -136,6 +136,7 @@ namespace DB.DataSeeder
                 foreach (var p in selectedProducts)
                 {
                     var quantity = rnd.Next(1, 4);
+                    var leadTime = rnd.Next(5, 13);
                     var orderProduct = new OrderProduct
                     {
                         OrderId = order.Id,
@@ -145,7 +146,7 @@ namespace DB.DataSeeder
                         Weight = 1.5m,
                         TotalPrice = quantity * p.Price,
                         DeliveryDate = orderDate.AddDays(p.Manufacturer!.Name == "Endress+Hauser" ? 63 : 56),
-                        LeadTime = 9,
+                        LeadTime = leadTime,
                         Comment = string.Empty,
                         IsDeleted = false
                     };
