@@ -1,12 +1,14 @@
-using Application.DataAccessLayer.Interface.Common;
 using Application.DataAccessLayer.Interface.CalculationService;
-using Application.DataAccessLayer.Interface.Entities;
-using Application.DataAccessLayer.Interface.Excel;
 using Application.DataAccessLayer.Interface.OrderService;
-using Application.DataAccessLayer.Service.Entity;
+using Application.DataAccessLayer.Service.OrderService;
 using Application.DataAccessLayer.Service.ExportExcel;
 using Application.DataAccessLayer.Service.ImportExcel;
-using Application.DataAccessLayer.Service.OrderService;
+using Application.DataAccessLayer.Interface.Entities;
+using Application.DataAccessLayer.Interface.Common;
+using Application.DataAccessLayer.Interface.Excel;
+using Application.DataAccessLayer.Interface.Hubs;
+using Application.DataAccessLayer.Service.Entity;
+using Application.DataAccessLayer.Service.Hubs;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 
@@ -22,11 +24,15 @@ namespace Application.DataAccessLayer.Service.Common
             {
                 RegisterAutoMapper(services);
                 RegisterDataAccess(services);
-                RegisterBusinessServices(services);
+                RegisterReferenceServices(services);
+                RegisterOrderServices(services);
+                RegisterOrderApiServices(services);
+                RegisterCalculationServices(services);
+                RegisterExcelServices(services);
+                RegisterNotificationServices(services);
+                RegisterConsolidationServices(services);
+                RegisterUtilities(services);
                 RegisterDBInitService(services);
-                RegisterCalculationService(services);
-                RegisterExcelService(services);
-                RegisterOrderApiService(services);
 
                 Log.Information("All services registered successfully");
             }
@@ -48,11 +54,20 @@ namespace Application.DataAccessLayer.Service.Common
             services.AddScoped(typeof(IRepository<>), typeof(GenericRepository<>));
             services.AddScoped(typeof(IFilterService<>), typeof(FilterService<>));
             services.AddScoped<ICascadeSoftDeleteService, CascadeSoftDeleteService>();
+
+            // Инфраструктура в рамках DataAccess
+            services.AddScoped<ILockService, LockService>();
+            services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<IConsolidationNotifier, ConsolidationNotifier>();
         }
 
-        private static void RegisterBusinessServices(IServiceCollection services)
+        private static void RegisterDBInitService(IServiceCollection services)
         {
-            // --- Справочники ---
+            services.AddScoped<IDBInitializer, DBInitializer>();
+        }
+
+        private static void RegisterReferenceServices(IServiceCollection services)
+        {
             services.AddScoped<ICityService, CityService>();
             services.AddScoped<ICompanyService, CompanyService>();
             services.AddScoped<ICustomerService, CustomerService>();
@@ -62,8 +77,10 @@ namespace Application.DataAccessLayer.Service.Common
             services.AddScoped<IProductApiService, ProductApiService>();
             services.AddScoped<IMeasureUnitService, MeasureUnitService>();
             services.AddScoped<ITaxTypeService, TaxTypeService>();
+        }
 
-            // --- Order ---
+        private static void RegisterOrderServices(IServiceCollection services)
+        {
             services.AddScoped<IOrderListService, OrderListService>();
             services.AddScoped<IOrderDeleteService, OrderDeleteService>();
             services.AddScoped<IOrderCreationService, OrderCreationService>();
@@ -71,36 +88,42 @@ namespace Application.DataAccessLayer.Service.Common
             services.AddScoped<IOrderDuplicateService, OrderDuplicateService>();
             services.AddScoped<IOrderSaveService, OrderSaveService>();
             services.AddScoped<IOrderNumberGenerator, OrderNumberGenerator>();
-
-            // --- Utilities ---
-            services.AddScoped<RussianNumberToWordsConverter>();
         }
 
-        private static void RegisterCalculationService(IServiceCollection services)
+        private static void RegisterOrderApiServices(IServiceCollection services)
+        {
+            services.AddScoped<IOrderLookupService, OrderLookupService>();
+            services.AddScoped<IOrderTaxManagementService, OrderTaxManagementService>();
+            services.AddScoped<IOrderStatusService, OrderStatusService>();
+            services.AddScoped<IQuickCreateService, QuickCreateService>();
+        }
+
+        private static void RegisterCalculationServices(IServiceCollection services)
         {
             services.AddScoped<ICalculationService, CalculationService>();
             services.AddScoped<ICalculationExportService, CalculationExportService>();
         }
 
-        private static void RegisterExcelService(IServiceCollection services)
+        private static void RegisterExcelServices(IServiceCollection services)
         {
             services.AddScoped<IExcelService, ReadExcelResponseService>();
             services.AddScoped<IExcelOrderProcessingService, ExcelOrderProcessingService>();
             services.AddScoped<IExportExcelService, ExportExcelService>();
         }
 
-        private static void RegisterOrderApiService(IServiceCollection services)
+        private static void RegisterNotificationServices(IServiceCollection services)
         {
-            services.AddScoped<IOrderLookupService, OrderLookupService>();
-            services.AddScoped<IOrderTaxManagementService, OrderTaxManagementService>();
-            services.AddScoped<IOrderStatusService, OrderStatusService>();
-            services.AddScoped<IQuickCreateService, QuickCreateService>();
-
+            services.AddScoped<IOrderNotificationService, OrderNotificationService>();
         }
 
-        private static void RegisterDBInitService(IServiceCollection services)
+        private static void RegisterConsolidationServices(IServiceCollection services)
         {
-            services.AddScoped<IDBInitializer, DBInitializer>();
+            services.AddScoped<IConsolidationService, ConsolidationService>();
+        }
+
+        private static void RegisterUtilities(IServiceCollection services)
+        {
+            services.AddScoped<RussianNumberToWordsConverter>();
         }
     }
 }

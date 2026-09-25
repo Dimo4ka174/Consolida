@@ -1,9 +1,9 @@
-using System.Collections.Concurrent;
 using Application.DataAccessLayer.Interface.Common;
-using DB;
+using Microsoft.Extensions.DependencyInjection;
+using System.Collections.Concurrent;
 using DB.Abstract;
 using DB.Entity;
-using Microsoft.Extensions.DependencyInjection;
+using DB;
 
 namespace Application.DataAccessLayer.Service.Common
 {
@@ -30,14 +30,26 @@ namespace Application.DataAccessLayer.Service.Common
         public IRepository<City> Cities => GetRepository<City>();
         public IRepository<Company> Companies => GetRepository<Company>();
         public IRepository<Customer> Customers => GetRepository<Customer>();
+        public IRepository<Order> Orders => GetRepository<Order>();
+        public IRepository<OrderNotification> OrderNotifications => GetRepository<OrderNotification>();
+        public IRepository<ConsolidationPool> ConsolidationPools => GetRepository<ConsolidationPool>();
+        public IRepository<ConsolidationWeightLimit> ConsolidationWeightLimits => GetRepository<ConsolidationWeightLimit>();
+        public IRepository<ConsolidationPoolHistory> ConsolidationPoolHistories => GetRepository<ConsolidationPoolHistory>();
 
 
         public async Task<int> SaveChangesAsync(CancellationToken ct = default)
         {
             return await _context.SaveChangesAsync(ct);
         }
+
         public async Task ExecuteInTransactionAsync(Func<Task> action, CancellationToken ct = default)
         {
+            if (HasActiveTransaction)
+            {
+                await action();
+                return;
+            }
+
             await using var transaction = await _context.Database.BeginTransactionAsync(ct);
             try
             {
@@ -46,13 +58,18 @@ namespace Application.DataAccessLayer.Service.Common
             }
             catch
             {
-                await transaction.RollbackAsync(ct);
+                await transaction.RollbackAsync(CancellationToken.None);
                 throw;
             }
         }
 
         public async Task<T> ExecuteInTransactionAsync<T>(Func<Task<T>> action, CancellationToken ct = default)
         {
+            if (HasActiveTransaction)
+            {
+                return await action();
+            }
+
             await using var transaction = await _context.Database.BeginTransactionAsync(ct);
             try
             {
@@ -62,7 +79,7 @@ namespace Application.DataAccessLayer.Service.Common
             }
             catch
             {
-                await transaction.RollbackAsync(ct);
+                await transaction.RollbackAsync(CancellationToken.None);
                 throw;
             }
         }

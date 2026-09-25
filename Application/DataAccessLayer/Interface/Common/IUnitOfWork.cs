@@ -10,6 +10,11 @@ namespace Application.DataAccessLayer.Interface.Common
         IRepository<City> Cities { get; }
         IRepository<Company> Companies { get; }
         IRepository<Customer> Customers { get; }
+        IRepository<Order> Orders { get; }
+        IRepository<OrderNotification> OrderNotifications { get; }
+        IRepository<ConsolidationPool> ConsolidationPools { get; }
+        IRepository<ConsolidationWeightLimit> ConsolidationWeightLimits { get; }
+        IRepository<ConsolidationPoolHistory> ConsolidationPoolHistories { get; }
 
         Task<int> SaveChangesAsync(CancellationToken ct = default);
         Task ExecuteInTransactionAsync(Func<Task> action, CancellationToken ct = default);

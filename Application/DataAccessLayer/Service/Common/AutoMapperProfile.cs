@@ -1,13 +1,14 @@
-using Application.ViewModels.CityModel;
-using Application.ViewModels.CodeTNVDModel;
-using Application.ViewModels.CompanyModel;
-using Application.ViewModels.CustomerModel;
+using Application.ViewModels.OrderModel.Products;
 using Application.ViewModels.ManufacturerModel;
 using Application.ViewModels.MeasureUnitModel;
-using Application.ViewModels.OrderModel;
-using Application.ViewModels.OrderModel.Products;
+using Application.ViewModels.CodeTNVDModel;
+using Application.ViewModels.CustomerModel;
 using Application.ViewModels.ProductModel;
 using Application.ViewModels.TaxTypeModel;
+using Application.ViewModels.CompanyModel;
+using Application.ViewModels.OrderModel;
+using Application.ViewModels.CityModel;
+using DB.Entity.Enum;
 using AutoMapper;
 using DB.Entity;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -164,7 +165,7 @@ namespace Application.DataAccessLayer.Service.Common
                 .ForMember(d => d.CreationDate, o => o.MapFrom(s => s.CreationDate))
                 .ForMember(d => d.TotalCost, o => o.MapFrom(s => s.TotalCost))
                 .ForMember(d => d.TotalWeight, o => o.MapFrom(s => s.TotalWeight))
-                .ForMember(d => d.Status, o => o.MapFrom(s => s.Status.ToString()))
+                .ForMember(d => d.Status, o => o.MapFrom(s => s.Status.GetDisplayName()))
                 .ForMember(d => d.Comment, o => o.MapFrom(s => s.Comment ?? string.Empty))
                 .ForMember(d => d.Products, o => o.Ignore())
                 .ForMember(d => d.StatusHistory, o => o.Ignore())
