@@ -1,0 +1,167 @@
+@model List<Application.ViewModels.OrderNotificationModel.OrderNotificationViewModel>
+@{
+    ViewData["Title"] = "Напоминания";
+    var showCompleted = (bool)(ViewBag.ShowCompleted ?? false);
+}
+
+<div class="container">
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <h2 class="mb-0">Напоминания</h2>
+        <div class="d-flex gap-2">
+            <button type="button" class="btn btn-create" id="openCreateNotifBtn">
+                Создать напоминание
+            </button>
+            <a asp-action="Index" asp-route-showCompleted="@(!showCompleted)"
+               class="btn btn-copy">
+                @(showCompleted ? "Только активные" : "Показать выполненные")
+            </a>
+        </div>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="card">
+            <div class="card-body text-center py-5 text-muted">
+                Напоминаний нет
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="card">
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Заказ</th>
+                            <th>Заголовок</th>
+                            <th>Дата</th>
+                            <th>Создано</th>
+                            <th>Статус</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var n in Model)
+                        {
+                            var cls = n.IsCompleted ? "text-muted"
+                                    : n.IsOverdue ? "table-danger"
+                                    : n.IsUrgent ? "table-warning"
+                                    : "";
+                            <tr class="@cls">
+                                <td>
+                                    <a asp-controller="Orders" asp-action="Details" asp-route-id="@n.OrderId">
+                                        №@n.OrderNumber
+                                    </a>
+                                </td>
+                                <td>
+                                    <div class="fw-semibold">@n.Title</div>
+                                    @if (!string.IsNullOrEmpty(n.Description))
+                                    {
+                                        <small class="text-muted">@n.Description</small>
+                                    }
+                                </td>
+                                <td>@n.DueDate.ToString("dd.MM.yyyy")</td>
+                                <td>
+                                    @n.CreatedAt.ToString("dd.MM.yy")
+                                    <small class="text-muted d-block">@n.CreatedBy</small>
+                                </td>
+                                <td>
+                                    @if (n.IsCompleted)
+                                    {
+                                        <span class="badge bg-secondary">Выполнено</span>
+                                    }
+                                    else if (n.IsOverdue)
+                                    {
+                                        <span class="badge bg-danger">Просрочено</span>
+                                    }
+                                    else if (n.IsUrgent)
+                                    {
+                                        <span class="badge bg-warning text-dark">Срочно</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-info">Активно</span>
+                                    }
+                                </td>
+                                <td class="text-end">
+                                    @if (n.IsCompleted)
+                                    {
+                                        <button type="button"
+                                                class="btn btn-sm btn-copy notification-restore-btn"
+                                                data-notification-id="@n.Id">
+                                            Вернуть
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button type="button"
+                                                class="btn btn-sm btn-create notification-complete-btn"
+                                                data-notification-id="@n.Id">
+                                            Выполнено
+                                        </button>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Модалка создания напоминания -->
+<div class="modal fade" id="createNotifPageModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Новое напоминание</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3 position-relative">
+                    <label class="form-label">Номер заказа *</label>
+                    <input type="text" class="form-control" id="createNotifOrderNumber"
+                           placeholder="Начните вводить номер..." autocomplete="off" />
+                    <input type="hidden" id="createNotifOrderId" />
+                    <div id="createNotifOrderSuggestions"
+                         class="suggestions-list"
+                         style="display:none;"></div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Заголовок *</label>
+                    <input type="text" class="form-control" id="createNotifTitle" maxlength="200" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Описание</label>
+                    <textarea class="form-control" id="createNotifDescription" rows="3" maxlength="2000"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Дата *</label>
+                    <input type="date" class="form-control" id="createNotifDueDate" />
+                </div>
+                <div id="createNotifError" class="text-danger small" style="display:none;"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="button" class="btn btn-create" id="createNotifSaveBtn">Создать</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Orders/SuggestionsStyle.css" />
+    <link rel="stylesheet" href="~/css/Orders/ButtonStyle.css" />
+}
+
+@section Scripts {
+    <script src="~/js/home/notifications-dashboard.js"></script>
+    <script src="~/js/order-notifications/create-modal.js"></script>
+}

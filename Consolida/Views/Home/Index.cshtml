@@ -1,20 +1,199 @@
+@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService AuthorizationService
+
 @{
     ViewData["Title"] = "Главная";
+
+    var canViewOrders = (await AuthorizationService.AuthorizeAsync(User, "OrderManager")).Succeeded;
+    var canViewConsolid = canViewOrders;
+    var canViewTracking = canViewOrders;
+    var allUrgent = ViewBag.UrgentNotifications as List<Application.ViewModels.OrderNotificationModel.OrderNotificationViewModel> ?? new List<Application.ViewModels.OrderNotificationModel.OrderNotificationViewModel>();
+    var shown = allUrgent.Take(4).ToList();
+    var hasMore = allUrgent.Count > shown.Count;
 }
 
 <div class="home-hero">
     <h1 class="home-hero-title">Consolida</h1>
     <p class="home-hero-subtitle">
-        Система расчёта стоимости заказов и консолидации поставок
+        Управление заказами, консолидация поставок и отслеживание отгрузок
     </p>
 </div>
 
-<div class="container">
-    <div class="home-guest">
-        <p class="home-guest-text">Проект в активной разработке</p>
+@if (User.Identity?.IsAuthenticated ?? false)
+{
+    <div class="container">
+        <div class="home-actions">
+
+            @if (canViewOrders)
+            {
+                <a asp-controller="Orders" asp-action="Index" class="home-action-card">
+                    <span class="home-action-icon-wrap">
+                        <svg class="home-action-icon" viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="1.6"
+                             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <rect x="3" y="4" width="18" height="16" rx="2" />
+                            <path d="M7 9h10M7 13h10M7 17h6" />
+                        </svg>
+                    </span>
+                    <span class="home-action-title">Заказы</span>
+                    <span class="home-action-description">
+                        Просмотр, создание и управление заказами клиентов
+                    </span>
+                    <span class="home-action-arrow" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M5 12h14M13 6l6 6-6 6" />
+                        </svg>
+                    </span>
+                </a>
+            }
+
+            @if (canViewConsolid)
+            {
+                <a asp-controller="Consolidation" asp-action="Index" class="home-action-card">
+                    <span class="home-action-icon-wrap">
+                        <svg class="home-action-icon" viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="1.6"
+                             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M3 7l9-4 9 4-9 4-9-4z" />
+                            <path d="M3 12l9 4 9-4" />
+                            <path d="M3 17l9 4 9-4" />
+                        </svg>
+                    </span>
+                    <span class="home-action-title">Консолидация</span>
+                    <span class="home-action-description">
+                        Объединение заказов в отгрузочные пулы по неделям
+                    </span>
+                    <span class="home-action-arrow" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M5 12h14M13 6l6 6-6 6" />
+                        </svg>
+                    </span>
+                </a>
+            }
+
+            @if (canViewTracking)
+            {
+                <a asp-controller="Consolidation" asp-action="Tracking" class="home-action-card">
+                    <span class="home-action-icon-wrap">
+                        <svg class="home-action-icon" viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="1.6"
+                             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M3 7h11v9H3z" />
+                            <path d="M14 10h4l3 3v3h-7" />
+                            <circle cx="7" cy="18" r="2" />
+                            <circle cx="17" cy="18" r="2" />
+                        </svg>
+                    </span>
+                    <span class="home-action-title">Отслеживание отгрузок</span>
+                    <span class="home-action-description">
+                        Мониторинг статусов, сроков и местоположения грузов
+                    </span>
+                    <span class="home-action-arrow" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M5 12h14M13 6l6 6-6 6" />
+                        </svg>
+                    </span>
+                </a>
+            }
+        </div>
+
+        @if (shown.Any())
+        {
+            <div class="card notifications-dashboard">
+                <div class="card-body">
+                    <div class="notifications-dashboard-header">
+                        <div class="notifications-dashboard-title">
+                            <span class="notifications-dashboard-icon">
+                                <span class="mask-icon mask-icon-bell"></span>
+                            </span>
+                            <div>
+                                <div class="notifications-dashboard-heading">Требуют внимания</div>
+                                <div class="notifications-dashboard-count">@allUrgent.Count напоминаний</div>
+                            </div>
+                        </div>
+                        @if (hasMore)
+                        {
+                            <a asp-controller="OrderNotifications" asp-action="Index" class="btn btn-sm btn-go-to">
+                                Показать все
+                            </a>
+                        }
+                    </div>
+
+                    <div class="notifications-grid">
+                        @foreach (var n in shown)
+                        {
+                            var cls = n.IsOverdue ? "notif-overdue"
+                                    : n.DaysLeft <= 3 ? "notif-warning"
+                                    : "notif-info";
+                            <div class="notif-card @cls">
+                                <div class="notif-card-header">
+                                    <span class="notif-badge">№@n.OrderNumber</span>
+                                    <span class="notif-due-badge">
+                                        @if (n.IsOverdue)
+                                        {
+                                            <text>Просрочено на @Math.Abs(n.DaysLeft) д.</text>
+                                        }
+                                        else if (n.DaysLeft == 0)
+                                        {
+                                            <text>Сегодня</text>
+                                        }
+                                        else
+                                        {
+                                            <text>через @n.DaysLeft д.</text>
+                                        }
+                                    </span>
+                                </div>
+                                <div class="notif-card-title">@n.Title</div>
+                                @if (!string.IsNullOrEmpty(n.Description))
+                                {
+                                    <div class="notif-card-desc">@n.Description</div>
+                                }
+                                <div class="notif-card-footer">
+                                    <small>@n.DueDate.ToString("dd.MM.yyyy")</small>
+                                    <div class="d-flex gap-1">
+                                        <a asp-controller="Orders" asp-action="Details" asp-route-id="@n.OrderId"
+                                           class="btn btn-sm btn-details">Заказ</a>
+                                        <button type="button"
+                                                class="btn btn-sm btn-create notification-complete-btn"
+                                                data-notification-id="@n.Id">
+                                            Готово
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    @if (hasMore)
+                    {
+                        <div class="text-center mt-3">
+                            <a asp-controller="OrderNotifications" asp-action="Index"
+                               class="btn btn-copy">Ещё @(allUrgent.Count - shown.Count) напоминаний</a>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
     </div>
-</div>
+}
+else
+{
+    <div class="home-guest">
+        <p class="home-guest-text">Войдите в систему, чтобы начать работу</p>
+        <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-create">
+            Войти в систему
+        </a>
+    </div>
+}
 
 @section Styles {
     <link rel="stylesheet" href="~/css/home/homeStyle.css" asp-append-version="true" />
+}
+
+@section Scripts {
+    <script src="~/js/home/notifications-dashboard.js"></script>
 }

@@ -1,0 +1,84 @@
+@using DB.Entity.Enum
+@using Application.ViewModels.ConsolidationModel
+@model ConsolidationBoardDto
+
+@{
+    ViewData["Title"] = "Отслеживание отгрузок";
+    ViewBag.FullWidth = true;
+
+    // Группируем пулы по «срочности»
+    var urgentPools = Model.Pools.Where(p =>
+        p.Status == Status.OnTheWay &&
+        p.ExpectedDeliveryDate.HasValue &&
+        p.ExpectedDeliveryDate.Value.Date <= DateTime.Now.AddDays(7).Date).ToList();
+
+    var onTheWayPools = Model.Pools.Where(p =>
+        p.Status == Status.OnTheWay &&
+        (urgentPools.All(u => u.PoolId != p.PoolId))).ToList();
+
+    var shippedPools = Model.Pools.Where(p => p.Status == Status.Shipped).ToList();
+}
+
+<div class="container-fluid px-3 consolidation-container">
+    @if (!Model.Pools.Any())
+    {
+        <div class="alert alert-info">Нет отгрузок в статусе «В пути» или «Отгружен».</div>
+    }
+    else
+    {
+        <!-- ===== Срочные ===== -->
+        @if (urgentPools.Any())
+        {
+            <div class="tracking-section">
+                <div class="tracking-section-header urgent">
+                    <h3 class="tracking-section-title">Скоро доставка</h3>
+                    <span class="tracking-section-count">@urgentPools.Count</span>
+                </div>
+                <div class="d-flex flex-row overflow-auto" style="gap: 1rem;">
+                    @foreach (var pool in urgentPools)
+                    {
+                        @await Html.PartialAsync("_TrackingPoolCard", pool)
+                    }
+                </div>
+            </div>
+        }
+
+        <!-- ===== В пути ===== -->
+        @if (onTheWayPools.Any())
+        {
+            <div class="tracking-section">
+                <div class="tracking-section-header">
+                    <h3 class="tracking-section-title">В пути</h3>
+                    <span class="tracking-section-count">@onTheWayPools.Count</span>
+                </div>
+                <div class="d-flex flex-row overflow-auto" style="gap: 1rem;">
+                    @foreach (var pool in onTheWayPools)
+                    {
+                        @await Html.PartialAsync("_TrackingPoolCard", pool)
+                    }
+                </div>
+            </div>
+        }
+
+        <!-- ===== Отгружены ===== -->
+        @if (shippedPools.Any())
+        {
+            <div class="tracking-section">
+                <div class="tracking-section-header muted">
+                    <h3 class="tracking-section-title">Отгружены</h3>
+                    <span class="tracking-section-count">@shippedPools.Count</span>
+                </div>
+                <div class="d-flex flex-row overflow-auto" style="gap: 1rem;">
+                    @foreach (var pool in shippedPools)
+                    {
+                        @await Html.PartialAsync("_TrackingPoolCard", pool)
+                    }
+                </div>
+            </div>
+        }
+    }
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/consolidation/consolidation.css" asp-append-version="true" />
+}

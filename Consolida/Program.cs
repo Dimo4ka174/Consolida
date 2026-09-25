@@ -1,5 +1,6 @@
 using Application.DataAccessLayer.Interface.Common;
 using Application.DataAccessLayer.Service.Common;
+using Application.DataAccessLayer.Service.Hubs;
 using Consolida.Infrastructure.Logging;
 using Consolida.Extensions;
 using Serilog;
@@ -21,6 +22,8 @@ builder.Services
     .AddCustomControllers()
     .AddCustomSwagger()
     .AddCustomCache(builder.Configuration);
+
+builder.Services.AddSignalR();
 
 builder.Services.AddSession(options =>
 {
@@ -62,6 +65,8 @@ app.MapRazorPages();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.MapHub<ConsolidationHub>("/hubs/consolidation");
 
 try
 {

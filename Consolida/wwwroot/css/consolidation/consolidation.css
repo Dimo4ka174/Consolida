@@ -1,0 +1,659 @@
+﻿/* ---------- Drag and Drop ---------- */
+.draggable-order {
+    cursor: grab;
+}
+
+    .draggable-order:active {
+        cursor: grabbing;
+    }
+
+.dragging {
+    opacity: 0.5;
+}
+
+.drop-target {
+    outline: 2px dashed var(--info);
+    outline-offset: -2px;
+    background-color: var(--info-soft);
+}
+
+.free-drop-zone {
+    min-width: 200px;
+    min-height: 60px;
+    border: 2px dashed var(--border-medium);
+    border-radius: var(--radius-md);
+    transition: background-color var(--transition-base), border-color var(--transition-base);
+}
+
+    .free-drop-zone.drop-target {
+        background-color: var(--info-soft);
+        border-color: var(--info);
+    }
+
+    .free-drop-zone span {
+        color: var(--text-muted);
+        font-size: var(--font-size-sm);
+    }
+
+/* ---------- Sticky-тулбар консолидации ---------- */
+.consolidation-toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    padding: var(--space-3) var(--space-4);
+    margin-bottom: var(--space-4);
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+}
+
+    .consolidation-toolbar .toolbar-group {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+    }
+
+    .consolidation-toolbar .toolbar-label {
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-medium);
+        color: var(--text-secondary);
+        white-space: nowrap;
+        margin: 0;
+    }
+
+    .consolidation-toolbar .custom-select {
+        height: 36px;
+        padding: 0 var(--space-3);
+        font-size: var(--font-size-sm);
+        width: auto;
+        min-width: 100px;
+    }
+
+    .consolidation-toolbar .toolbar-divider {
+        width: 1px;
+        height: 24px;
+        background-color: var(--border-soft);
+        flex-shrink: 0;
+    }
+
+    /* Кнопка "Создать отгрузку" — компактная, но с иконкой слева */
+    .consolidation-toolbar .btn-create:not(.btn-icon-only) {
+        height: 36px;
+        padding-left: 36px;
+        padding-right: var(--space-4);
+        font-size: var(--font-size-sm);
+        text-transform: none;
+        letter-spacing: 0;
+    }
+
+        /* Иконка для btn-create в тулбаре остаётся как в ButtonStyle.css */
+        .consolidation-toolbar .btn-create:not(.btn-icon-only)::after {
+            width: 14px;
+            height: 14px;
+            left: 12px;
+            transform: translateY(-50%);
+        }
+
+    /* Кнопка-иконка внутри тулбара — квадрат 36×36, иконка по центру */
+    .consolidation-toolbar .btn-icon-only {
+        width: 36px;
+        height: 36px;
+        min-width: 36px;
+        padding: 0;
+        border-radius: var(--radius-md);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+
+        /* Приоритет над общим правилом .btn-create (выравнивание иконки) */
+        .consolidation-toolbar .btn-icon-only::after {
+            position: absolute;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            width: 14px;
+            height: 14px;
+        }
+
+    .consolidation-toolbar .free-drop-zone {
+        min-width: 200px;
+        min-height: 36px;
+        padding: 0 var(--space-3);
+        border-radius: var(--radius-md);
+        font-size: var(--font-size-xs);
+        flex-shrink: 0;
+    }
+
+    .consolidation-toolbar .toolbar-right {
+        margin-left: auto;
+    }
+
+    /* Подсветка зоны удаления при перетаскивании */
+    .consolidation-toolbar.drag-active .free-drop-zone {
+        border-color: var(--accent);
+        background-color: var(--accent-soft);
+        animation: pulse-border 1.5s ease-in-out infinite;
+    }
+
+@keyframes pulse-border {
+    0%, 100% {
+        border-color: var(--accent);
+    }
+
+    50% {
+        border-color: var(--accent-hover);
+    }
+}
+
+@media (max-width: 768px) {
+    .consolidation-toolbar {
+        position: static;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+        .consolidation-toolbar .toolbar-right {
+            margin-left: 0;
+        }
+
+        .consolidation-toolbar .toolbar-divider {
+            display: none;
+        }
+}
+
+/* ---------- Подсказки (chips) ---------- */
+.suggestion-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    background-color: var(--bg-surface);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-pill);
+    font-size: var(--font-size-sm);
+    color: var(--text-primary);
+    transition: background-color var(--transition-fast), border-color var(--transition-fast);
+}
+
+    .suggestion-badge:hover {
+        background-color: var(--bg-hover);
+        border-color: var(--border-medium);
+    }
+
+.suggestion-chip {
+    cursor: pointer;
+    color: var(--text-primary);
+}
+
+.accept-suggestion {
+    cursor: pointer;
+    color: var(--accent);
+    font-weight: var(--font-weight-semibold);
+    transition: color var(--transition-fast);
+    white-space: nowrap;
+}
+
+    .accept-suggestion:hover {
+        color: var(--accent-hover);
+    }
+
+.highlight {
+    background-color: var(--warning-soft) !important;
+    border-color: var(--warning) !important;
+}
+
+/* ---------- Карточка пула ---------- */
+.pool-card {
+    background-color: var(--bg-surface);
+    border: 2px solid var(--pool-color, var(--border-soft));
+    padding: 0;
+    overflow: hidden;
+    min-width: 460px;
+    max-width: 560px;
+}
+
+    .pool-card > .card-header {
+        background-color: var(--pool-color, var(--bg-subtle));
+        color: #1f2937;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        padding: var(--space-4);
+        border-radius: 0;
+    }
+
+        .pool-card > .card-header h5 {
+            color: #1f2937;
+            font-weight: var(--font-weight-semibold);
+        }
+
+        .pool-card > .card-header .badge {
+            background-color: rgba(255, 255, 255, 0.7) !important;
+            color: #1f2937 !important;
+            font-weight: var(--font-weight-semibold);
+        }
+
+    .pool-card > .card-body {
+        padding: var(--space-4);
+    }
+
+    .pool-card.locked {
+        opacity: 0.7;
+        border-style: dashed;
+    }
+
+    .pool-card.pool-shipped {
+        opacity: 0.6;
+        filter: grayscale(40%);
+    }
+
+    .pool-card.pool-urgent {
+        border: 3px solid var(--warning);
+        box-shadow: 0 4px 12px var(--warning-soft);
+    }
+
+/* ---------- Действия в пуле: кнопки в одну строку ---------- */
+.pool-actions {
+    display: flex;
+    gap: var(--space-2);
+    align-items: center;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding-bottom: 2px;
+}
+
+    .pool-actions .btn {
+        height: 36px;
+        padding-left: 32px;
+        padding-right: var(--space-3);
+        font-size: var(--font-size-xs);
+        white-space: nowrap;
+        flex-shrink: 0;
+        display: inline-flex;
+        align-items: center;
+    }
+
+        .pool-actions .btn::after {
+            width: 14px;
+            height: 14px;
+            left: 10px;
+        }
+
+/* ---------- Карточка заказа внутри пула ---------- */
+.pool-order {
+    background-color: var(--bg-subtle);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-md);
+    padding: var(--space-3);
+    margin-bottom: var(--space-2);
+}
+
+    .pool-order.inactive {
+        background-color: var(--warning-soft);
+        border: 1px dashed var(--warning);
+    }
+
+    .pool-order.locked-remote {
+        border: 2px dashed var(--danger);
+        background-color: var(--danger-soft);
+    }
+
+/* ---------- Свободная колонка (по неделям) ---------- */
+.free-column {
+    background-color: var(--bg-surface);
+    min-width: 400px;
+    max-width: 420px;
+}
+
+    .free-column > .card-header {
+        background-color: var(--bg-subtle);
+        border-bottom: 1px solid var(--border-soft);
+        padding: var(--space-4);
+    }
+
+    .free-column > .card-body {
+        padding: var(--space-4);
+    }
+
+/* ---------- Свободный заказ ---------- */
+.free-order {
+    background-color: var(--bg-subtle);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-md);
+    padding: var(--space-3);
+    margin-bottom: var(--space-2);
+}
+
+    .free-order.locked {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+
+/* ---------- Чекбокс в свободной карточке ---------- */
+.order-checkbox {
+    margin-right: var(--space-2);
+    margin-top: 4px;
+    flex-shrink: 0;
+}
+
+/* ---------- Неактивный заказ (статус изменён) ---------- */
+.inactive {
+    background-color: var(--warning-soft) !important;
+    border: 1px dashed var(--warning) !important;
+    opacity: 0.95;
+}
+
+.inactive-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-2);
+}
+
+.status-badge {
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+    padding: 2px 10px;
+    border-radius: var(--radius-pill);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    box-shadow: var(--shadow-xs);
+    white-space: nowrap;
+}
+
+/* ---------- Бейдж блокировки ---------- */
+.lock-badge {
+    display: inline-block;
+    background-color: var(--warning-soft);
+    color: var(--text-primary);
+    padding: 2px 8px;
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    border: 1px solid var(--warning);
+    white-space: nowrap;
+}
+
+.locked .draggable-order,
+.locked-remote {
+    cursor: not-allowed !important;
+}
+
+.locked-remote {
+    opacity: 0.7;
+    border: 2px dashed var(--danger) !important;
+    position: relative;
+}
+
+.remote-lock {
+    background-color: var(--danger-soft) !important;
+    color: var(--danger) !important;
+    border-color: var(--danger) !important;
+}
+
+/* ---------- Presence ---------- */
+.viewers-panel {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    background-color: var(--bg-subtle);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-md);
+    padding: 4px 10px;
+    font-size: var(--font-size-sm);
+    max-width: 100%;
+}
+
+.viewers-label {
+    color: var(--text-muted);
+    font-weight: var(--font-weight-medium);
+    white-space: nowrap;
+}
+
+.viewers-list {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.viewer-chip {
+    display: inline-flex;
+    align-items: center;
+    background-color: var(--info-soft);
+    color: var(--info);
+    padding: 2px 10px;
+    border-radius: var(--radius-pill);
+    font-weight: var(--font-weight-medium);
+    white-space: nowrap;
+}
+
+    .viewer-chip::before {
+        content: '';
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background-color: var(--accent);
+        margin-right: 6px;
+    }
+
+/* ---------- Кнопка «История» ---------- */
+.btn-history {
+    color: var(--text-primary);
+    background-color: var(--bg-surface);
+    border: 2px solid var(--border-medium);
+    position: relative;
+    padding-left: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 44px;
+    transition: background-color var(--transition-base), color var(--transition-base), border-color var(--transition-base);
+}
+
+    .btn-history::after {
+        content: '';
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 16px;
+        height: 16px;
+        -webkit-mask-image: url('/images/icons/search.svg');
+        mask-image: url('/images/icons/search.svg');
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+    }
+
+    .btn-history:hover {
+        background-color: var(--accent-soft);
+        border-color: var(--accent);
+        color: var(--accent);
+    }
+
+/* ---------- Модалка истории пула ---------- */
+.pool-history-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.pool-history-item {
+    border-bottom: 1px solid var(--border-soft);
+    padding: var(--space-3) 0;
+}
+
+    .pool-history-item:last-child {
+        border-bottom: none;
+    }
+
+.pool-history-header {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+}
+
+.pool-history-event {
+    font-weight: var(--font-weight-medium);
+    color: var(--text-primary);
+}
+
+.pool-history-date {
+    color: var(--text-muted);
+    font-size: var(--font-size-sm);
+    white-space: nowrap;
+}
+
+.pool-history-author {
+    color: var(--text-muted);
+    font-size: var(--font-size-sm);
+    margin-top: 2px;
+}
+
+/* ---------- Tracking: метаданные пула ---------- */
+.pool-meta {
+    margin-bottom: var(--space-3);
+    font-size: var(--font-size-sm);
+}
+
+    .pool-meta strong {
+        color: var(--text-secondary);
+        font-weight: var(--font-weight-medium);
+        margin-right: 4px;
+    }
+
+/* ============================================================
+   Tracking: секции и группировка
+   ============================================================ */
+.tracking-section {
+    margin-bottom: var(--space-6);
+}
+
+.tracking-section-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-3);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--border-soft);
+}
+
+.tracking-section-title {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.tracking-section-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 26px;
+    height: 22px;
+    padding: 0 8px;
+    border-radius: var(--radius-pill);
+    background-color: var(--bg-subtle);
+    color: var(--text-secondary);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+}
+
+/* Срочная секция — акцентная полоса слева */
+.tracking-section-header.urgent {
+    border-bottom-color: var(--warning);
+}
+
+    .tracking-section-header.urgent .tracking-section-title {
+        color: var(--warning);
+    }
+
+    .tracking-section-header.urgent .tracking-section-count {
+        background-color: var(--warning-soft);
+        color: var(--warning);
+    }
+
+/* Секция отгруженных — приглушённая */
+.tracking-section-header.muted .tracking-section-title {
+    color: var(--text-muted);
+}
+
+/* ============================================================
+   Tracking: карточка пула
+   ============================================================ */
+.tracking-pool-card .pool-meta {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--border-soft);
+}
+
+.pool-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 4px 12px;
+    border-radius: var(--radius-pill);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    width: fit-content;
+    background-color: var(--bg-subtle);
+    color: var(--text-primary);
+}
+
+.pool-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--text-muted);
+    flex-shrink: 0;
+}
+
+.pool-status-badge.status-ontheway {
+    background-color: var(--info-soft);
+    color: var(--info);
+}
+
+    .pool-status-badge.status-ontheway .pool-status-dot {
+        background-color: var(--info);
+    }
+
+.pool-status-badge.status-shipped {
+    background-color: var(--success-soft);
+    color: var(--success);
+}
+
+    .pool-status-badge.status-shipped .pool-status-dot {
+        background-color: var(--success);
+    }
+
+.pool-delivery-date {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--font-size-sm);
+}
+
+.pool-delivery-label {
+    color: var(--text-muted);
+}
+
+.pool-delivery-value {
+    color: var(--text-primary);
+    font-weight: var(--font-weight-semibold);
+}

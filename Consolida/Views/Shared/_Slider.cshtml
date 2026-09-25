@@ -16,6 +16,31 @@
                         <span class="sidebar-btn-label">Заказы</span>
                     </a>
                 </li>
+
+                <li class="sidebar-item">
+                    <button type="button" class="sidebar-btn" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="mask-icon mask-icon-box"></span>
+                        <span class="sidebar-btn-label">Консолидация</span>
+                    </button>
+                    <ul class="dropdown-menu sidebar-dropdown">
+                        <li>
+                            <a class="dropdown-item @(Context.Request.Path.StartsWithSegments("/Consolidation") && !Context.Request.Path.StartsWithSegments("/Tracking") ? "active" : "")"
+                               href="/Consolidation">Доска консолидации</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item @(Context.Request.Path.StartsWithSegments("/Tracking") ? "active" : "")"
+                               href="/Consolidation/Tracking">Отслеживание отгрузок</a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="sidebar-item">
+                    <a class="sidebar-btn @(Context.Request.Path.StartsWithSegments("/OrderNotifications") ? "active" : "")"
+                       href="/OrderNotifications">
+                        <span class="mask-icon mask-icon-bell"></span>
+                        <span class="sidebar-btn-label">Напоминания</span>
+                    </a>
+                </li>
             }
 
             @if ((await AuthorizationService.AuthorizeAsync(User, "ReadCities")).Succeeded ||

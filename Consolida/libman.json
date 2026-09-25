@@ -1,0 +1,14 @@
+{
+  "version": "3.0",
+  "defaultProvider": "cdnjs",
+  "libraries": [
+    {
+      "library": "microsoft-signalr@10.0.11",
+      "destination": "wwwroot/microsoft-signalr/"
+    },
+    {
+      "library": "bootstrap-icons@1.13.1",
+      "destination": "wwwroot/bootstrap-icons/"
+    }
+  ]
+}

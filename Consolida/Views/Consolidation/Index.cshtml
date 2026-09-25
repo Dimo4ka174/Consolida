@@ -1,0 +1,362 @@
+@using DB.Entity.Enum
+@using Application.ViewModels.ConsolidationModel
+@model ConsolidationBoardDto
+
+@{
+    ViewData["Title"] = "Консолидация";
+    ViewBag.FullWidth = true;
+    var currentUser = User.FindFirst("DisplayName")?.Value ?? User.Identity?.Name;
+    var allWeeks = Model.Columns.Select(c => c.Week)
+        .Concat(Model.Pools.Select(p => p.TargetWeek))
+        .Distinct()
+        .OrderBy(w => w)
+        .ToList();
+}
+
+<div class="container-fluid px-3 consolidation-container" data-current-user="@currentUser">
+
+    <!-- ===== Sticky-тулбар ===== -->
+    <div class="consolidation-toolbar" id="consolidationToolbar">
+
+        <div class="toolbar-group">
+            <label for="weekSpanSelect" class="toolbar-label">Диапазон:</label>
+            <select id="weekSpanSelect" class="custom-select">
+                @for (int i = 1; i <= 10; i++)
+                {
+                    <option value="@i" selected="@(Model.WeekSpan == i)">@i нед.</option>
+                }
+            </select>
+        </div>
+
+        <div class="toolbar-divider"></div>
+
+        <div class="toolbar-group">
+            <label for="weightLimitSelect" class="toolbar-label">Лимит:</label>
+            <select id="weightLimitSelect" class="custom-select">
+                <option value="" selected="@(!Model.SelectedWeightLimit.HasValue)">Без лимита</option>
+                @foreach (var limit in Model.AvailableWeightLimits)
+                {
+                    <option value="@limit.Value" selected="@(Model.SelectedWeightLimit == limit.Value)">
+                        @limit.Value.ToString("N0") кг
+                    </option>
+                }
+            </select>
+            <button type="button" id="addWeightLimitBtn"
+                    class="btn btn-sm btn-create btn-icon-only"
+                    title="Добавить лимит веса" aria-label="Добавить лимит веса"></button>
+        </div>
+
+        <div class="toolbar-divider"></div>
+
+        <button id="createPoolBtn" class="btn btn-create" title="Создать отгрузку из выбранных">
+            Создать отгрузку
+        </button>
+
+        <div id="viewersPanel" class="viewers-panel toolbar-right" style="display:none;">
+            <span class="viewers-label">Смотрят:</span>
+            <div id="viewersList" class="viewers-list"></div>
+        </div>
+
+        <div class="free-drop-zone d-flex align-items-center justify-content-center"
+             id="freeDropZone">
+            <span>Перетащите сюда, чтобы убрать из отгрузки</span>
+        </div>
+    </div>
+
+    <!-- Подсказки -->
+    @if (Model.Suggestions.Any())
+    {
+        <div class="d-flex flex-wrap gap-2 mb-4">
+            @foreach (var suggestion in Model.Suggestions)
+            {
+                <div class="suggestion-badge">
+                    <span class="suggestion-chip" data-order-ids='@Json.Serialize(suggestion.OrderIds)' data-pool-id="@suggestion.PoolId">
+                        @if (suggestion.PoolId.HasValue)
+                        {
+                            @($"Отгрузка №{suggestion.PoolId} + {suggestion.OrderCount} зак. → {suggestion.ToWeek} нед. · {suggestion.TotalWeight.ToString("N1")} кг")
+                        }
+                        else
+                        {
+                            @($"{suggestion.FromWeek} → {suggestion.ToWeek} нед. · {suggestion.OrderCount} зак. · {suggestion.TotalWeight.ToString("N1")} кг")
+                        }
+                    </span>
+                    <span class="accept-suggestion" title="Принять">
+                        @(suggestion.PoolId.HasValue ? "Добавить к отгрузке" : "Принять")
+                    </span>
+                </div>
+            }
+        </div>
+    }
+
+    @if (!Model.Columns.Any() && !Model.Pools.Any())
+    {
+        <div class="alert alert-info">Нет оплаченных заказов.</div>
+    }
+    else
+    {
+        <div class="d-flex flex-row overflow-auto" style="gap: 1rem;">
+            @foreach (var week in allWeeks)
+            {
+                // ===== Пулы =====
+                foreach (var pool in Model.Pools.Where(p => p.TargetWeek == week))
+                {
+                    bool poolLockedByOther = !string.IsNullOrEmpty(pool.LockedByUserId)
+                                          && pool.LockedByUserId != currentUser;
+
+                    <div class="card pool-card @(poolLockedByOther ? "locked" : "")"
+                         style="--pool-color: @pool.Color;"
+                         data-pool-id="@pool.PoolId">
+                        <div class="card-header d-flex justify-content-between align-items-center flex-wrap" style="gap: 0.5rem;">
+                            <h5 class="mb-0">Отгрузка №@pool.PoolId</h5>
+                            <div class="d-flex align-items-center gap-2">
+                                @if (poolLockedByOther)
+                                {
+                                    <span class="lock-badge" title="Отгрузка редактируется другим пользователем">
+                                        🔒 @pool.LockedByUserId
+                                    </span>
+                                }
+                                <span class="badge">@pool.TargetWeek нед. · @pool.TotalWeight.ToString("N1") кг</span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            @foreach (var order in pool.Orders)
+                            {
+                                bool orderLockedByOther = !string.IsNullOrEmpty(order.LockedByUserId)
+                                                       && order.LockedByUserId != currentUser;
+
+                                <div class="pool-order position-relative draggable-order
+                                    @(order.IsInactive ? "inactive" : "")
+                                    @(orderLockedByOther ? "locked" : "")"
+                                     data-order-id="@order.OrderId"
+                                     data-source="pool"
+                                     data-pool-id="@pool.PoolId"
+                                     draggable="true">
+                                    @if (orderLockedByOther)
+                                    {
+                                        <div class="lock-badge mb-1">🔒 @order.LockedByUserId</div>
+                                    }
+                                    @if (order.IsInactive)
+                                    {
+                                        <div class="inactive-header">
+                                            <span class="status-badge">@order.StatusDisplay</span>
+                                        </div>
+                                    }
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>@order.OrderNumber</strong> — @order.CompanyName<br />
+                                            <span>@order.TotalWeight.ToString("N2") кг · @order.TotalCost.ToString("N2") ¥</span>
+                                        </div>
+                                        <div class="d-flex gap-1 align-items-center">
+                                            <a asp-controller="Orders" asp-action="Details" asp-route-id="@order.OrderId"
+                                               class="btn btn-sm btn-details btn-icon-only"
+                                               title="Детали" aria-label="Детали" draggable="false"></a>
+                                            <form method="post" asp-action="RemoveOrderFromPool"
+                                                  asp-route-orderId="@order.OrderId"
+                                                  class="m-0" draggable="false">
+                                                <button type="submit"
+                                                        class="btn btn-sm btn-delete btn-icon-only"
+                                                        title="Убрать из отгрузки"
+                                                        aria-label="Убрать из отгрузки"
+                                                        draggable="false"></button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+
+                            <!-- Действия пула — текстовые кнопки в одну строку -->
+                            <div class="pool-actions mt-3">
+                                <form method="post" asp-action="DissolvePool"
+                                      asp-route-poolId="@pool.PoolId" class="m-0">
+                                    <button type="submit" class="btn btn-delete"
+                                            title="Разобрать отгрузку">
+                                        Разобрать
+                                    </button>
+                                </form>
+                                <button type="button"
+                                        class="btn btn-history pool-history-btn"
+                                        data-pool-id="@pool.PoolId">
+                                    История
+                                </button>
+                                <button type="button"
+                                        class="btn btn-edit set-pool-status-btn"
+                                        data-pool-id="@pool.PoolId"
+                                        data-target-week="@pool.TargetWeek">
+                                    Сменить статус
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                // ===== Свободные заказы =====
+                var column = Model.Columns.FirstOrDefault(c => c.Week == week);
+                if (column != null)
+                {
+                    <div class="card free-column">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">@column.Week нед.</h5>
+                            <span class="badge bg-secondary">@column.OrderCount зак. · @column.TotalWeight.ToString("N1") кг</span>
+                        </div>
+                        <div class="card-body">
+                            @foreach (var order in column.Orders)
+                            {
+                                bool freeLockedByOther = !string.IsNullOrEmpty(order.LockedByUserId)
+                                                      && order.LockedByUserId != currentUser;
+
+                                <div class="free-order draggable-order @(freeLockedByOther ? "locked" : "")"
+                                     data-order-id="@order.OrderId"
+                                     data-source="free"
+                                     draggable="true">
+                                    @if (freeLockedByOther)
+                                    {
+                                        <div class="lock-badge mb-1">🔒 @order.LockedByUserId</div>
+                                    }
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div class="d-flex align-items-start gap-2">
+                                            <input class="form-check-input order-checkbox"
+                                                   type="checkbox"
+                                                   value="@order.OrderId"
+                                                   id="chk_@order.OrderId">
+                                            <div>
+                                                <div class="d-flex justify-content-between">
+                                                    <strong>@order.OrderNumber</strong>
+                                                    <span class="text-muted ms-2">@order.LeadTimeWeeks нед.</span>
+                                                </div>
+                                                <div class="mb-1">@order.CompanyName</div>
+                                                <div>
+                                                    <span>@order.TotalWeight.ToString("N2") кг · @order.TotalCost.ToString("N2") ¥</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex gap-1 align-items-center">
+                                            <a asp-controller="Orders" asp-action="Details" asp-route-id="@order.OrderId"
+                                               class="btn btn-sm btn-details btn-icon-only"
+                                               title="Детали" aria-label="Детали"></a>
+                                            <button type="button"
+                                                    class="btn btn-sm btn-create btn-icon-only btn-add-to-pool"
+                                                    data-order-id="@order.OrderId"
+                                                    title="Добавить в отгрузку"
+                                                    aria-label="Добавить в отгрузку"></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    }
+
+    <!-- ========== Модалки ========== -->
+
+    <div class="modal fade" id="addToPoolModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Добавить заказ в отгрузку</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="selectedOrderId" />
+                    <label for="targetPoolSelect" class="form-label">Выберите отгрузку:</label>
+                    <select id="targetPoolSelect" class="custom-select">
+                        <option value="">-- Отгрузки --</option>
+                        @foreach (var pool in Model.Pools)
+                        {
+                            <option value="@pool.PoolId">Отгрузка №@pool.PoolId (@pool.TargetWeek нед. · @pool.TotalWeight.ToString("N1") кг)</option>
+                        }
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-reset" data-bs-dismiss="modal">Отмена</button>
+                    <button type="button" id="confirmAddToPool" class="btn btn-create">Добавить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="setPoolStatusModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Смена статуса отгрузки</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="poolStatusPoolId" />
+                    <div class="mb-3">
+                        <label for="poolStatusSelect" class="form-label">Новый статус:</label>
+                        <select id="poolStatusSelect" class="custom-select">
+                            @foreach (Status status in Enum.GetValues(typeof(Status)))
+                            {
+                                if ((int)status >= (int)Status.Paid)
+                                {
+                                    <option value="@((int)status)">@status.GetDisplayName()</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="poolDeliveryDate" class="form-label">Ожидаемая дата доставки:</label>
+                        <input type="date" id="poolDeliveryDate" class="custom-input" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-reset" data-bs-dismiss="modal">Отмена</button>
+                    <button type="button" id="confirmSetPoolStatus" class="btn btn-create">Сохранить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="addWeightLimitModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Добавить лимит веса</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <label for="newWeightLimitValue" class="form-label">Лимит, кг:</label>
+                    <input type="number" id="newWeightLimitValue" class="custom-input" min="1" max="100000" step="1" placeholder="Например, 500" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-reset" data-bs-dismiss="modal">Отмена</button>
+                    <button type="button" id="confirmAddWeightLimit" class="btn btn-create">Добавить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="poolHistoryModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">История отгрузки №<span id="poolHistoryTitle"></span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="poolHistoryEmpty" class="text-muted text-center py-4" style="display:none;">
+                        История пока пуста
+                    </div>
+                    <ul id="poolHistoryList" class="pool-history-list"></ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-reset" data-bs-dismiss="modal">Закрыть</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/consolidation/consolidation.css" asp-append-version="true" />
+}
+
+@section Scripts {
+    <script src="~/lib/microsoft-signalr/signalr.min.js"></script>
+    <script src="~/js/consolidation/consolidation.js" asp-append-version="true"></script>
+    <script src="~/js/consolidation/consolidation-realtime.js" asp-append-version="true"></script>
+}
