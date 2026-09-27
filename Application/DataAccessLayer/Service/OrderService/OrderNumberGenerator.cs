@@ -1,14 +1,19 @@
-﻿using System.Text.RegularExpressions;
+using Application.DataAccessLayer.Interface.OrderService;
+using Application.DataAccessLayer.Interface.Common;
+using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
 using DB.Entity;
-using Application.DataAccessLayer.Interface.Common;
-using Application.DataAccessLayer.Interface.OrderService;
 
 namespace Application.DataAccessLayer.Service.OrderService
 {
-    public class OrderNumberGenerator : IOrderNumberGenerator
+    public partial class OrderNumberGenerator : IOrderNumberGenerator
     {
         private readonly IUnitOfWork _unitOfWork;
+        [GeneratedRegex(@"^(\d+)(?:-(\d+))?/(\d+)$", RegexOptions.None, matchTimeoutMilliseconds: 1000)]
+        private static partial Regex OrderNumberRegex();
+
+        [GeneratedRegex(@"^(\d+)-(\d+)/\d+$", RegexOptions.None, matchTimeoutMilliseconds: 1000)]
+        private static partial Regex DuplicateSuffixRegex();
 
         public OrderNumberGenerator(IUnitOfWork unitOfWork)
         {
@@ -49,49 +54,42 @@ namespace Application.DataAccessLayer.Service.OrderService
 
         public async Task<string> GenerateDuplicateOrderNumber(string originalOrderNumber)
         {
-            // Парсим оригинальный номер
-            var match = Regex.Match(originalOrderNumber, @"^(\d+)(?:-(\d+))?/(\d+)$");
+            var match = OrderNumberRegex().Match(originalOrderNumber);
 
             if (!match.Success)
                 return await GenerateOrderNumber();
 
-            var baseNumber = match.Groups[1].Value; // Номер заказа
-            var duplicateNumber = match.Groups[2].Success ? int.Parse(match.Groups[2].Value) : 0; // если есть - номер дубля
-            var year = match.Groups[3].Value; // Год
-
-            //TODO: Возможно стоит отказаться от смены года у дубля
+            var baseNumber = match.Groups[1].Value;
+            var year = match.Groups[3].Value;
             var currentYear = DateTime.Now.ToString("yy");
-            // Проверяем, что год совпадает с текущим
-            if (year != currentYear)
-            {
-                // Если год другой, начинаем с 1 для этого года
-                return $"{baseNumber}-1/{currentYear}";
-            }
 
-            // Ищем максимальный номер дубля для этого базового номера в текущем году
-            var pattern = $"^{baseNumber}-(\\d+)/{currentYear}$";
+            if (year != currentYear)
+                return $"{baseNumber}-1/{currentYear}";
+
+            var prefix = $"{baseNumber}-";
+            var suffix = $"/{currentYear}";
 
             var existingDuplicates = await _unitOfWork.GetRepository<Order>()
                 .GetQueryable()
-                .Where(o => !o.IsDeleted)
-                .Where(o => EF.Functions.Like(o.OrderNumber, $"{baseNumber}-%/{currentYear}"))
+                .Where(o => !o.IsDeleted
+                            && o.OrderNumber.StartsWith(prefix)
+                            && o.OrderNumber.EndsWith(suffix))
                 .Select(o => o.OrderNumber)
                 .ToListAsync();
 
-            int maxDuplicate = 0;
+            var maxDuplicate = 0;
 
             foreach (var num in existingDuplicates)
             {
-                var duplicateMatch = Regex.Match(num, $"^{baseNumber}-(\\d+)/{currentYear}$");
-                if (duplicateMatch.Success && int.TryParse(duplicateMatch.Groups[1].Value, out int dupNum))
+                var duplicateMatch = DuplicateSuffixRegex().Match(num);
+                if (duplicateMatch.Success
+                    && int.TryParse(duplicateMatch.Groups[2].Value, out var dupNum))
                 {
                     maxDuplicate = Math.Max(maxDuplicate, dupNum);
                 }
             }
 
-            // Если есть дубли, берем следующий номер, иначе начинаем с 1
-            int nextDuplicate = maxDuplicate > 0 ? maxDuplicate + 1 : 1;
-
+            var nextDuplicate = maxDuplicate > 0 ? maxDuplicate + 1 : 1;
             return $"{baseNumber}-{nextDuplicate}/{currentYear}";
         }
 
@@ -144,7 +142,7 @@ namespace Application.DataAccessLayer.Service.OrderService
 
                 return false;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }

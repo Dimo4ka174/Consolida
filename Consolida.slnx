@@ -2,4 +2,6 @@
   <Project Path="Application/Application.csproj" />
   <Project Path="Consolida/Consolida.csproj" />
   <Project Path="DB/DB.csproj" />
+  <Project Path="Tests/Consolida.IntegrationTests/Consolida.IntegrationTests.csproj" Id="ee270a74-fb07-4d5d-999e-1c5d1162ff6c" />
+  <Project Path="Tests/Consolida.UnitTests/Consolida.UnitTests.csproj" Id="a1b38ba2-bda0-416f-bf4c-14a6dbd6ceb2" />
 </Solution>

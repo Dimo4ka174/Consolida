@@ -1,4 +1,4 @@
-﻿using Application.DataAccessLayer.Interface.CalculationService;
+using Application.DataAccessLayer.Interface.CalculationService;
 using Application.ViewModels.OrderModel.ExcelDoc;
 using Application.ViewModels.OrderModel;
 using Microsoft.EntityFrameworkCore;
@@ -268,44 +268,43 @@ namespace Application.DataAccessLayer.Service.OrderService
         {
             var taxes = new List<CalculationTaxViewModel>();
 
-            if (orderId.HasValue)
+            if (!orderId.HasValue) return taxes;
+
+            var productTaxes = await _unitOfWork.GetRepository<OrderTaxProduct>()
+                .GetQueryable()
+                .Where(ot => ot.OrderProduct.OrderId == orderId &&
+                            ot.OrderProduct.ProductId == productId)
+                .Include(ot => ot.TaxType)
+                    .ThenInclude(tt => tt.MeasureUnit)
+                .ToListAsync();
+
+            foreach (var tax in productTaxes)
             {
-                var productTaxes = await _unitOfWork.GetRepository<OrderTaxProduct>()
-                    .GetQueryable()
-                    .Where(ot => ot.OrderProduct.OrderId == orderId &&
-                                ot.OrderProduct.ProductId == productId)
-                    .Include(ot => ot.TaxType)
-                        .ThenInclude(tt => tt.MeasureUnit)
-                    .ToListAsync();
+                var taxName = tax.TaxType?.Name ?? "Неизвестный налог";
+                var measureUnit = tax.TaxType?.MeasureUnit?.Name ?? "₽";
 
-                foreach (var tax in productTaxes)
+                // Исключаем процентные налоги и налоги, которые уже учтены отдельно
+                var excludedTaxes = new List<string>
                 {
-                    var taxName = tax.TaxType?.Name ?? "Неизвестный налог";
-                    var measureUnit = tax.TaxType?.MeasureUnit?.Name ?? "₽";
+                    "Комиссия банка",
+                    "Маржа",
+                    "Не предвиденные расходы",
+                    "Пошлина"
+                };
 
-                    // Исключаем процентные налоги и налоги, которые уже учтены отдельно
-                    var excludedTaxes = new List<string>
-                    {
-                        "Комиссия банка",
-                        "Маржа",
-                        "Не предвиденные расходы",
-                        "Пошлина"
-                    };
+                if (excludedTaxes.Contains(taxName, StringComparer.OrdinalIgnoreCase))
+                    continue;
 
-                    if (excludedTaxes.Contains(taxName, StringComparer.OrdinalIgnoreCase))
-                        continue;
+                // Также исключаем налоги с процентной единицей измерения
+                if (measureUnit == "%")
+                    continue;
 
-                    // Также исключаем налоги с процентной единицей измерения
-                    if (measureUnit == "%")
-                        continue;
-
-                    taxes.Add(new CalculationTaxViewModel
-                    {
-                        Name = taxName,
-                        Cost = tax.Cost * quantity,
-                        MeasureUnit = measureUnit
-                    });
-                }
+                taxes.Add(new CalculationTaxViewModel
+                {
+                    Name = taxName,
+                    Cost = tax.Cost * quantity,
+                    MeasureUnit = measureUnit
+                });
             }
 
             return taxes;
