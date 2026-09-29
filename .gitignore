@@ -7,8 +7,6 @@ obj/
 *.suo
 *.userosscache
 *.sln.docstates
-TestResults/
-TestResults*
 
 # --- Публикация ---
 publish/
@@ -20,6 +18,20 @@ publish/
 .vs/
 .vscode/
 .idea/
+
+# --- JetBrains Rider ---
+*.DotSettings.user
+.generated.dotSettings
+_ReSharper*/
+
+# --- VS Code local history ---
+.history/
+
+# --- Прочие IDE-кэши ---
+*.lscache
+*.tsbuildinfo
+.prettiercache
+.eslintcache
 
 # --- Логи ---
 logs/
@@ -80,8 +92,15 @@ Thumbs.db
 *.bak
 *.old
 
-# --- Тестовые данные ---
+# --- Тестовые данные / покрытие ---
 test-results/
+TestResults/
+TestResults*/
 coverage/
+CoverageReport/
+**/CoverageReport/
 *.coverage
 *.coveragexml
+coverage*.xml
+coverage*.json
+*.opencover.xml

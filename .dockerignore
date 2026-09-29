@@ -1,0 +1,44 @@
+# Build artifacts
+**/bin/
+**/obj/
+**/TestResults/
+**/CoverageReport/
+
+# IDE
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Docs & meta
+docs/
+README.md
+LICENSE
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Tests (не нужны в рантайм-образе)
+Tests/
+
+# Env
+.env
+.env.*
+!.env.example
+
+# Logs & keys
+**/logs/
+*.log
+**/DataProtection-Keys/
+
+# Прочее
+**/*.csproj.user
+**/launchSettings.json

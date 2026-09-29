@@ -1,0 +1,91 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: consolida_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-consolida}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-CHANGE_ME}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks: [consolida_net]
+
+  # Redis нужен только если REDIS_HOST задан.
+  # Запускайте: docker compose up postgres redis app
+  # либо уберите REDIS_HOST из .env и стартуйте без этого сервиса.
+  redis:
+    image: redis:7-alpine
+    container_name: consolida_redis
+    restart: unless-stopped
+    command: >
+      sh -c "redis-server $${REDIS_PASSWORD:+--requirepass $$REDIS_PASSWORD}"
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks: [consolida_net]
+    profiles: ["with-redis"]
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: consolida_app
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Production}
+      ASPNETCORE_URLS: http://+:8080
+
+      ConnectionStrings__DefaultConnection: >-
+        Host=postgres;Port=5432;
+        Database=${POSTGRES_DB:-consolida};
+        Username=${POSTGRES_USER:-postgres};
+        Password=${POSTGRES_PASSWORD:-CHANGE_ME}
+
+      REDIS_HOST: ${REDIS_HOST:-}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      REDIS_INSTANCE_NAME: Consolida_
+
+      DATA_PROTECTION_PATH: /app/DataProtection-Keys
+
+      EmailSettings__SmtpServer: ${EmailSettings__SmtpServer:-}
+      EmailSettings__SmtpPort: ${EmailSettings__SmtpPort:-587}
+      EmailSettings__SmtpUsername: ${EmailSettings__SmtpUsername:-}
+      EmailSettings__SmtpPassword: ${EmailSettings__SmtpPassword:-}
+      EmailSettings__FromEmail: ${EmailSettings__FromEmail:-}
+      EmailSettings__ToEmail: ${EmailSettings__ToEmail:-}
+    ports:
+      - "5000:8080"
+    volumes:
+      - data_protection_keys:/app/DataProtection-Keys
+      - app_logs:/app/logs
+    networks: [consolida_net]
+
+volumes:
+  postgres_data:
+  redis_data:
+  data_protection_keys:
+  app_logs:
+
+networks:
+  consolida_net:
+    driver: bridge
