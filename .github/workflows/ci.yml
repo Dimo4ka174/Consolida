@@ -90,6 +90,7 @@ jobs:
           dotnet test \
             --no-build \
             --configuration Release \
+            --settings coverlet.runsettings \
             --collect:"XPlat Code Coverage" \
             --results-directory ./TestResults
 

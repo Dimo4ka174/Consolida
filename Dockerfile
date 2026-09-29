@@ -1,15 +1,11 @@
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
-# Сначала только csproj — restore кэшируется отдельно от исходников.
-COPY Consolida.slnx ./
 COPY Consolida/Consolida.csproj Consolida/
 COPY Application/Application.csproj Application/
 COPY DB/DB.csproj DB/
-COPY Tests/Consolida.UnitTests/Consolida.UnitTests.csproj Tests/Consolida.UnitTests/
-COPY Tests/Consolida.IntegrationTests/Consolida.IntegrationTests.csproj Tests/Consolida.IntegrationTests/
 
-RUN dotnet restore Consolida.slnx
+RUN dotnet restore Consolida/Consolida.csproj
 
 COPY . .
 
@@ -20,15 +16,15 @@ RUN dotnet publish Consolida.csproj \
     --no-restore \
     /p:UseAppHost=false
 
+# ---------- Stage 2: Runtime ----------
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 
-# curl для healthcheck.
 RUN apt-get update \
     && apt-get install -y --no-install-recommends curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Непривилегированный пользователь.
-RUN groupadd -r app && useradd -r -g app app
+RUN groupadd -f -r app \
+    && id -u app >/dev/null 2>&1 || useradd -r -g app app
 
 WORKDIR /app
 COPY --from=build --chown=app:app /app/publish .

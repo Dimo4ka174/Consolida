@@ -118,9 +118,13 @@ dotnet run --project Consolida
 ### Через Docker
 
 ```bash
-cp .env.example .env
-# заполнить POSTGRES_PASSWORD и (при необходимости) REDIS_PASSWORD
-docker compose up -d --build
+# 1. Подготовить .env (создаётся из .env.example)
+make docker-env
+# 2. Запустить стек (postgres + app, без Redis)
+make docker-up
+# Если Redis — вместо второго шага:
+make docker-up-redis
+# 3. Открыть http://localhost:5000
 ```
 
 Приложение — http://localhost:5000, Hangfire dashboard — http://localhost:5000/hangfire (доступен только с localhost).
