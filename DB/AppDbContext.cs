@@ -208,9 +208,13 @@ namespace DB
 
             // --- ConsolidationPool ---
             // Optimistic concurrency через системную колонку Postgres xmin.
-            modelBuilder.Entity<ConsolidationPool>()
-                .Property(p => p.Version)
-                .IsRowVersion();
+            // Sqlite (используется в интеграционных тестах) не поддерживает xid, поэтому настраиваем rowVersion только для Npgsql.
+            if (Database.IsNpgsql())
+            {
+                modelBuilder.Entity<ConsolidationPool>()
+                    .Property(p => p.Version)
+                    .IsRowVersion();
+            }
 
             modelBuilder.Entity<ConsolidationPool>()
                 .HasIndex(p => p.Status);
